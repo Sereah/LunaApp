@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ArchitectureCompose</string>
+    <string name="enter_welcome_text">Welcome! The app is built on architecture of Clean and MVI, using Hilt to decouple and Navigation to jump.</string>
+    <string name="author">Sereah.Zhou</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/two_navigation"
+    app:startDestination="@id/dest_two">
+
+    <fragment
+        android:id="@+id/dest_two"
+        android:name="com.lunacattus.app.presentation.view.feature.two.TwoFragment"
+        android:label="OneFragment"
+        tools:layout="@layout/fragment_two" />
+
+</navigation>
