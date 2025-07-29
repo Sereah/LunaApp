@@ -13,22 +13,22 @@ object Logger {
         baseTag = tag
     }
 
-    fun d(tag: String, message: String) {
+    fun d(tag: String = "", message: String) {
         log(message, LogLevel.DEBUG, tag)
     }
 
-    fun i(tag: String, message: String) {
+    fun i(tag: String = "", message: String) {
         log(message, LogLevel.INFO, tag)
     }
 
-    fun e(tag: String, message: String) {
+    fun e(tag: String = "", message: String) {
         log(message, LogLevel.ERROR, tag)
     }
 
     private fun log(message: String, level: LogLevel = LogLevel.INFO, tag: String) {
         val timestamp = dateFormat.format(Date())
         val threadName = Thread.currentThread().name
-        val fullTag = "$baseTag [$timestamp] [$threadName] [$tag]"
+        val fullTag = "$baseTag [$timestamp] [$threadName] " + if (tag.isNotEmpty()) "[$tag]" else ""
 
         when (level) {
             LogLevel.INFO -> Log.i(fullTag, message)
