@@ -24,7 +24,7 @@ fun AppNav() {
         popExitTransition = { slideOutFromRight }
     ) {
         enterRouter(
-            navToMain = { navController.navToHome("Msg from enter.") }
+            navToMain = { navController.navToHome() }
         )
         homeRouter(navController)
     }

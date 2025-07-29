@@ -45,7 +45,7 @@ fun EnterScreen(
     ) {
         TypewriteText(
             text = stringResource(R.string.enter_welcome_text),
-            skipToEnd = !isFirstEnter,
+            skipToEnd = true,
             style = quoteTextStyle(),
             spec = tween(
                 durationMillis = textDuration,
@@ -57,7 +57,7 @@ fun EnterScreen(
         )
         TypewriteText(
             text = "-- ${stringResource(R.string.author)}",
-            skipToEnd = !isFirstEnter,
+            skipToEnd = true,
             style = quoteTextStyle(),
             spec = tween(
                 durationMillis = authorDuration,
