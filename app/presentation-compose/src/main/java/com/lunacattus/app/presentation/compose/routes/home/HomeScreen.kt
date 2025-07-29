@@ -1,62 +1,43 @@
 package com.lunacattus.app.presentation.compose.routes.home
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.lunacattus.app.domain.model.videoUri
 import com.lunacattus.app.presentation.compose.routes.home.mvi.HomeUiIntent
 import com.lunacattus.app.presentation.compose.routes.home.mvi.HomeUiState
-import com.lunacattus.app.presentation.compose.theme.AppTheme
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    msgFromRoute: String,
     uiState: HomeUiState,
     sendUiIntent: (HomeUiIntent) -> Unit,
 ) {
 
-    var text by remember { mutableStateOf("") }
-    text = when (uiState) {
-        is HomeUiState.Init -> "Init..."
-        is HomeUiState.Fail -> uiState.msg
-        HomeUiState.Loading -> "Loading..."
-        is HomeUiState.Success -> uiState.msg
-    }
-
-    LaunchedEffect(Unit) {
-        sendUiIntent(HomeUiIntent.Start)
-    }
-
-    Column(
+    Box(
         modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFF8BC34A))
     ) {
-        CompositionLocalProvider(
-            LocalTextStyle provides LocalTextStyle.current.copy(
-                fontSize = 14.sp,
-                color = AppTheme.colors.mainText
-            )
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth()
+                .height(400.dp)
+                .background(Color(0xFF2196F3))
+                .align(Alignment.Center)
         ) {
-            Text(
-                text = "HomeScreen, $msgFromRoute",
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(20.dp)
-            )
-            Text(
-                text = "UiState: $text",
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+            Player(
+                modifier = Modifier.align(Alignment.Center),
+                uri = videoUri
             )
         }
     }

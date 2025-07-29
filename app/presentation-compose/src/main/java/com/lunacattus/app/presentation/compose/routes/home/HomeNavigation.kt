@@ -23,13 +23,13 @@ import com.lunacattus.app.presentation.compose.theme.AppTheme
 import kotlinx.serialization.Serializable
 
 @Serializable
-private data class HomeGraph(val msg: String)
+private data object HomeGraph
 
 @Serializable
 private data object HomeRoute
 
-fun NavController.navToHome(msg: String) {
-    navigate(HomeGraph(msg))
+fun NavController.navToHome() {
+    navigate(HomeGraph)
 }
 
 fun NavGraphBuilder.homeRouter(navController: NavHostController) {
@@ -38,13 +38,11 @@ fun NavGraphBuilder.homeRouter(navController: NavHostController) {
             val graph = remember(it) {
                 navController.getBackStackEntry<HomeGraph>()
             }
-            val args = graph.toRoute<HomeGraph>()
             HomeScreen(
-                modifier = Modifier.Companion
+                modifier = Modifier
                     .background(AppTheme.colors.background)
                     .safeDrawingPadding()
                     .fillMaxSize(),
-                msgFromRoute = args.msg,
                 uiState = graph.getUiState().value,
                 sendUiIntent = graph.sendUiIntent()
             )
