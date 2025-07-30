@@ -20,6 +20,7 @@ import com.lunacattus.app.presentation.compose.routes.home.mvi.HomeUiIntent
 import com.lunacattus.app.presentation.compose.routes.home.mvi.HomeUiState
 import com.lunacattus.app.presentation.compose.routes.home.mvi.HomeViewModel
 import com.lunacattus.app.presentation.compose.theme.AppTheme
+import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 
 @Serializable

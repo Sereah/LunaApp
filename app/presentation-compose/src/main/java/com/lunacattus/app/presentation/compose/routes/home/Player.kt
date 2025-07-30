@@ -1,8 +1,11 @@
 package com.lunacattus.app.presentation.compose.routes.home
 
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
@@ -10,25 +13,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
+import androidx.media3.ui.compose.PlayerSurface
 import com.lunacattus.logger.Logger
-
-val playerListener = object : Player.Listener {
-    override fun onEvents(
-        player: Player,
-        events: Player.Events
-    ) {
-
-    }
-}
 
 @Composable
 fun Player(
@@ -36,25 +30,49 @@ fun Player(
     uri: String
 ) {
 
+    var videoAspectRatio by remember { mutableFloatStateOf(16f / 9f) }
     val lifecycleOwner = LocalLifecycleOwner.current
     var mediaItemIndex by rememberSaveable { mutableIntStateOf(0) }
     var currentPosition by rememberSaveable { mutableLongStateOf(0) }
 
     val context = LocalContext.current
     val exoPlayer = remember {
-        ExoPlayer.Builder(context).build().apply {
+        ExoPlayer.Builder(context).build()
+    }
+
+    LaunchedEffect(uri) {
+        exoPlayer.apply {
             val mediaItem = MediaItem.fromUri(uri.toUri())
             setMediaItem(mediaItem)
-            Logger.d(message = "mediaItemIndex: $mediaItemIndex, currentPosition: $currentPosition")
             seekTo(mediaItemIndex, currentPosition)
             prepare()
             playWhenReady = true
-            addListener(playerListener)
+        }
+    }
+
+    DisposableEffect(exoPlayer) {
+
+        val playerListener = object : Player.Listener {
+
+            override fun onVideoSizeChanged(videoSize: VideoSize) {
+                videoAspectRatio = if (videoSize.height == 0) {
+                    16f / 9f
+                } else {
+                    (videoSize.width * videoSize.pixelWidthHeightRatio) / videoSize.height
+                }
+            }
+        }
+        exoPlayer.addListener(playerListener)
+
+        onDispose {
+            exoPlayer.apply {
+                removeListener(playerListener)
+                release()
+            }
         }
     }
 
     DisposableEffect(lifecycleOwner) {
-
         val observe = LifecycleEventObserver { owner, event ->
             Logger.d(message = "Life: ${event.name}")
             when (event) {
@@ -83,20 +101,12 @@ fun Player(
         lifecycleOwner.lifecycle.addObserver(observer = observe)
 
         onDispose {
-            exoPlayer.apply {
-                removeListener(playerListener)
-                release()
-            }
             lifecycleOwner.lifecycle.removeObserver(observe)
         }
     }
 
-    AndroidView(
-        modifier = modifier,
-        factory = { context ->
-            PlayerView(context).apply {
-                player = exoPlayer
-            }
-        }
+    PlayerSurface(
+        player = exoPlayer,
+        modifier = modifier.aspectRatio(videoAspectRatio)
     )
 }
