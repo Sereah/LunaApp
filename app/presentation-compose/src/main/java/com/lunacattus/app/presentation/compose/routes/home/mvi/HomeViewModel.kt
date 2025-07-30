@@ -33,14 +33,9 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         when (intent) {
             HomeUiIntent.Start -> {
                 viewModelScope.launch {
-                    delay(1000)
                     _uiState.update { HomeUiState.Loading }
                     delay(1000)
-                    _uiState.update { HomeUiState.Success("Success---First") }
-                    delay(1000)
-                    _uiState.update { HomeUiState.Success("Success---Second") }
-                    delay(1000)
-                    _uiState.update { HomeUiState.Fail("Fail") }
+                    _uiState.update { HomeUiState.Success("Success") }
                 }
             }
         }

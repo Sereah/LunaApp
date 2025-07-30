@@ -3,15 +3,19 @@ package com.lunacattus.app.presentation.compose.routes.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.lunacattus.app.domain.model.videoUri
+import com.lunacattus.app.presentation.compose.common.components.CircleLoader
 import com.lunacattus.app.presentation.compose.routes.home.mvi.HomeUiIntent
 import com.lunacattus.app.presentation.compose.routes.home.mvi.HomeUiState
 
@@ -22,21 +26,31 @@ fun HomeScreen(
     sendUiIntent: (HomeUiIntent) -> Unit,
 ) {
 
+    LaunchedEffect(Unit) {
+        sendUiIntent(HomeUiIntent.Start)
+    }
+
+    var showLoading by remember { mutableStateOf(true) }
+
+    showLoading = when (uiState) {
+        is HomeUiState.Success -> false
+        else -> true
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFF8BC34A))
     ) {
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .fillMaxWidth()
-                .height(400.dp)
-                .background(Color(0xFF2196F3))
-                .align(Alignment.Center)
-        ) {
+        if (showLoading) {
+            CircleLoader(
+                modifier = Modifier.size(40.dp).align(Alignment.Center),
+                isVisible = true,
+                color = Color(0xFF009688),
+                secondColor = null
+            )
+        } else {
             Player(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier.fillMaxSize().background(Color.Black),
                 uri = videoUri
             )
         }
