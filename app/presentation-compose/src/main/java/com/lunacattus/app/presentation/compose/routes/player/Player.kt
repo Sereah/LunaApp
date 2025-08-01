@@ -1,4 +1,4 @@
-package com.lunacattus.app.presentation.compose.routes.home
+package com.lunacattus.app.presentation.compose.routes.player
 
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable

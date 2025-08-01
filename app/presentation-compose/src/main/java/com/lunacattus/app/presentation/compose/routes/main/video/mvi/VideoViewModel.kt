@@ -1,10 +1,10 @@
-package com.lunacattus.app.presentation.compose.routes.home.mvi
+package com.lunacattus.app.presentation.compose.routes.main.video.mvi
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lunacattus.app.data.repository.VideoRepository
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -12,13 +12,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class VideoViewModel @Inject constructor(
+    private val videoRepository: VideoRepository
+) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Init)
+    private val _uiState = MutableStateFlow<VideoUiState>(VideoUiState.Init)
     val uiState = _uiState.asStateFlow()
 
     companion object {
-        const val TAG = "HomeViewModel"
+        const val TAG = "VideoViewModel"
     }
 
     init {
@@ -29,13 +31,13 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         Logger.d(TAG, "onCleared.")
     }
 
-    fun handleUiIntent(intent: HomeUiIntent) {
+    fun handleUiIntent(intent: VideoUiIntent) {
+        _uiState.update { VideoUiState.Loading }
         when (intent) {
-            HomeUiIntent.Start -> {
+            VideoUiIntent.Init -> {
                 viewModelScope.launch {
-                    _uiState.update { HomeUiState.Loading }
-                    delay(1000)
-                    _uiState.update { HomeUiState.Success("Success") }
+                    val videos = videoRepository.getJsonVideos()
+                    _uiState.update { VideoUiState.Success(videos) }
                 }
             }
         }

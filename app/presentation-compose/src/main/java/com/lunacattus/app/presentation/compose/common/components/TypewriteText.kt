@@ -93,7 +93,7 @@ fun quoteTextStyle() = TextStyle(
     lineHeight = 18.sp,
     fontFamily = FontFamily.Serif,
     fontStyle = FontStyle.Italic,
-    color = AppTheme.colors.mainText
+    color = AppTheme.colors.primary
 )
 
 @Preview
