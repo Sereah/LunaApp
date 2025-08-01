@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.architecture.android.library)
     alias(libs.plugins.architecture.android.library.jacoco)
     alias(libs.plugins.architecture.hilt)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 android {

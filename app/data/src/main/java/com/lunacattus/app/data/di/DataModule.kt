@@ -1,6 +1,7 @@
 package com.lunacattus.app.data.di
 
 import android.content.Context
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,4 +20,8 @@ object DataModule {
     ): Context {
         return context
     }
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = Gson()
 }
