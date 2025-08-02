@@ -1,6 +1,9 @@
 package com.lunacattus.app.presentation.compose.routes.player
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.pm.ActivityInfo
+import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -16,6 +19,8 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Fullscreen
+import androidx.compose.material.icons.rounded.FullscreenExit
 import androidx.compose.material.icons.rounded.PauseCircle
 import androidx.compose.material.icons.rounded.PlayCircle
 import androidx.compose.material.icons.rounded.SkipNext
@@ -57,6 +62,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.ui.compose.PlayerSurface
+import com.lunacattus.app.presentation.compose.MainActivity
 import com.lunacattus.app.presentation.compose.R
 import com.lunacattus.app.presentation.compose.common.components.VideoSlider
 import com.lunacattus.logger.Logger
@@ -68,12 +74,14 @@ fun PlayerScreen(
     uri: String,
     title: String,
     modifier: Modifier = Modifier,
+    navBack: () -> Unit,
 ) {
     var videoAspectRatio by remember { mutableFloatStateOf(16f / 9f) }
     val lifecycleOwner = LocalLifecycleOwner.current
     var mediaItemIndex by rememberSaveable { mutableIntStateOf(0) }
     var currentPosition by rememberSaveable { mutableLongStateOf(0) }
     val context = LocalContext.current
+    val activity = remember { context as? MainActivity }
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build()
     }
@@ -82,6 +90,16 @@ fun PlayerScreen(
     var playFraction by remember { mutableFloatStateOf(0f) }
     var bufferFraction by remember { mutableFloatStateOf(0f) }
     var isUserSlide by remember { mutableStateOf(false) }
+    var isFullScreen by rememberSaveable { mutableStateOf(false) }
+
+    BackHandler(enabled = isFullScreen) {
+        activity?.exitFullScreen()
+        isFullScreen = false
+    }
+
+    BackHandler(enabled = !isFullScreen) {
+        navBack()
+    }
 
     LaunchedEffect(uri) {
         exoPlayer.apply {
@@ -231,6 +249,16 @@ fun PlayerScreen(
                         (exoPlayer.currentPosition + 15 * 1000)
                             .coerceAtMost(exoPlayer.duration)
                     )
+                },
+                isFullScreen = isFullScreen,
+                onFullScreenClick = {
+                    if (isFullScreen) {
+                        activity?.exitFullScreen()
+                        isFullScreen = false
+                    } else {
+                        activity?.enterFullScreen()
+                        isFullScreen = true
+                    }
                 }
             )
         }
@@ -253,6 +281,8 @@ fun MediaControlView(
     onPreClick: () -> Unit,
     onSeekBackClick: () -> Unit,
     onSeekForwardClick: () -> Unit,
+    isFullScreen: Boolean,
+    onFullScreenClick: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         CompositionLocalProvider(
@@ -336,6 +366,22 @@ fun MediaControlView(
                     Spacer(modifier = Modifier.weight(1f))
                     Row {
                         Icon(
+                            imageVector = if (isFullScreen) {
+                                Icons.Rounded.FullscreenExit
+                            } else {
+                                Icons.Rounded.Fullscreen
+                            },
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(30.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures {
+                                        onFullScreenClick()
+                                    }
+                                }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
                             imageVector = Icons.Rounded.SkipPrevious,
                             contentDescription = null,
                             tint = if (hasPreMediaItem) {
@@ -386,4 +432,13 @@ fun Long.formatDuration(): String {
     } else {
         String.format("%02d:%02d", minutes, seconds)
     }
+}
+
+fun Activity.enterFullScreen() {
+    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+}
+
+@SuppressLint("SourceLockedOrientationActivity")
+fun Activity.exitFullScreen() {
+    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 }

@@ -28,7 +28,7 @@ fun NavHostController.navToPlayer(uri: String, title: String) {
     navigate(PlayerRoute.createRoute(uri, title))
 }
 
-fun NavGraphBuilder.playerRouter() {
+fun NavGraphBuilder.playerRouter(rootNavController: NavHostController) {
     composable(
         route = PlayerRoute.route,
         arguments = listOf(
@@ -46,7 +46,9 @@ fun NavGraphBuilder.playerRouter() {
     ) {
         val uri = it.arguments?.getString(PlayerRoute.ARG_URI) ?: ""
         val title = it.arguments?.getString(PlayerRoute.ARG_TITLE) ?: ""
-        PlayerScreen(uri, title)
+        PlayerScreen(uri, title) {
+            rootNavController.popBackStack()
+        }
     }
 }
 
