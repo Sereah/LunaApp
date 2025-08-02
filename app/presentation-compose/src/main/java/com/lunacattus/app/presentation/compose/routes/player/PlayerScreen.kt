@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
@@ -48,11 +49,15 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM
+import androidx.media3.common.Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM
 import androidx.media3.common.Player.STATE_BUFFERING
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.ui.compose.PlayerSurface
+import com.lunacattus.app.presentation.compose.R
 import com.lunacattus.app.presentation.compose.common.components.VideoSlider
 import com.lunacattus.logger.Logger
 import kotlinx.coroutines.delay
@@ -107,7 +112,7 @@ fun PlayerScreen(
         val playerListener = object : Player.Listener {
 
             override fun onVideoSizeChanged(videoSize: VideoSize) {
-                Logger.d(TAG, "onVideoSizeChanged: $videoSize")
+                Logger.d(TAG, "onVideoSizeChanged: ${videoSize.width}x${videoSize.height}")
                 videoAspectRatio = if (videoSize.height == 0) {
                     16f / 9f
                 } else {
@@ -196,11 +201,37 @@ fun PlayerScreen(
                     playFraction = it
                 },
                 onUserSlideFinish = {
+                    exoPlayer.setSeekParameters(SeekParameters.CLOSEST_SYNC)
                     exoPlayer.seekTo((playFraction * exoPlayer.duration).toLong())
                     isUserSlide = false
                 },
                 duration = exoPlayer.duration.coerceAtLeast(0),
-                currentDuration = exoPlayer.currentPosition
+                currentDuration = exoPlayer.currentPosition,
+                hasNextMediaItem = exoPlayer.hasNextMediaItem(),
+                hasPreMediaItem = exoPlayer.hasPreviousMediaItem(),
+                onNextClick = {
+                    if (exoPlayer.isCommandAvailable(COMMAND_SEEK_TO_NEXT_MEDIA_ITEM)) {
+                        exoPlayer.seekToNextMediaItem()
+                    }
+                },
+                onPreClick = {
+                    if (exoPlayer.isCommandAvailable(COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM)) {
+                        exoPlayer.seekToPreviousMediaItem()
+                    }
+                },
+                onSeekBackClick = {
+                    exoPlayer.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                    exoPlayer.seekTo(
+                        (exoPlayer.currentPosition - 5 * 1000).coerceAtLeast(0)
+                    )
+                },
+                onSeekForwardClick = {
+                    exoPlayer.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                    exoPlayer.seekTo(
+                        (exoPlayer.currentPosition + 15 * 1000)
+                            .coerceAtMost(exoPlayer.duration)
+                    )
+                }
             )
         }
     }
@@ -215,7 +246,13 @@ fun MediaControlView(
     onUserSlide: (Float) -> Unit,
     onUserSlideFinish: () -> Unit,
     duration: Long,
-    currentDuration: Long
+    currentDuration: Long,
+    hasNextMediaItem: Boolean,
+    hasPreMediaItem: Boolean,
+    onNextClick: () -> Unit,
+    onPreClick: () -> Unit,
+    onSeekBackClick: () -> Unit,
+    onSeekForwardClick: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         CompositionLocalProvider(
@@ -225,8 +262,22 @@ fun MediaControlView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp)
-                    .align(Alignment.Center)
+                    .align(Alignment.Center),
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(
+                    painter = painterResource(R.drawable.ic_back_5s),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .weight(1f)
+                        .pointerInput(Unit) {
+                            detectTapGestures {
+                                onSeekBackClick()
+                            }
+                        }
+                )
                 Icon(
                     imageVector = if (isMediaPlaying) {
                         Icons.Rounded.PauseCircle
@@ -243,6 +294,19 @@ fun MediaControlView(
                             }
                         }
                 )
+                Icon(
+                    painter = painterResource(R.drawable.ic_foward_15s),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .weight(1f)
+                        .pointerInput(Unit) {
+                            detectTapGestures {
+                                onSeekForwardClick()
+                            }
+                        }
+                )
+                Spacer(modifier = Modifier.weight(1f))
             }
             Column(
                 modifier = Modifier
@@ -251,7 +315,6 @@ fun MediaControlView(
                     .fillMaxWidth()
             ) {
                 VideoSlider(
-                    enable = isMediaPlaying,
                     playFraction = playFraction,
                     onPlayFractionChange = onUserSlide,
                     onPlayFractionChangeFinish = onUserSlideFinish,
@@ -266,7 +329,7 @@ fun MediaControlView(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row {
-                        Text(text = currentDuration.formatDuration())
+                        Text(text = currentDuration.coerceAtLeast(0).formatDuration())
                         Text(text = " - ")
                         Text(text = duration.formatDuration())
                     }
@@ -275,11 +338,16 @@ fun MediaControlView(
                         Icon(
                             imageVector = Icons.Rounded.SkipPrevious,
                             contentDescription = null,
+                            tint = if (hasPreMediaItem) {
+                                LocalContentColor.current
+                            } else {
+                                LocalContentColor.current.copy(alpha = 0.4f)
+                            },
                             modifier = Modifier
                                 .size(30.dp)
                                 .pointerInput(Unit) {
                                     detectTapGestures {
-
+                                        onPreClick()
                                     }
                                 }
                         )
@@ -287,11 +355,16 @@ fun MediaControlView(
                         Icon(
                             imageVector = Icons.Rounded.SkipNext,
                             contentDescription = null,
+                            tint = if (hasNextMediaItem) {
+                                LocalContentColor.current
+                            } else {
+                                LocalContentColor.current.copy(alpha = 0.4f)
+                            },
                             modifier = Modifier
                                 .size(30.dp)
                                 .pointerInput(Unit) {
                                     detectTapGestures {
-
+                                        onNextClick()
                                     }
                                 }
                         )
