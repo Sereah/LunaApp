@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
                     composable(route = "mainNav") {
                         Main(rootNavController)
                     }
-                    playerRouter()
+                    playerRouter(rootNavController)
                 }
             }
         }
