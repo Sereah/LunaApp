@@ -50,5 +50,7 @@ fun NavGraphBuilder.playerRouter() {
     }
 }
 
+internal const val TAG = "PlayerRouter"
+
 
 
