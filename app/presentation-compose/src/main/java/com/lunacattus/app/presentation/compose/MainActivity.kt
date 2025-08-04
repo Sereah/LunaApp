@@ -19,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -140,7 +142,7 @@ fun bottomItems(): List<BottomItem> {
         ),
         BottomItem(
             title = "PlayList",
-            icon = Icons.Rounded.FormatListNumberedRtl,
+            icon = ImageVector.vectorResource(R.drawable.ic_play_list),
             selectedColor = AppTheme.colors.primary,
             unSelectColor = AppTheme.colors.inversePrimary,
             route = PlayListGraph.route

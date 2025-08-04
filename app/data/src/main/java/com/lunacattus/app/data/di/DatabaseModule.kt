@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.lunacattus.app.data.AppDatabase
 import com.lunacattus.app.data.DataDao
+import com.lunacattus.app.data.VideoDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,7 +26,13 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideResumeDao(database: AppDatabase): DataDao {
+    fun provideDataDao(database: AppDatabase): DataDao {
         return database.dataDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideVideoDao(database: AppDatabase): VideoDao {
+        return database.videoDao()
     }
 }

@@ -6,7 +6,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
       ],
       "subtitle": "By Blender Foundation",
-      "thumb": "images/BigBuckBunny.jpg",
+      "coverPic": "images/BigBuckBunny.jpg",
       "title": "Big Buck Bunny"
     },
     {
@@ -15,7 +15,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
       ],
       "subtitle": "By Blender Foundation",
-      "thumb": "images/ElephantsDream.jpg",
+      "coverPic": "images/ElephantsDream.jpg",
       "title": "Elephant Dream"
     },
     {
@@ -24,7 +24,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
       ],
       "subtitle": "By Google",
-      "thumb": "images/ForBiggerBlazes.jpg",
+      "coverPic": "images/ForBiggerBlazes.jpg",
       "title": "For Bigger Blazes"
     },
     {
@@ -33,7 +33,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
       ],
       "subtitle": "By Google",
-      "thumb": "images/ForBiggerEscapes.jpg",
+      "coverPic": "images/ForBiggerEscapes.jpg",
       "title": "For Bigger Escape"
     },
     {
@@ -42,7 +42,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
       ],
       "subtitle": "By Google",
-      "thumb": "images/ForBiggerFun.jpg",
+      "coverPic": "images/ForBiggerFun.jpg",
       "title": "For Bigger Fun"
     },
     {
@@ -51,7 +51,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
       ],
       "subtitle": "By Google",
-      "thumb": "images/ForBiggerJoyrides.jpg",
+      "coverPic": "images/ForBiggerJoyrides.jpg",
       "title": "For Bigger Joyrides"
     },
     {
@@ -60,7 +60,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
       ],
       "subtitle": "By Google",
-      "thumb": "images/ForBiggerMeltdowns.jpg",
+      "coverPic": "images/ForBiggerMeltdowns.jpg",
       "title": "For Bigger Meltdowns"
     },
     {
@@ -69,7 +69,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
       ],
       "subtitle": "By Blender Foundation",
-      "thumb": "images/Sintel.jpg",
+      "coverPic": "images/Sintel.jpg",
       "title": "Sintel"
     },
     {
@@ -78,7 +78,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4"
       ],
       "subtitle": "By Garage419",
-      "thumb": "images/SubaruOutbackOnStreetAndDirt.jpg",
+      "coverPic": "images/SubaruOutbackOnStreetAndDirt.jpg",
       "title": "Subaru Outback On Street And Dirt"
     },
     {
@@ -87,7 +87,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
       ],
       "subtitle": "By Blender Foundation",
-      "thumb": "images/TearsOfSteel.jpg",
+      "coverPic": "images/TearsOfSteel.jpg",
       "title": "Tears of Steel"
     },
     {
@@ -96,7 +96,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4"
       ],
       "subtitle": "By Garage419",
-      "thumb": "images/VolkswagenGTIReview.jpg",
+      "coverPic": "images/VolkswagenGTIReview.jpg",
       "title": "Volkswagen GTI Review"
     },
     {
@@ -105,7 +105,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4"
       ],
       "subtitle": "By Garage419",
-      "thumb": "images/WeAreGoingOnBullrun.jpg",
+      "coverPic": "images/WeAreGoingOnBullrun.jpg",
       "title": "We Are Going On Bullrun"
     },
     {
@@ -114,7 +114,7 @@
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4"
       ],
       "subtitle": "By Garage419",
-      "thumb": "images/WhatCarCanYouGetForAGrand.jpg",
+      "coverPic": "images/WhatCarCanYouGetForAGrand.jpg",
       "title": "What car can you get for a grand?"
     }
   ]

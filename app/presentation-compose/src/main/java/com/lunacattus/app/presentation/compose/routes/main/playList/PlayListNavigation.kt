@@ -1,16 +1,19 @@
 package com.lunacattus.app.presentation.compose.routes.main.playList
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.lunacattus.app.presentation.compose.routes.base.NavRoute
-import com.lunacattus.app.presentation.compose.theme.AppTheme
+import com.lunacattus.app.presentation.compose.routes.main.playList.mvi.PlayListUiIntent
+import com.lunacattus.app.presentation.compose.routes.main.playList.mvi.PlayListUiState
+import com.lunacattus.app.presentation.compose.routes.main.playList.mvi.PlayListViewModel
 
 data object PlayListGraph : NavRoute {
     override val route: String
@@ -32,12 +35,24 @@ fun NavGraphBuilder.playListRouter(navController: NavHostController) {
                 navController.getBackStackEntry(PlayListGraph.route)
             }
             PlayListScreen(
-                modifier = Modifier
-                    .background(AppTheme.colors.background)
-                    .safeDrawingPadding()
-                    .fillMaxSize(),
+                uiState = graph.getUiState().value,
+                sendUiIntent = graph.sendUiIntent()
             )
         }
+    }
+}
+
+@Composable
+private fun NavBackStackEntry.getUiState(): State<PlayListUiState> {
+    val viewModel: PlayListViewModel = hiltViewModel(this)
+    return viewModel.uiState.collectAsStateWithLifecycle()
+}
+
+@Composable
+private fun NavBackStackEntry.sendUiIntent(): (PlayListUiIntent) -> Unit {
+    val viewModel: PlayListViewModel = hiltViewModel(this)
+    return {
+        viewModel.handleUiIntent(it)
     }
 }
 
