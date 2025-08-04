@@ -9,10 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -30,11 +28,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM
 import androidx.media3.common.Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM
@@ -45,14 +46,13 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.ui.compose.PlayerSurface
 import com.lunacattus.app.presentation.compose.MainActivity
+import com.lunacattus.app.presentation.compose.routes.player.mvi.PlayerViewModel
 import com.lunacattus.logger.Logger
 import kotlinx.coroutines.delay
 
 @OptIn(UnstableApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerScreen(
-    uri: String,
-    title: String,
     modifier: Modifier = Modifier,
     navBack: () -> Unit,
 ) {
@@ -61,10 +61,12 @@ fun PlayerScreen(
     var mediaItemIndex by rememberSaveable { mutableIntStateOf(0) }
     var currentPosition by rememberSaveable { mutableLongStateOf(0) }
     val context = LocalContext.current
-    val activity = remember { context as? MainActivity }
+    val activity = remember { context as MainActivity }
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build()
     }
+    val viewModel = hiltViewModel<PlayerViewModel>(viewModelStoreOwner = activity)
+    val mediaItems = viewModel.mediaItems.collectAsStateWithLifecycle()
     var isMediaReady by remember { mutableStateOf(false) }
     var isMediaPlaying by remember { mutableStateOf(false) }
     var playFraction by remember { mutableFloatStateOf(0f) }
@@ -74,7 +76,7 @@ fun PlayerScreen(
     var showListDialog by remember { mutableStateOf(false) }
 
     BackHandler(enabled = isFullScreen) {
-        activity?.exitFullScreen()
+        activity.exitFullScreen()
         isFullScreen = false
     }
 
@@ -82,11 +84,14 @@ fun PlayerScreen(
         navBack()
     }
 
-    LaunchedEffect(uri) {
+    LaunchedEffect(mediaItems) {
         exoPlayer.apply {
-            val mediaItem = MediaItem.fromUri(uri.toUri())
-            setMediaItem(mediaItem)
-            seekTo(mediaItemIndex, currentPosition)
+            exoPlayer.setMediaItems(
+                mediaItems.value.list,
+                mediaItems.value.startIndex,
+                C.TIME_UNSET
+            )
+//            seekTo(mediaItemIndex, currentPosition)
             prepare()
         }
     }
@@ -127,6 +132,14 @@ fun PlayerScreen(
             override fun onPlaybackStateChanged(playbackState: Int) {
                 Logger.d(TAG, "onPlaybackStateChanged: $playbackState")
                 isMediaReady = playbackState >= STATE_BUFFERING
+            }
+
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                Logger.d(TAG, "onMediaItemTransition, item: $mediaItem, reason: $reason")
+            }
+
+            override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+                Logger.d(TAG, "onMediaMetadataChanged, data: $mediaMetadata")
             }
         }
         exoPlayer.addListener(playerListener)
@@ -234,10 +247,10 @@ fun PlayerScreen(
                 isFullScreen = isFullScreen,
                 onFullScreenClick = {
                     if (isFullScreen) {
-                        activity?.exitFullScreen()
+                        activity.exitFullScreen()
                         isFullScreen = false
                     } else {
-                        activity?.enterFullScreen()
+                        activity.enterFullScreen()
                         isFullScreen = true
                     }
                 },

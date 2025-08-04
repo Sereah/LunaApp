@@ -44,9 +44,7 @@ fun NavGraphBuilder.playerRouter(rootNavController: NavHostController) {
         popEnterTransition = { stayStillIn },
         popExitTransition = { slideOutFromRight }
     ) {
-        val uri = it.arguments?.getString(PlayerRoute.ARG_URI) ?: ""
-        val title = it.arguments?.getString(PlayerRoute.ARG_TITLE) ?: ""
-        PlayerScreen(uri, title) {
+        PlayerScreen {
             rootNavController.popBackStack()
         }
     }

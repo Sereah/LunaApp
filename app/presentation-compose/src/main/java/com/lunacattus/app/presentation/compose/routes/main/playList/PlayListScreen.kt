@@ -24,18 +24,26 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import com.lunacattus.app.presentation.compose.MainActivity
 import com.lunacattus.app.presentation.compose.common.components.SwipeToRevealItem
 import com.lunacattus.app.presentation.compose.common.components.overScrollVertical
 import com.lunacattus.app.presentation.compose.common.extensions.clickableWithDebounce
 import com.lunacattus.app.presentation.compose.routes.main.playList.mvi.PlayListUiIntent
 import com.lunacattus.app.presentation.compose.routes.main.playList.mvi.PlayListUiState
+import com.lunacattus.app.presentation.compose.routes.player.mvi.MediaItems
+import com.lunacattus.app.presentation.compose.routes.player.mvi.PlayerViewModel
 import com.lunacattus.app.presentation.compose.theme.AppTheme
 
 @Composable
@@ -43,11 +51,15 @@ fun PlayListScreen(
     modifier: Modifier = Modifier,
     uiState: PlayListUiState,
     sendUiIntent: (PlayListUiIntent) -> Unit,
+    navToPlayer: () -> Unit
 ) {
 
     LaunchedEffect(Unit) {
         sendUiIntent(PlayListUiIntent.Init)
     }
+    val context = LocalContext.current
+    val activity = remember { context as MainActivity }
+    val playerViewModel = hiltViewModel<PlayerViewModel>(activity)
 
     val playList = when (uiState) {
         is PlayListUiState.Fail,
@@ -67,6 +79,18 @@ fun PlayListScreen(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(top = 100.dp, start = 10.dp, end = 10.dp, bottom = 90.dp)
     ) {
+        val mediaList = playList.map {
+            MediaItem.Builder().apply {
+                setMediaId(it.title)
+                setUri(it.uri)
+                val mediaMetadata = MediaMetadata.Builder().apply {
+                    setDisplayTitle(it.title)
+                    setArtist(it.subtitle)
+                    setDescription(it.description)
+                }.build()
+                setMediaMetadata(mediaMetadata)
+            }.build()
+        }
         itemsIndexed(
             items = playList,
             key = { _, video -> video.id }) { index, video ->
@@ -98,7 +122,8 @@ fun PlayListScreen(
                         .fillMaxSize()
                         .background(Color.White)
                         .clickableWithDebounce {
-                            // TODO:
+                            navToPlayer.invoke()
+                            playerViewModel.setPlayList(MediaItems(mediaList, index))
                         },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
