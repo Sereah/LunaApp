@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FileCopy
-import androidx.compose.material.icons.rounded.FormatListNumberedRtl
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.SlowMotionVideo
@@ -115,7 +114,7 @@ fun Main(rootNavController: NavHostController) {
             ) {
                 videoRouter(mainNavController, rootNavController)
                 musicRouter(mainNavController)
-                playListRouter(mainNavController)
+                playListRouter(mainNavController, rootNavController)
                 browserRouter(mainNavController)
                 settingsRouter(mainNavController)
             }

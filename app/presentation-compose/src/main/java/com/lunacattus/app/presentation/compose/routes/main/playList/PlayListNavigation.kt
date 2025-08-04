@@ -14,6 +14,7 @@ import com.lunacattus.app.presentation.compose.routes.base.NavRoute
 import com.lunacattus.app.presentation.compose.routes.main.playList.mvi.PlayListUiIntent
 import com.lunacattus.app.presentation.compose.routes.main.playList.mvi.PlayListUiState
 import com.lunacattus.app.presentation.compose.routes.main.playList.mvi.PlayListViewModel
+import com.lunacattus.app.presentation.compose.routes.player.navToPlayer
 
 data object PlayListGraph : NavRoute {
     override val route: String
@@ -25,7 +26,10 @@ data object PlayListRoute : NavRoute {
         get() = "PlayListRoute"
 }
 
-fun NavGraphBuilder.playListRouter(navController: NavHostController) {
+fun NavGraphBuilder.playListRouter(
+    navController: NavHostController,
+    rootNavController: NavHostController
+) {
     navigation(
         route = PlayListGraph.route,
         startDestination = PlayListRoute.route
@@ -36,7 +40,8 @@ fun NavGraphBuilder.playListRouter(navController: NavHostController) {
             }
             PlayListScreen(
                 uiState = graph.getUiState().value,
-                sendUiIntent = graph.sendUiIntent()
+                sendUiIntent = graph.sendUiIntent(),
+                navToPlayer = {rootNavController.navToPlayer("", "")}
             )
         }
     }
