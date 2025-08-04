@@ -39,13 +39,13 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM
 import androidx.media3.common.Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM
-import androidx.media3.common.Player.STATE_BUFFERING
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.ui.compose.PlayerSurface
 import com.lunacattus.app.presentation.compose.MainActivity
+import com.lunacattus.app.presentation.compose.common.extensions.clickableWithDebounce
 import com.lunacattus.app.presentation.compose.routes.player.mvi.PlayerViewModel
 import com.lunacattus.logger.Logger
 import kotlinx.coroutines.delay
@@ -67,13 +67,21 @@ fun PlayerScreen(
     }
     val viewModel = hiltViewModel<PlayerViewModel>(viewModelStoreOwner = activity)
     val mediaItems = viewModel.mediaItems.collectAsStateWithLifecycle()
-    var isMediaReady by remember { mutableStateOf(false) }
+    var playState by remember { mutableIntStateOf(-1) }
     var isMediaPlaying by remember { mutableStateOf(false) }
     var playFraction by remember { mutableFloatStateOf(0f) }
     var bufferFraction by remember { mutableFloatStateOf(0f) }
     var isUserSlide by remember { mutableStateOf(false) }
     var isFullScreen by rememberSaveable { mutableStateOf(false) }
     var showListDialog by remember { mutableStateOf(false) }
+    var showControls by remember { mutableStateOf(true) } // 新增：控制PlayerControlView的可见性
+
+    LaunchedEffect(showControls, isMediaPlaying) {
+        if (showControls && isMediaPlaying) {
+            delay(5000) // 5秒延迟
+            showControls = false
+        }
+    }
 
     BackHandler(enabled = isFullScreen) {
         activity.exitFullScreen()
@@ -131,11 +139,13 @@ fun PlayerScreen(
 
             override fun onPlaybackStateChanged(playbackState: Int) {
                 Logger.d(TAG, "onPlaybackStateChanged: $playbackState")
-                isMediaReady = playbackState >= STATE_BUFFERING
+                playState = playbackState
             }
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 Logger.d(TAG, "onMediaItemTransition, item: $mediaItem, reason: $reason")
+                playFraction = 0f
+                bufferFraction = 0f
             }
 
             override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
@@ -188,7 +198,10 @@ fun PlayerScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(Color.Black)
+            .clickableWithDebounce {
+                showControls = !showControls
+            },
     ) {
         PlayerSurface(
             player = exoPlayer,
@@ -196,7 +209,7 @@ fun PlayerScreen(
                 .aspectRatio(videoAspectRatio)
                 .align(Alignment.Center)
         )
-        if (isMediaReady) {
+        if (playState >= 2 && showControls) {
             PlayerControlView(
                 isMediaPlaying = isMediaPlaying,
                 playFraction = playFraction,
