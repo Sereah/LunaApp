@@ -3,6 +3,8 @@ package com.lunacattus.app.presentation.compose.routes.main.video.mvi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.app.data.repository.VideoRepository
+import com.lunacattus.app.domain.model.mapper
+import com.lunacattus.app.presentation.compose.routes.main.video.mvi.VideoUiState.*
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,7 @@ class VideoViewModel @Inject constructor(
     private val videoRepository: VideoRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<VideoUiState>(VideoUiState.Init)
+    private val _uiState = MutableStateFlow<VideoUiState>(Init)
     val uiState = _uiState.asStateFlow()
 
     companion object {
@@ -32,12 +34,18 @@ class VideoViewModel @Inject constructor(
     }
 
     fun handleUiIntent(intent: VideoUiIntent) {
-        _uiState.update { VideoUiState.Loading }
         when (intent) {
             VideoUiIntent.Init -> {
+                _uiState.update { Loading }
                 viewModelScope.launch {
                     val videos = videoRepository.getJsonVideos()
-                    _uiState.update { VideoUiState.Success(videos) }
+                    _uiState.update { Success(videos) }
+                }
+            }
+
+            is VideoUiIntent.AddToPlayList -> {
+                viewModelScope.launch {
+                    videoRepository.insertPlayList(intent.video.mapper())
                 }
             }
         }
