@@ -10,6 +10,7 @@ material = "1.12.0"
 kspVersion = "2.0.21-1.0.27"
 hilt = "2.56.2"
 hiltNavigationFragment = "1.2.0"
+media3 = "1.8.0"
 roomVersion = "2.7.0"
 navigation = "2.9.0"
 activity = "1.10.1"
@@ -78,6 +79,9 @@ coil-gif = { module = "io.coil-kt:coil-gif", version.ref = "coilCompose" }
 coil-video = { module = "io.coil-kt:coil-video", version.ref = "coilCompose" }
 haze-android = { module = "dev.chrisbanes.haze:haze-android", version.ref = "haze" }
 haze-material = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
+androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
+androidx-media3-exoplayer-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3" }
+androidx-media3-exoplayer-compose = { module = "androidx.media3:media3-ui-compose", version.ref = "media3" }
 
 # test
 junit = { group = "junit", name = "junit", version.ref = "junit" }

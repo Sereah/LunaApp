@@ -1,5 +1,7 @@
 package com.lunacattus.app.presentation.compose
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -21,7 +23,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -29,22 +35,28 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.lunacattus.app.domain.model.VideoType
 import com.lunacattus.app.presentation.compose.common.components.BottomItem
 import com.lunacattus.app.presentation.compose.common.components.HazeAppBarBottomScaffold
 import com.lunacattus.app.presentation.compose.routes.main.browser.BrowserGraph
 import com.lunacattus.app.presentation.compose.routes.main.browser.browserRouter
+import com.lunacattus.app.presentation.compose.routes.main.browser.buildVideoFromUri
 import com.lunacattus.app.presentation.compose.routes.main.playList.PlayListGraph
 import com.lunacattus.app.presentation.compose.routes.main.playList.playListRouter
 import com.lunacattus.app.presentation.compose.routes.main.settings.SettingsGraph
 import com.lunacattus.app.presentation.compose.routes.main.settings.settingsRouter
 import com.lunacattus.app.presentation.compose.routes.main.video.VideoGraph
 import com.lunacattus.app.presentation.compose.routes.main.video.videoRouter
+import com.lunacattus.app.presentation.compose.routes.player.mvi.MediaItems
+import com.lunacattus.app.presentation.compose.routes.player.mvi.PlayerViewModel
+import com.lunacattus.app.presentation.compose.routes.player.navToPlayer
 import com.lunacattus.app.presentation.compose.routes.player.playerRouter
 import com.lunacattus.app.presentation.compose.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
@@ -56,6 +68,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 val rootNavController = rememberNavController()
+                val playerViewModel = hiltViewModel<PlayerViewModel>(this)
                 NavHost(
                     navController = rootNavController,
                     startDestination = "mainNav"
@@ -65,6 +78,7 @@ class MainActivity : ComponentActivity() {
                     }
                     playerRouter(rootNavController)
                 }
+                HandleUriIntent(intent, playerViewModel, this, rootNavController)
             }
         }
     }
@@ -151,6 +165,37 @@ fun bottomItems(): List<BottomItem> {
             route = SettingsGraph.route
         )
     )
+}
+
+@Composable
+fun HandleUriIntent(
+    intent: Intent,
+    playerViewModel: PlayerViewModel,
+    context: Context,
+    rootNavController: NavHostController
+) {
+    val uri = intent.data
+    if (uri != null && intent.action == Intent.ACTION_VIEW) {
+        val video = buildVideoFromUri(context, uri)
+        playerViewModel.setPlayList(
+            MediaItems(
+                list = listOf(MediaItem.Builder().apply {
+                    setMediaId(video.id)
+                    setUri(video.uri)
+                    val mediaMetadata = MediaMetadata.Builder().apply {
+                        setTitle(video.title)
+                        setDisplayTitle(video.title)
+                        setArtist(video.subtitle)
+                        setArtworkUri(video.coverPic.toUri())
+                        setDescription(video.description)
+                    }.build()
+                    setMediaMetadata(mediaMetadata)
+                }.build()),
+                types = listOf(VideoType.LocalVideo)
+            )
+        )
+        rootNavController.navToPlayer("", "")
+    }
 }
 
 fun MainActivity.setLightStatusBarIcons(darkIcons: Boolean) {
