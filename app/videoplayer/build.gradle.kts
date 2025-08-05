@@ -8,10 +8,10 @@ plugins {
 }
 
 android {
-    namespace = "com.lunacattus.app.presentation.compose"
+    namespace = "com.lunacattus.app.player"
 
     defaultConfig {
-        applicationId = "com.lunacattus.app.architecture.compose"
+        applicationId = "com.lunacattus.app.player"
         versionCode = 1
         versionName = "1.0"
     }
