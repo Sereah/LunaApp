@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -83,29 +84,36 @@ fun PlayListDialog(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column(
                             horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.weight(1f)
                         ) {
                             Text(
                                 text = mediaItem.mediaMetadata.title.toString(),
                                 fontSize = 15.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                                 color = if (index == currentPlayIndex) {
                                     AppTheme.colors.primary
                                 } else {
                                     Color.White
                                 }
                             )
-                            Text(
-                                text = mediaItem.mediaMetadata.artist.toString(),
-                                fontSize = 12.sp,
-                                color = if (index == currentPlayIndex) {
-                                    AppTheme.colors.primary
-                                } else {
-                                    Color.White
-                                }
-                            )
+                            if (mediaItem.mediaMetadata.artist.toString() != "") {
+                                Text(
+                                    text = mediaItem.mediaMetadata.artist.toString(),
+                                    fontSize = 12.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = if (index == currentPlayIndex) {
+                                        AppTheme.colors.primary
+                                    } else {
+                                        Color.White
+                                    }
+                                )
+                            }
                         }
                         if (index == currentPlayIndex) {
-                            Spacer(modifier = Modifier.weight(1f))
+                            Spacer(modifier = Modifier.width(10.dp))
                             MusicBars(
                                 modifier = Modifier.size(20.dp),
                                 barCount = 4,

@@ -23,15 +23,40 @@ data class Video(
     val uri: String,
     val subtitle: String,
     val coverPic: String,
-    val title: String
+    val title: String,
+    val type: VideoType,
 )
 
-fun JsonVideo.mapper() : Video {
+sealed interface VideoType {
+    data object LocalVideo : VideoType
+    data object WebStream : VideoType
+    data object JsonFile : VideoType
+    data object Unknow : VideoType
+
+    companion object {
+        fun fromString(value: String): VideoType = when (value) {
+            "WebStream" -> WebStream
+            "JsonFile" -> JsonFile
+            "LocalVideo" -> LocalVideo
+            else -> Unknow
+        }
+
+        fun toString(type: VideoType): String = when (type) {
+            WebStream -> "WebStream"
+            JsonFile -> "JsonFile"
+            LocalVideo -> "LocalVideo"
+            else -> "Unknow"
+        }
+    }
+}
+
+fun JsonVideo.mapper(): Video {
     return Video(
         description = description,
         uri = sources.first(),
         subtitle = subtitle,
         coverPic = coverPic,
-        title = title
+        title = title,
+        type = VideoType.JsonFile
     )
 }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9116ea2a94bead9678212741b57621ee",
+    "identityHash": "96a419fe51287ae37d41284ef9f0b5b4",
     "entities": [
       {
         "tableName": "data",
@@ -30,7 +30,7 @@
       },
       {
         "tableName": "VideoEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `subTitle` TEXT NOT NULL, `description` TEXT NOT NULL, `coverPic` TEXT NOT NULL, `uri` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `subTitle` TEXT NOT NULL, `description` TEXT NOT NULL, `coverPic` TEXT NOT NULL, `uri` TEXT NOT NULL, `type` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -67,6 +67,12 @@
             "columnName": "uri",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -79,7 +85,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9116ea2a94bead9678212741b57621ee')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '96a419fe51287ae37d41284ef9f0b5b4')"
     ]
   }
 }

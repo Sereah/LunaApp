@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
-import androidx.compose.material.icons.rounded.VideoLibrary
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +41,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.lunacattus.app.domain.model.JsonVideo
 import com.lunacattus.app.presentation.compose.MainActivity
+import com.lunacattus.app.presentation.compose.R
 import com.lunacattus.app.presentation.compose.common.components.SwipeToRevealItem
 import com.lunacattus.app.presentation.compose.common.components.overScrollVertical
 import com.lunacattus.app.presentation.compose.common.extensions.clickableWithDebounce
@@ -122,7 +123,6 @@ fun VideoScreen(
                         .clickableWithDebounce {
                             navToPlayer(video)
                             val mediaItem = MediaItem.Builder().apply {
-                                setMediaId(video.title)
                                 setUri(video.sources.first())
                                 val mediaMetadata = MediaMetadata.Builder().apply {
                                     setDisplayTitle(video.title)
@@ -150,7 +150,7 @@ fun VideoScreen(
 //                        contentScale = ContentScale.Crop
 //                    )
                     Image(
-                        imageVector = Icons.Rounded.VideoLibrary,
+                        painter = painterResource(R.drawable.ic_json_media),
                         contentDescription = null,
                         modifier = Modifier
                             .size(60.dp)

@@ -1,11 +1,17 @@
 package com.lunacattus.app.presentation.compose.routes.main.browser
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.lunacattus.app.presentation.compose.routes.base.NavRoute
+import com.lunacattus.app.presentation.compose.routes.main.browser.mvi.BrowserUiIntent
+import com.lunacattus.app.presentation.compose.routes.main.browser.mvi.BrowserViewModel
+import com.lunacattus.app.presentation.compose.routes.player.navToPlayer
 
 data object BrowserGraph : NavRoute {
     override val route: String
@@ -17,7 +23,10 @@ data object BrowserRoute : NavRoute {
         get() = "BrowserRoute"
 }
 
-fun NavGraphBuilder.browserRouter(navController: NavHostController) {
+fun NavGraphBuilder.browserRouter(
+    navController: NavHostController,
+    rootNavController: NavHostController
+) {
     navigation(
         route = BrowserGraph.route,
         startDestination = BrowserRoute.route
@@ -26,8 +35,18 @@ fun NavGraphBuilder.browserRouter(navController: NavHostController) {
             val graph = remember(it) {
                 navController.getBackStackEntry(BrowserGraph.route)
             }
-            BrowserScreen()
+            BrowserScreen(sendUiIntent = graph.sendUiIntent()) {
+                rootNavController.navToPlayer("", "")
+            }
         }
+    }
+}
+
+@Composable
+private fun NavBackStackEntry.sendUiIntent(): (BrowserUiIntent) -> Unit {
+    val viewModel: BrowserViewModel = hiltViewModel(this)
+    return {
+        viewModel.handleUiIntent(it)
     }
 }
 

@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
-import androidx.compose.material.icons.rounded.VideoLibrary
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +37,9 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import com.lunacattus.app.domain.model.VideoType
 import com.lunacattus.app.presentation.compose.MainActivity
+import com.lunacattus.app.presentation.compose.R
 import com.lunacattus.app.presentation.compose.common.components.SwipeToRevealItem
 import com.lunacattus.app.presentation.compose.common.components.overScrollVertical
 import com.lunacattus.app.presentation.compose.common.extensions.clickableWithDebounce
@@ -132,7 +134,12 @@ fun PlayListScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
-                        imageVector = Icons.Rounded.VideoLibrary,
+                        painter = when (video.type) {
+                            VideoType.JsonFile -> painterResource(R.drawable.ic_json_media)
+                            VideoType.Unknow -> painterResource(R.drawable.ic_unknow)
+                            VideoType.WebStream -> painterResource(R.drawable.ic_web_video)
+                            VideoType.LocalVideo -> painterResource(R.drawable.ic_local_video)
+                        },
                         contentDescription = null,
                         modifier = Modifier
                             .size(60.dp)
@@ -146,23 +153,23 @@ fun PlayListScreen(
                     ) {
                         Text(text = video.title, fontSize = 18.sp)
                         Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            text = video.description,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        if (video.description != "") {
+                            Text(
+                                text = video.description,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
             }
-            if (video != playList.last()) {
-                Spacer(
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .height(0.5.dp)
-                        .fillMaxWidth()
-                        .background(Color.LightGray)
-                )
-            }
+            Spacer(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .height(0.5.dp)
+                    .fillMaxWidth()
+                    .background(Color.LightGray)
+            )
         }
     }
 }

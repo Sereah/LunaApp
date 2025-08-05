@@ -3,6 +3,7 @@ package com.lunacattus.app.data.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.lunacattus.app.domain.model.Video
+import com.lunacattus.app.domain.model.VideoType
 
 @Entity(tableName = "VideoEntity")
 data class VideoEntity(
@@ -12,7 +13,8 @@ data class VideoEntity(
     val subTitle: String,
     val description: String,
     val coverPic: String,
-    val uri: String
+    val uri: String,
+    val type: String,
 )
 
 fun Video.mapper(): VideoEntity {
@@ -22,7 +24,8 @@ fun Video.mapper(): VideoEntity {
         subTitle = this.subtitle,
         description = this.description,
         coverPic = coverPic,
-        uri = this.uri
+        uri = this.uri,
+        type = VideoType.toString(type)
     )
 }
 
@@ -34,5 +37,6 @@ fun VideoEntity.mapper(): Video {
         subtitle = subTitle,
         coverPic = coverPic,
         title = title,
+        type = VideoType.fromString(this.type)
     )
 }
