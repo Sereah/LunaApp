@@ -318,14 +318,13 @@ fun AppBottom(
 
         Row(
             modifier = modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
         ) {
 
             items.forEach { item ->
                 Column(
-                    verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
+                        .padding(vertical = 10.dp)
                         .fillMaxHeight()
                         .weight(1f)
                         .pointerInput(Unit) {
