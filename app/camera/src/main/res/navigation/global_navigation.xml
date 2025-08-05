@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/global_navigation"
+    app:startDestination="@id/dest_home">
+
+    <fragment
+        android:id="@+id/dest_home"
+        android:name="com.lunacattus.app.camera.feature.home.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_home_to_one"
+            app:destination="@id/one_navigation" />
+
+        <action
+            android:id="@+id/action_home_to_two"
+            app:destination="@id/two_navigation" />
+
+    </fragment>
+
+    <include app:graph="@navigation/one_navigation" />
+    <include app:graph="@navigation/two_navigation" />
+
+</navigation>
