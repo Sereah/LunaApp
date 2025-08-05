@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -79,14 +80,16 @@ fun PlayListScreen(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(top = 100.dp, start = 10.dp, end = 10.dp, bottom = 90.dp)
     ) {
-        val mediaList = playList.map {
+        val mediaList = playList.map { video ->
             MediaItem.Builder().apply {
-                setMediaId(it.title)
-                setUri(it.uri)
+                setMediaId(video.id)
+                setUri(video.uri)
                 val mediaMetadata = MediaMetadata.Builder().apply {
-                    setDisplayTitle(it.title)
-                    setArtist(it.subtitle)
-                    setDescription(it.description)
+                    setTitle(video.title)
+                    setDisplayTitle(video.title)
+                    setArtist(video.subtitle)
+                    setArtworkUri(video.coverPic.toUri())
+                    setDescription(video.description)
                 }.build()
                 setMediaMetadata(mediaMetadata)
             }.build()
@@ -104,6 +107,7 @@ fun PlayListScreen(
                             .fillMaxSize()
                             .background(Color.Gray)
                             .clickableWithDebounce {
+                                sendUiIntent(PlayListUiIntent.RemoveVideo(video))
                                 close.invoke()
                             },
                         contentAlignment = Alignment.Center

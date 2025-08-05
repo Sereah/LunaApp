@@ -126,6 +126,7 @@ fun VideoScreen(
                                 setUri(video.sources.first())
                                 val mediaMetadata = MediaMetadata.Builder().apply {
                                     setDisplayTitle(video.title)
+                                    setTitle(video.title)
                                     setArtist(video.subtitle)
                                     setDescription(video.description)
                                 }.build()

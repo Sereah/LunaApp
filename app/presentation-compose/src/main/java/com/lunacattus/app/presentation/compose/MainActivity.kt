@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -161,4 +162,10 @@ fun bottomItems(): List<BottomItem> {
             route = SettingsGraph.route
         )
     )
+}
+
+fun MainActivity.setLightStatusBarIcons(darkIcons: Boolean) {
+    val window = this.window ?: return
+    val controller = WindowInsetsControllerCompat(window, window.decorView)
+    controller.isAppearanceLightStatusBars = darkIcons
 }

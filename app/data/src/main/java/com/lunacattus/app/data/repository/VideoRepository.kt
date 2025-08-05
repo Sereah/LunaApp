@@ -37,4 +37,8 @@ class VideoRepository @Inject constructor(
     override fun queryAllVideo(): Flow<List<Video>> {
         return dao.queryAllVideo().map { list -> list.map { it.mapper() } }
     }
+
+    override suspend fun deleteVideo(video: Video) {
+        dao.deleteVideo(video.id)
+    }
 }
