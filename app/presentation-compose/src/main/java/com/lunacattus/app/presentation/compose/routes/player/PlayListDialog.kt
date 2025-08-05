@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.VideoLibrary
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -22,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +28,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.media3.common.MediaItem
+import com.lunacattus.app.domain.model.VideoType
+import com.lunacattus.app.presentation.compose.R
 import com.lunacattus.app.presentation.compose.common.components.MusicBars
 import com.lunacattus.app.presentation.compose.common.extensions.clickableWithDebounce
 import com.lunacattus.app.presentation.compose.theme.AppTheme
@@ -39,7 +40,8 @@ fun PlayListDialog(
     onDismiss: () -> Unit,
     playList: List<MediaItem>,
     currentPlayIndex: Int,
-    onSelectItem: (Int) -> Unit
+    onSelectItem: (Int) -> Unit,
+    typeList: List<VideoType>
 ) {
     Dialog(
         onDismissRequest = onDismiss,
@@ -70,7 +72,12 @@ fun PlayListDialog(
                         }
                     ) {
                         Image(
-                            imageVector = Icons.Rounded.VideoLibrary,
+                            painter = when (typeList[index]) {
+                                VideoType.JsonFile -> painterResource(R.drawable.ic_json_media)
+                                VideoType.Unknow -> painterResource(R.drawable.ic_unknow)
+                                VideoType.WebStream -> painterResource(R.drawable.ic_web_video)
+                                VideoType.LocalVideo -> painterResource(R.drawable.ic_local_video)
+                            },
                             contentDescription = null,
                             colorFilter = ColorFilter.tint(
                                 if (index == currentPlayIndex) {

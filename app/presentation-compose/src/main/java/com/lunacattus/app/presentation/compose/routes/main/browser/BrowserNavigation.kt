@@ -50,5 +50,7 @@ private fun NavBackStackEntry.sendUiIntent(): (BrowserUiIntent) -> Unit {
     }
 }
 
+internal const val TAG = "BrowserRoute"
+
 
 
