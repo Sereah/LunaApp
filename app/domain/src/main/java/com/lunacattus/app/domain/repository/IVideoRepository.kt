@@ -10,4 +10,6 @@ interface IVideoRepository {
     suspend fun insertPlayList(video: Video)
 
     fun queryAllVideo(): Flow<List<Video>>
+
+    suspend fun deleteVideo(video: Video)
 }

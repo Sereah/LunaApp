@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -30,11 +30,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.lunacattus.app.presentation.compose.R
 import com.lunacattus.app.presentation.compose.common.components.VideoSlider
 
 @Composable
 fun PlayerControlView(
+    mediaTitle: String,
     isMediaPlaying: Boolean,
     playFraction: Float,
     bufferFraction: Float,
@@ -57,6 +59,13 @@ fun PlayerControlView(
         CompositionLocalProvider(
             LocalContentColor provides Color.White
         ) {
+            Text(
+                text = mediaTitle,
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 40.dp, start = 20.dp, end = 20.dp)
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -109,7 +118,7 @@ fun PlayerControlView(
             }
             Column(
                 modifier = Modifier
-                    .safeContentPadding()
+                    .padding(20.dp)
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
             ) {

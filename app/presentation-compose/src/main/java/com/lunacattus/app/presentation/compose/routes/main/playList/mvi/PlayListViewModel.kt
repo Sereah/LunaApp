@@ -3,6 +3,7 @@ package com.lunacattus.app.presentation.compose.routes.main.playList.mvi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.app.data.repository.VideoRepository
+import com.lunacattus.app.presentation.compose.routes.main.playList.mvi.PlayListUiState.*
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,8 +37,14 @@ class PlayListViewModel @Inject constructor(
                 _uiState.update { PlayListUiState.Loading }
                 viewModelScope.launch {
                     videoRepository.queryAllVideo().collect { list ->
-                        _uiState.update { PlayListUiState.Success(list) }
+                        _uiState.update { Success(list) }
                     }
+                }
+            }
+
+            is PlayListUiIntent.RemoveVideo -> {
+                viewModelScope.launch {
+                    videoRepository.deleteVideo(intent.video)
                 }
             }
         }

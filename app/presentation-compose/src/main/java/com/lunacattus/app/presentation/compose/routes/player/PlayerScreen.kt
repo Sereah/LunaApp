@@ -47,6 +47,7 @@ import androidx.media3.ui.compose.PlayerSurface
 import com.lunacattus.app.presentation.compose.MainActivity
 import com.lunacattus.app.presentation.compose.common.extensions.clickableWithDebounce
 import com.lunacattus.app.presentation.compose.routes.player.mvi.PlayerViewModel
+import com.lunacattus.app.presentation.compose.setLightStatusBarIcons
 import com.lunacattus.logger.Logger
 import kotlinx.coroutines.delay
 
@@ -78,7 +79,7 @@ fun PlayerScreen(
 
     LaunchedEffect(showControls, isMediaPlaying) {
         if (showControls && isMediaPlaying) {
-            delay(5000) // 5秒延迟
+            delay(10_000)
             showControls = false
         }
     }
@@ -121,6 +122,7 @@ fun PlayerScreen(
     }
 
     DisposableEffect(exoPlayer) {
+        activity.setLightStatusBarIcons(false)
         val playerListener = object : Player.Listener {
 
             override fun onVideoSizeChanged(videoSize: VideoSize) {
@@ -155,6 +157,7 @@ fun PlayerScreen(
         exoPlayer.addListener(playerListener)
 
         onDispose {
+            activity.setLightStatusBarIcons(true)
             exoPlayer.apply {
                 removeListener(playerListener)
                 release()
@@ -211,6 +214,7 @@ fun PlayerScreen(
         )
         if (playState >= 2 && showControls) {
             PlayerControlView(
+                mediaTitle = exoPlayer.currentMediaItem?.mediaMetadata?.title.toString(),
                 isMediaPlaying = isMediaPlaying,
                 playFraction = playFraction,
                 bufferFraction = bufferFraction,
@@ -280,10 +284,11 @@ fun PlayerScreen(
                 .width(300.dp)
                 .height(500.dp),
             onDismiss = { showListDialog = false },
-            playList = if (exoPlayer.currentMediaItem == null) {
-                emptyList()
-            } else {
-                listOf(exoPlayer.currentMediaItem!!)
+            playList = mediaItems.value.list,
+            currentPlayIndex = exoPlayer.currentMediaItemIndex,
+            onSelectItem = { index ->
+                exoPlayer.seekTo(index, 0L)
+                showListDialog = false
             }
         )
     }
