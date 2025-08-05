@@ -21,7 +21,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "LunaPlayer"
-include(":app:presentation-compose")
+include(":app:videoplayer")
 include(":app:presentation-view")
 include(":app:domain")
 include(":app:data")

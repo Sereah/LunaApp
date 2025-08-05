@@ -35,9 +35,9 @@ dependencies {
     implementation(project(":app:domain"))
     implementation(project(":app:data"))
 
-    implementation("androidx.media3:media3-exoplayer:1.8.0")
-    implementation("androidx.media3:media3-exoplayer-dash:1.8.0")
-    implementation("androidx.media3:media3-ui-compose:1.8.0")
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.exoplayer.dash)
+    implementation(libs.androidx.media3.exoplayer.compose)
     implementation(libs.coil.compose)
     implementation(libs.coil.video)
     implementation(libs.haze.android)
