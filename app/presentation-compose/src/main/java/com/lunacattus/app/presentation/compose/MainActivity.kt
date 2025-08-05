@@ -116,7 +116,7 @@ fun Main(rootNavController: NavHostController) {
                 videoRouter(mainNavController, rootNavController)
                 musicRouter(mainNavController)
                 playListRouter(mainNavController, rootNavController)
-                browserRouter(mainNavController)
+                browserRouter(mainNavController, rootNavController)
                 settingsRouter(mainNavController)
             }
         }
