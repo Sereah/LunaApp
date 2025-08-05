@@ -129,7 +129,9 @@ fun PlayListScreen(
                         .background(Color.White)
                         .clickableWithDebounce {
                             navToPlayer.invoke()
-                            playerViewModel.setPlayList(MediaItems(mediaList, index))
+                            playerViewModel.setPlayList(
+                                MediaItems(mediaList, index, types = playList.map { it.type })
+                            )
                         },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -151,7 +153,10 @@ fun PlayListScreen(
                             .padding(start = 10.dp),
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(text = video.title, fontSize = 18.sp)
+                        Text(
+                            text = video.title, fontSize = 18.sp,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis
+                        )
                         Spacer(modifier = Modifier.height(10.dp))
                         if (video.description != "") {
                             Text(

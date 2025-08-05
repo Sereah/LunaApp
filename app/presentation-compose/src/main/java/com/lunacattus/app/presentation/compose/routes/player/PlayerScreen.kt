@@ -18,7 +18,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,7 +32,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
@@ -59,8 +57,6 @@ fun PlayerScreen(
 ) {
     var videoAspectRatio by remember { mutableFloatStateOf(16f / 9f) }
     val lifecycleOwner = LocalLifecycleOwner.current
-    var mediaItemIndex by rememberSaveable { mutableIntStateOf(0) }
-    var currentPosition by rememberSaveable { mutableLongStateOf(0) }
     val context = LocalContext.current
     val activity = remember { context as MainActivity }
     val exoPlayer = remember {
@@ -75,7 +71,7 @@ fun PlayerScreen(
     var isUserSlide by remember { mutableStateOf(false) }
     var isFullScreen by rememberSaveable { mutableStateOf(false) }
     var showListDialog by remember { mutableStateOf(false) }
-    var showControls by remember { mutableStateOf(true) } // 新增：控制PlayerControlView的可见性
+    var showControls by remember { mutableStateOf(true) }
 
     LaunchedEffect(showControls, isMediaPlaying) {
         if (showControls && isMediaPlaying) {
@@ -98,10 +94,10 @@ fun PlayerScreen(
             exoPlayer.setMediaItems(
                 mediaItems.value.list,
                 mediaItems.value.startIndex,
-                C.TIME_UNSET
+                mediaItems.value.startPosition
             )
-//            seekTo(mediaItemIndex, currentPosition)
             prepare()
+            playWhenReady = true
         }
     }
 
@@ -172,9 +168,6 @@ fun PlayerScreen(
                 Lifecycle.Event.ON_CREATE -> {}
 
                 Lifecycle.Event.ON_START -> {
-                    if (!exoPlayer.isPlaying) {
-                        exoPlayer.play()
-                    }
                 }
 
                 Lifecycle.Event.ON_RESUME -> {}
@@ -184,8 +177,12 @@ fun PlayerScreen(
                 }
 
                 Lifecycle.Event.ON_DESTROY -> {
-                    mediaItemIndex = exoPlayer.currentMediaItemIndex
-                    currentPosition = exoPlayer.currentPosition
+                    viewModel.updateMediaItems(
+                        mediaItems.value.copy(
+                            startIndex = exoPlayer.currentMediaItemIndex,
+                            startPosition = exoPlayer.currentPosition
+                        )
+                    )
                 }
 
                 Lifecycle.Event.ON_ANY -> {}
@@ -285,6 +282,7 @@ fun PlayerScreen(
                 .height(500.dp),
             onDismiss = { showListDialog = false },
             playList = mediaItems.value.list,
+            typeList = mediaItems.value.types,
             currentPlayIndex = exoPlayer.currentMediaItemIndex,
             onSelectItem = { index ->
                 exoPlayer.seekTo(index, 0L)

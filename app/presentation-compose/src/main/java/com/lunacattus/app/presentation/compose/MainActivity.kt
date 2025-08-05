@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FileCopy
-import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.SlowMotionVideo
 import androidx.compose.material3.Text
@@ -34,8 +33,6 @@ import com.lunacattus.app.presentation.compose.common.components.BottomItem
 import com.lunacattus.app.presentation.compose.common.components.HazeAppBarBottomScaffold
 import com.lunacattus.app.presentation.compose.routes.main.browser.BrowserGraph
 import com.lunacattus.app.presentation.compose.routes.main.browser.browserRouter
-import com.lunacattus.app.presentation.compose.routes.main.music.MusicGraph
-import com.lunacattus.app.presentation.compose.routes.main.music.musicRouter
 import com.lunacattus.app.presentation.compose.routes.main.playList.PlayListGraph
 import com.lunacattus.app.presentation.compose.routes.main.playList.playListRouter
 import com.lunacattus.app.presentation.compose.routes.main.settings.SettingsGraph
@@ -114,7 +111,6 @@ fun Main(rootNavController: NavHostController) {
                 startDestination = VideoGraph.route,
             ) {
                 videoRouter(mainNavController, rootNavController)
-                musicRouter(mainNavController)
                 playListRouter(mainNavController, rootNavController)
                 browserRouter(mainNavController, rootNavController)
                 settingsRouter(mainNavController)
@@ -132,13 +128,6 @@ fun bottomItems(): List<BottomItem> {
             selectedColor = AppTheme.colors.primary,
             unSelectColor = AppTheme.colors.inversePrimary,
             route = VideoGraph.route
-        ),
-        BottomItem(
-            title = "Music",
-            icon = Icons.Rounded.MusicNote,
-            selectedColor = AppTheme.colors.primary,
-            unSelectColor = AppTheme.colors.inversePrimary,
-            route = MusicGraph.route
         ),
         BottomItem(
             title = "PlayList",

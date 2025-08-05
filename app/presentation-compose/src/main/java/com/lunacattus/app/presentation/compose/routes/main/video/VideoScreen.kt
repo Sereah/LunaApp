@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.lunacattus.app.domain.model.JsonVideo
+import com.lunacattus.app.domain.model.VideoType
 import com.lunacattus.app.presentation.compose.MainActivity
 import com.lunacattus.app.presentation.compose.R
 import com.lunacattus.app.presentation.compose.common.components.SwipeToRevealItem
@@ -132,7 +133,12 @@ fun VideoScreen(
                                 }.build()
                                 setMediaMetadata(mediaMetadata)
                             }.build()
-                            playerViewModel.setPlayList(MediaItems(list = listOf(mediaItem)))
+                            playerViewModel.setPlayList(
+                                MediaItems(
+                                    list = listOf(mediaItem),
+                                    types = listOf(VideoType.JsonFile)
+                                )
+                            )
                         },
                 ) {
 //                    AsyncImage(
