@@ -11,17 +11,6 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
 
-        <action
-            android:id="@+id/action_home_to_one"
-            app:destination="@id/one_navigation" />
-
-        <action
-            android:id="@+id/action_home_to_two"
-            app:destination="@id/two_navigation" />
-
     </fragment>
-
-    <include app:graph="@navigation/one_navigation" />
-    <include app:graph="@navigation/two_navigation" />
 
 </navigation>

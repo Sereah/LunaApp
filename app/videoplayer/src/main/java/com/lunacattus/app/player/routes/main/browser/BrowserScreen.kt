@@ -39,15 +39,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.lunacattus.app.base.compose.components.overScrollVertical
+import com.lunacattus.app.base.compose.extensions.clickableWithDebounce
 import com.lunacattus.app.domain.model.Video
 import com.lunacattus.app.domain.model.VideoType
 import com.lunacattus.app.player.MainActivity
-import com.lunacattus.app.player.common.components.overScrollVertical
-import com.lunacattus.app.player.common.extensions.clickableWithDebounce
+import com.lunacattus.app.player.R
 import com.lunacattus.app.player.routes.main.browser.mvi.BrowserUiIntent
 import com.lunacattus.app.player.routes.player.mvi.PlayerViewModel
 import com.lunacattus.app.player.theme.AppTheme
-import com.lunacattus.app.player.R
 import com.lunacattus.logger.Logger
 
 @Composable
@@ -180,7 +180,10 @@ fun buildVideoFromUri(context: Context, uri: Uri): Video {
         val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
         val album = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
         val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-        Logger.d(tag = TAG, message = "buildVideoFromUri, duration: $duration, title: $title, artist: $artist, album: $album")
+        Logger.d(
+            tag = TAG,
+            message = "buildVideoFromUri, duration: $duration, title: $title, artist: $artist, album: $album"
+        )
         if (title == null) {
             title = getDisplayName(context, uri)
         }

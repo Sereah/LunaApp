@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat
 
 plugins {
     alias(libs.plugins.architecture.android.application)
-    alias(libs.plugins.architecture.android.compose)
+    alias(libs.plugins.architecture.android.application.compose)
     alias(libs.plugins.architecture.android.application.jacoco)
     alias(libs.plugins.architecture.hilt)
 }
@@ -34,6 +34,7 @@ android {
 dependencies {
     implementation(project(":app:domain"))
     implementation(project(":app:data"))
+    implementation(project(":app:base"))
 
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.exoplayer.dash)

@@ -1,6 +1,6 @@
+import com.android.build.api.dsl.ApplicationExtension
 import com.lunacattus.convention.configureKotlinAndroid
 import com.lunacattus.convention.libs
-import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -26,12 +26,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         keyAlias = "system"
                         keyPassword = "123456"
                     }
-                    create("platform_x9") {
-                        storeFile = file("$rootDir/keystore/platform_x9.jks")
-                        storePassword = "123456"
-                        keyAlias = "x9hp"
-                        keyPassword = "123456"
-                    }
                 }
 
                 buildTypes {
@@ -51,13 +45,13 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
                 flavorDimensions += "platform"
                 productFlavors {
-                    create("aosp") {
+                    create("app") {
+                        dimension = "platform"
+                        signingConfig = signingConfigs.getByName("debug")
+                    }
+                    create("system") {
                         dimension = "platform"
                         signingConfig = signingConfigs.getByName("platform_system")
-                    }
-                    create("F515") {
-                        dimension = "platform"
-                        signingConfig = signingConfigs.getByName("platform_x9")
                     }
                 }
 

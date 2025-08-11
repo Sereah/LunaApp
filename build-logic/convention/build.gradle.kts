@@ -43,9 +43,14 @@ gradlePlugin {
             implementationClass = "AndroidLibraryConventionPlugin"
         }
 
-        register("androidCompose") {
-            id = libs.plugins.architecture.android.compose.get().pluginId
-            implementationClass = "AndroidComposeConventionPlugin"
+        register("androidApplicationCompose") {
+            id = libs.plugins.architecture.android.application.compose.get().pluginId
+            implementationClass = "AndroidApplicationComposeConventionPlugin"
+        }
+
+        register("androidLibraryCompose") {
+            id = libs.plugins.architecture.android.library.compose.get().pluginId
+            implementationClass = "AndroidLibraryComposeConventionPlugin"
         }
 
         register("androidView") {

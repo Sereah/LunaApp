@@ -6,6 +6,7 @@ junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 appcompat = "1.7.0"
+lifecycleRuntimeKtx = "2.9.2"
 material = "1.12.0"
 kspVersion = "2.0.21-1.0.27"
 hilt = "2.56.2"
@@ -59,6 +60,7 @@ androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navi
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 
 # room
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
@@ -111,9 +113,10 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 # build-logic plugins
 architecture-android-application = { id = "architecture.android.application" }
-architecture-android-compose = { id = "architecture.android.compose" }
+architecture-android-application-compose = { id = "architecture.android.application.compose" }
 architecture-android-view = { id = "architecture.android.view" }
 architecture-android-library = { id = "architecture.android.library" }
+architecture-android-library-compose = { id = "architecture.android.library.compose" }
 architecture-android-application-jacoco = { id = "architecture.android.application.jacoco" }
 architecture-android-library-jacoco = { id = "architecture.android.library.jacoco" }
 architecture-hilt = { id = "architecture.hilt" }
