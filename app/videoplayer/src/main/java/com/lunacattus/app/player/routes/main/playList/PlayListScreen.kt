@@ -37,17 +37,17 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import com.lunacattus.app.base.compose.components.SwipeToRevealItem
+import com.lunacattus.app.base.compose.components.overScrollVertical
+import com.lunacattus.app.base.compose.extensions.clickableWithDebounce
 import com.lunacattus.app.domain.model.VideoType
 import com.lunacattus.app.player.MainActivity
-import com.lunacattus.app.player.common.components.SwipeToRevealItem
-import com.lunacattus.app.player.common.components.overScrollVertical
-import com.lunacattus.app.player.common.extensions.clickableWithDebounce
+import com.lunacattus.app.player.R
 import com.lunacattus.app.player.routes.main.playList.mvi.PlayListUiIntent
 import com.lunacattus.app.player.routes.main.playList.mvi.PlayListUiState
 import com.lunacattus.app.player.routes.player.mvi.MediaItems
 import com.lunacattus.app.player.routes.player.mvi.PlayerViewModel
 import com.lunacattus.app.player.theme.AppTheme
-import com.lunacattus.app.player.R
 
 @Composable
 fun PlayListScreen(

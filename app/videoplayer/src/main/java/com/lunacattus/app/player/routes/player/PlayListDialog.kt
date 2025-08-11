@@ -28,11 +28,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.media3.common.MediaItem
+import com.lunacattus.app.base.compose.components.MusicBars
+import com.lunacattus.app.base.compose.extensions.clickableWithDebounce
 import com.lunacattus.app.domain.model.VideoType
-import com.lunacattus.app.player.common.components.MusicBars
-import com.lunacattus.app.player.common.extensions.clickableWithDebounce
-import com.lunacattus.app.player.theme.AppTheme
 import com.lunacattus.app.player.R
+import com.lunacattus.app.player.theme.AppTheme
 
 @Composable
 fun PlayListDialog(
