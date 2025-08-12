@@ -3,7 +3,6 @@ package com.lunacattus.app.data.di
 import android.content.Context
 import androidx.room.Room
 import com.lunacattus.app.data.AppDatabase
-import com.lunacattus.app.data.DataDao
 import com.lunacattus.app.data.VideoDao
 import dagger.Module
 import dagger.Provides
@@ -22,12 +21,6 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context, AppDatabase::class.java, "app.db"
         ).build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideDataDao(database: AppDatabase): DataDao {
-        return database.dataDao()
     }
 
     @Provides
