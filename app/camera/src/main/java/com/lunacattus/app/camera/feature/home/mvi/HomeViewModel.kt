@@ -1,7 +1,7 @@
 package com.lunacattus.app.camera.feature.home.mvi
 
 import androidx.lifecycle.viewModelScope
-import com.lunacattus.app.base.view.BaseViewModel
+import com.lunacattus.app.base.view.base.BaseViewModel
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay

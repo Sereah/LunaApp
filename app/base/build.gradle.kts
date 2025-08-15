@@ -13,8 +13,10 @@ android {
 
 dependencies {
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.coil.compose)
     implementation(libs.coil.video)
     implementation(libs.haze.android)
+    implementation(libs.androidx.recyclerview)
 }

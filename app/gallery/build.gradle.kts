@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.architecture.android.application)
     alias(libs.plugins.architecture.android.view)
     alias(libs.plugins.architecture.hilt)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -33,9 +32,5 @@ android {
 dependencies {
     implementation(project(":app:domain"))
     implementation(project(":app:data"))
-    implementation(project(":app:base"))
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
+    implementation(libs.glide)
 }

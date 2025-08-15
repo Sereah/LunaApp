@@ -1,6 +1,6 @@
 package com.lunacattus.app.camera.feature.home.mvi
 
-import com.lunacattus.app.base.view.IUIState
+import com.lunacattus.app.base.view.base.IUIState
 
 sealed interface HomeUIState : IUIState {
     data object Init : HomeUIState

@@ -1,24 +1,28 @@
-package com.lunacattus.app.base.view
+package com.lunacattus.app.base.view.base
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewbinding.ViewBinding
+import com.lunacattus.app.base.view.StateCollectorDelegate
+import kotlinx.coroutines.launch
 
-abstract class BaseDialogFragment<
+abstract class BaseFragment<
         VB : ViewBinding,
         INTENT : IUIIntent,
         STATE : IUIState,
         EFFECT : IUIEffect,
         VM : BaseViewModel<INTENT, STATE, EFFECT>>(
     private val inflateBinding: (LayoutInflater, ViewGroup?, Boolean) -> VB
-) : DialogFragment() {
+) : Fragment() {
 
     abstract val viewModel: VM
+    protected abstract fun handleSideEffect(effect: EFFECT)
 
     private var _binding: VB? = null
     protected val binding get() = _binding!!
@@ -42,7 +46,7 @@ abstract class BaseDialogFragment<
             lifecycleOwner = viewLifecycleOwner,
             uiStateFlow = viewModel.uiState
         )
-        applyWindowConfiguration()
+        collectUiEffect()
     }
 
     override fun onDestroyView() {
@@ -50,37 +54,23 @@ abstract class BaseDialogFragment<
         super.onDestroyView()
     }
 
+    /**
+     * 子fragment分发UIIntent， 传递给对应的viewmodel处理事件
+     */
     protected fun dispatchUiIntent(intent: INTENT) {
         viewModel.handleUiIntent(intent)
     }
 
-    protected open fun provideDialogConfig(): DialogConfig {
-        return DialogConfig()
-    }
-
-    protected class DialogConfig(
-        val widthDp: Int = WindowManager.LayoutParams.WRAP_CONTENT,
-        val heightDp: Int = WindowManager.LayoutParams.WRAP_CONTENT,
-        val gravity: Int = Gravity.CENTER,
-        val marginX: Int = 0,
-        val marginY: Int = 0,
-        val outCancelable: Boolean = true,
-    )
-
-    private fun applyWindowConfiguration() {
-        val config = provideDialogConfig()
-        val window = dialog?.window ?: return
-        val params = window.attributes
-
-        params.width = config.widthDp
-        params.height = config.heightDp
-
-        params.gravity = config.gravity
-        if (config.gravity != Gravity.CENTER) {
-            params.x = config.marginX
-            params.y = config.marginY
+    /**
+     * 接收viewmodel发送过来的一次性事件，传递给子fragment处理
+     */
+    private fun collectUiEffect() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiEffect.collect { effect ->
+                    handleSideEffect(effect)
+                }
+            }
         }
-        window.attributes = params
-        isCancelable = config.outCancelable
     }
 }

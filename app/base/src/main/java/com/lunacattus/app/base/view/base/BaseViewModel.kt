@@ -1,4 +1,4 @@
-package com.lunacattus.app.base.view
+package com.lunacattus.app.base.view.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
