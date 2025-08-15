@@ -1,6 +1,6 @@
 package com.lunacattus.app.gallery.feature.play.mvi
 
-import com.lunacattus.app.base.view.IUIState
+import com.lunacattus.app.base.view.base.IUIState
 
 sealed interface PlayUiState: IUIState {
     data object Init: PlayUiState

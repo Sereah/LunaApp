@@ -1,4 +1,4 @@
-package com.lunacattus.app.base.view
+package com.lunacattus.app.base.view.base
 
 /**
  * viewmodel -> fragment, 持久化状态（加载状态，数据列表）

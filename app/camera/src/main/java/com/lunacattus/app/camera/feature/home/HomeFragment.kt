@@ -28,7 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.viewModels
 import com.lunacattus.app.base.view.setOnClickListenerWithDebounce
-import com.lunacattus.app.base.view.BaseFragment
+import com.lunacattus.app.base.view.base.BaseFragment
 import com.lunacattus.app.camera.databinding.FragmentHomeBinding
 import com.lunacattus.app.camera.feature.home.mvi.HomeUIState
 import com.lunacattus.app.camera.feature.home.mvi.HomeUiEffect
@@ -180,7 +180,7 @@ class HomeFragment :
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-GalleryImage")
             }
         }
 
