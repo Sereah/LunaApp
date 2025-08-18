@@ -39,8 +39,8 @@ class GalleryAdapter(
         position: Int
     ) {
         when (val item = getItem(position)) {
-            is Gallery.Image -> (holder as ListAdapterImageViewHolder).bind(item)
-            is Gallery.Video -> (holder as ListAdapterVideoViewHolder).bind(item)
+            is Gallery.Image -> (holder as ListAdapterImageViewHolder).bind(item, position)
+            is Gallery.Video -> (holder as ListAdapterVideoViewHolder).bind(item, position)
             else -> throw IllegalArgumentException("Unknown Gallery item type")
         }
     }
@@ -73,7 +73,7 @@ class GalleryAdapter(
 
     inner class ListAdapterImageViewHolder(val binding: ItemListImageBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Gallery?) {
+        fun bind(item: Gallery?, position: Int) {
             val image = item as? Gallery.Image
             if (image == null) {
                 binding.image.setImageURI(null)
@@ -82,6 +82,8 @@ class GalleryAdapter(
                     .load(image.galleryImage.contentUri)
                     .into(binding.image)
             }
+            binding.position.text = position.toString()
+            binding.id.text = image?.galleryImage?.id.toString()
             binding.root.setOnClickListenerWithDebounce {
                 item?.let {
                     onItemClick(it)
@@ -92,7 +94,7 @@ class GalleryAdapter(
 
     inner class ListAdapterVideoViewHolder(val binding: ItemListVideoBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Gallery?) {
+        fun bind(item: Gallery?, position: Int) {
             val video = item as? Gallery.Video
             if (video != null) {
                 val uri = video.galleryVideo.contentUri
@@ -100,6 +102,8 @@ class GalleryAdapter(
                     .load(uri)
                     .into(binding.bg)
             }
+            binding.position.text = position.toString()
+            binding.id.text = video?.galleryVideo?.id.toString()
             binding.root.setOnClickListenerWithDebounce {
                 item?.let {
                     onItemClick(it)

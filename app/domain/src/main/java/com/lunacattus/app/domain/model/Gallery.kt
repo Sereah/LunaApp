@@ -22,3 +22,15 @@ sealed class Gallery {
     data class Image(val galleryImage: GalleryImage) : Gallery()
     data class Video(val galleryVideo: GalleryVideo) : Gallery()
 }
+
+val Gallery.id
+    get() = when (this) {
+        is Gallery.Image -> this.galleryImage.id
+        is Gallery.Video -> this.galleryVideo.id
+    }
+
+val Gallery.addData
+    get() = when (this) {
+        is Gallery.Video -> this.galleryVideo.addData
+        is Gallery.Image -> this.galleryImage.addData
+    }
