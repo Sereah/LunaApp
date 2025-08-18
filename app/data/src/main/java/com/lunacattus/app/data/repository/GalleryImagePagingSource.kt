@@ -92,6 +92,6 @@ class GalleryImagePagingSource(
     }
 
     companion object {
-        const val TAG = "GalleryPagingSource"
+        const val TAG = "GalleryImagePagingSource"
     }
 }

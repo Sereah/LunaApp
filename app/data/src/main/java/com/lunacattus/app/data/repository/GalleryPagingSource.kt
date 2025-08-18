@@ -73,11 +73,7 @@ class GalleryPagingSource @Inject constructor(
                             galleryList.add(
                                 Gallery.Video(
                                     GalleryVideo(
-                                        id,
-                                        name,
-                                        data,
-                                        data.toDateTimeString(),
-                                        contentUri
+                                        id, name, data, data.toDateTimeString(), contentUri
                                     )
                                 )
                             )
@@ -85,26 +81,27 @@ class GalleryPagingSource @Inject constructor(
                             galleryList.add(
                                 Gallery.Image(
                                     GalleryImage(
-                                        id,
-                                        name,
-                                        data,
-                                        data.toDateTimeString(),
-                                        contentUri
+                                        id, name, data, data.toDateTimeString(), contentUri
                                     )
                                 )
                             )
+                        } else {
+                            continue
                         }
                         count++
                     } while (it.moveToNext() && count < params.loadSize)
                 }
             }
+            val prevKey = if (position == 0) null else max(0, position - params.loadSize)
+            val nextKey =
+                if (galleryList.size < params.loadSize) null else position + galleryList.size
 
-            Logger.d(TAG, "Loaded ${galleryList.size} items from position $position")
-
+            Logger.d(
+                TAG,
+                "Loaded ${galleryList.size} items from position $position, prevKey: $prevKey, nextKey: $nextKey"
+            )
             LoadResult.Page(
-                data = galleryList,
-                prevKey = if (position == 0) null else max(0, position - params.loadSize),
-                nextKey = if (galleryList.size < params.loadSize) null else position + galleryList.size
+                data = galleryList, prevKey = prevKey, nextKey = nextKey
             )
         } catch (e: Exception) {
             e.printStackTrace()
