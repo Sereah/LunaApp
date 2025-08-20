@@ -2,8 +2,8 @@ package com.lunacattus.app.data.di
 
 import android.content.Context
 import androidx.room.Room
-import com.lunacattus.app.data.AppDatabase
-import com.lunacattus.app.data.VideoDao
+import com.lunacattus.app.data.db.AppDatabase
+import com.lunacattus.app.data.db.VideoDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

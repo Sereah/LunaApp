@@ -8,6 +8,7 @@ import com.lunacattus.app.base.view.BottomNavItem
 import com.lunacattus.app.base.view.base.BaseFragment
 import com.lunacattus.app.gallery.R
 import com.lunacattus.app.gallery.databinding.FragmentListBinding
+import com.lunacattus.app.gallery.feature.list.adapter.PagerAdapter
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiEffect
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiIntent
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiState
@@ -40,6 +41,7 @@ class ListFragment :
             adapter = PagerAdapter(this@ListFragment)
             registerOnPageChangeCallback(pagerCallback)
             offscreenPageLimit = 1
+            isUserInputEnabled = false
         }
     }
 

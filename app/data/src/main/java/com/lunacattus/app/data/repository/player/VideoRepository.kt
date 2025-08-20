@@ -1,8 +1,8 @@
-package com.lunacattus.app.data.repository
+package com.lunacattus.app.data.repository.player
 
 import android.content.Context
 import com.google.gson.Gson
-import com.lunacattus.app.data.VideoDao
+import com.lunacattus.app.data.db.VideoDao
 import com.lunacattus.app.data.entity.mapper
 import com.lunacattus.app.domain.model.JsonVideo
 import com.lunacattus.app.domain.model.JsonVideos

@@ -222,7 +222,7 @@ class HomeFragment :
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-                        Logger.d(TAG, "Average luminosity: $luma")
+//                        Logger.d(TAG, "Average luminosity: $luma")
                     })
                 }
             val recorder = Recorder.Builder()

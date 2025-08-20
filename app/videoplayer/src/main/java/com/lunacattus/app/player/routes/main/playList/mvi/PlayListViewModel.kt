@@ -2,7 +2,7 @@ package com.lunacattus.app.player.routes.main.playList.mvi
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lunacattus.app.data.repository.VideoRepository
+import com.lunacattus.app.data.repository.player.VideoRepository
 import com.lunacattus.app.player.routes.main.playList.mvi.PlayListUiState.*
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel

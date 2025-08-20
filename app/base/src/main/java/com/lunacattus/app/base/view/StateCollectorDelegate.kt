@@ -17,8 +17,8 @@ import kotlinx.coroutines.launch
  * 状态收集委托类，封装通用的状态收集逻辑
  */
 class StateCollectorDelegate<STATE : IUIState>(
-    private val lifecycleOwner: LifecycleOwner,
-    private val uiStateFlow: Flow<STATE>
+    val lifecycleOwner: LifecycleOwner,
+    val uiStateFlow: Flow<STATE>
 ) {
 
     /**
@@ -52,7 +52,7 @@ class StateCollectorDelegate<STATE : IUIState>(
      * @param filterFn 状态过滤条件（默认不过滤）
      * @param collectFn 状态收集回调
      */
-    internal inline fun <reified T : STATE> collectState(
+    inline fun <reified T : STATE> collectState(
         noinline filterFn: (T) -> Boolean = { true },
         crossinline collectFn: (T) -> Unit
     ) {
@@ -89,7 +89,7 @@ class StateCollectorDelegate<STATE : IUIState>(
      * @param config 状态处理配置对象
      * @param collectFn 最终结果回调
      */
-    internal inline fun <reified T : STATE, R> collectState(
+    inline fun <reified T : STATE, R> collectState(
         config: CollectConfig<T, R>,
         crossinline collectFn: (R) -> Unit
     ) {
@@ -133,7 +133,7 @@ class StateCollectorDelegate<STATE : IUIState>(
      * @param flowB 第二个状态的收集配置
      * @param collectFn 组合结果回调（A, B → Unit）
      */
-    internal inline fun <reified T : STATE, A, B> collectCombined(
+    inline fun <reified T : STATE, A, B> collectCombined(
         flowA: CollectConfig<T, A>,
         flowB: CollectConfig<T, B>,
         crossinline collectFn: (A, B) -> Unit

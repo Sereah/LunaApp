@@ -13,7 +13,7 @@ import com.lunacattus.logger.Logger
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ImageListFragment : BaseListFragment() {
+class MediaListFragment : BaseListFragment() {
 
     override val viewModel: ListViewModel by activityViewModels()
 
@@ -21,13 +21,12 @@ class ImageListFragment : BaseListFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dispatchUiIntent(ListUiIntent.LoadMoreImage)
         stateCollector.collectState(
             config = CollectConfig<ListUiState.Success, List<Gallery>>(
-                mapFn = { it.imageList }
+                mapFn = { it.mediaList }
             )
         ) {
-            Logger.d(TAG, "collect image list: ${it.size}")
+            Logger.d(TAG, "collect media list: ${it.size}")
             val firstVisibleItem = gridLayoutManager.findFirstVisibleItemPosition()
             listAdapter.submitList(it) {
                 if (firstVisibleItem == 0) {
@@ -38,10 +37,6 @@ class ImageListFragment : BaseListFragment() {
     }
 
     override fun loadMore() {
-        dispatchUiIntent(ListUiIntent.LoadMoreImage)
-    }
-
-    companion object {
-        const val TAG = "ImageListFragment"
+        dispatchUiIntent(ListUiIntent.LoadMoreMedia)
     }
 }
