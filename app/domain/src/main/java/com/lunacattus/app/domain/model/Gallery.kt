@@ -18,19 +18,20 @@ data class GalleryVideo(
     val contentUri: Uri,
 )
 
+data class GalleryDate(
+    val date: String,
+)
+
 sealed class Gallery {
     data class Image(val galleryImage: GalleryImage) : Gallery()
     data class Video(val galleryVideo: GalleryVideo) : Gallery()
+    data class Date(val galleryDate: GalleryDate) : Gallery()
+    data object OtherFile : Gallery()
 }
 
-val Gallery.id
+val Gallery.id: Long?
     get() = when (this) {
         is Gallery.Image -> this.galleryImage.id
         is Gallery.Video -> this.galleryVideo.id
-    }
-
-val Gallery.addData
-    get() = when (this) {
-        is Gallery.Video -> this.galleryVideo.addData
-        is Gallery.Image -> this.galleryImage.addData
+        else -> null
     }

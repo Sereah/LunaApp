@@ -1,8 +1,8 @@
 package com.lunacattus.app.data.di
 
-import com.lunacattus.app.data.repository.MediaStoreRepository
-import com.lunacattus.app.data.repository.VideoRepository
-import com.lunacattus.app.domain.repository.IMediaStoreRepository
+import com.lunacattus.app.data.repository.gallery.GalleryRepository
+import com.lunacattus.app.data.repository.player.VideoRepository
+import com.lunacattus.app.domain.repository.IGalleryRepository
 import com.lunacattus.app.domain.repository.IVideoRepository
 import dagger.Binds
 import dagger.Module
@@ -17,5 +17,5 @@ abstract class RepositoryModule {
     abstract fun provideVideoRepository(impl: VideoRepository): IVideoRepository
 
     @Binds
-    abstract fun provideMediaStoreRepository(impl: MediaStoreRepository): IMediaStoreRepository
+    abstract fun provideGalleryRepository(impl: GalleryRepository): IGalleryRepository
 }

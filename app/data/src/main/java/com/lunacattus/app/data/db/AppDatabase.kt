@@ -1,4 +1,4 @@
-package com.lunacattus.app.data
+package com.lunacattus.app.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

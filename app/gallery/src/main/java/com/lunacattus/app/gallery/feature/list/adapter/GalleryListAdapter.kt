@@ -1,21 +1,20 @@
-package com.lunacattus.app.gallery.feature.list
+package com.lunacattus.app.gallery.feature.list.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.lunacattus.app.base.view.setOnClickListenerWithDebounce
 import com.lunacattus.app.domain.model.Gallery
 import com.lunacattus.app.gallery.databinding.ItemListImageBinding
+import com.lunacattus.app.gallery.databinding.ItemListTitleBinding
 import com.lunacattus.app.gallery.databinding.ItemListVideoBinding
 
-class GalleryAdapter(
-    private val context: Context,
+class GalleryListAdapter(
     private val onItemClick: (Gallery) -> Unit
-) : PagingDataAdapter<Gallery, RecyclerView.ViewHolder>(GALLERY_COMPARATOR) {
+) : ListAdapter<Gallery, RecyclerView.ViewHolder>(GALLERY_COMPARATOR) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -27,9 +26,13 @@ class GalleryAdapter(
         val videoBinding = ItemListVideoBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
+        val dateBinding = ItemListTitleBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
         return when (viewType) {
             TYPE_IMAGE -> ListAdapterImageViewHolder(imageBinding)
             TYPE_VIDEO -> ListAdapterVideoViewHolder(videoBinding)
+            TYPE_TITLE -> ListAdapterTitleViewHolder(dateBinding)
             else -> throw IllegalArgumentException("Unknown Gallery item type")
         }
     }
@@ -39,8 +42,9 @@ class GalleryAdapter(
         position: Int
     ) {
         when (val item = getItem(position)) {
-            is Gallery.Image -> (holder as ListAdapterImageViewHolder).bind(item, position)
-            is Gallery.Video -> (holder as ListAdapterVideoViewHolder).bind(item, position)
+            is Gallery.Image -> (holder as ListAdapterImageViewHolder).bind(item)
+            is Gallery.Video -> (holder as ListAdapterVideoViewHolder).bind(item)
+            is Gallery.Date -> (holder as ListAdapterTitleViewHolder).bind(item)
             else -> throw IllegalArgumentException("Unknown Gallery item type")
         }
     }
@@ -49,6 +53,7 @@ class GalleryAdapter(
         return when (getItem(position)) {
             is Gallery.Image -> TYPE_IMAGE
             is Gallery.Video -> TYPE_VIDEO
+            is Gallery.Date -> TYPE_TITLE
             else -> throw IllegalArgumentException("Unknown Gallery item type")
         }
     }
@@ -59,6 +64,7 @@ class GalleryAdapter(
                 return when {
                     oldItem is Gallery.Image && newItem is Gallery.Image -> oldItem.galleryImage.id == newItem.galleryImage.id
                     oldItem is Gallery.Video && newItem is Gallery.Video -> oldItem.galleryVideo.id == newItem.galleryVideo.id
+                    oldItem is Gallery.Date && newItem is Gallery.Date -> oldItem.galleryDate.date == newItem.galleryDate.date
                     else -> false
                 }
             }
@@ -69,45 +75,37 @@ class GalleryAdapter(
         }
         const val TYPE_IMAGE = 0
         const val TYPE_VIDEO = 1
+        const val TYPE_TITLE = 2
+    }
+
+    inner class ListAdapterTitleViewHolder(val binding: ItemListTitleBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: Gallery.Date) {
+            binding.title.text = item.galleryDate.date
+        }
     }
 
     inner class ListAdapterImageViewHolder(val binding: ItemListImageBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Gallery?, position: Int) {
-            val image = item as? Gallery.Image
-            if (image == null) {
-                binding.image.setImageURI(null)
-            } else {
-                Glide.with(context)
-                    .load(image.galleryImage.contentUri)
-                    .into(binding.image)
-            }
-            binding.position.text = position.toString()
-            binding.id.text = image?.galleryImage?.id.toString()
+        fun bind(item: Gallery.Image) {
+            Glide.with(binding.root)
+                .load(item.galleryImage.contentUri)
+                .into(binding.image)
             binding.root.setOnClickListenerWithDebounce {
-                item?.let {
-                    onItemClick(it)
-                }
+                onItemClick(item)
             }
         }
     }
 
     inner class ListAdapterVideoViewHolder(val binding: ItemListVideoBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Gallery?, position: Int) {
-            val video = item as? Gallery.Video
-            if (video != null) {
-                val uri = video.galleryVideo.contentUri
-                Glide.with(context)
-                    .load(uri)
-                    .into(binding.bg)
-            }
-            binding.position.text = position.toString()
-            binding.id.text = video?.galleryVideo?.id.toString()
+        fun bind(video: Gallery.Video) {
+            val uri = video.galleryVideo.contentUri
+            Glide.with(binding.root)
+                .load(uri)
+                .into(binding.bg)
             binding.root.setOnClickListenerWithDebounce {
-                item?.let {
-                    onItemClick(it)
-                }
+                onItemClick(video)
             }
         }
     }

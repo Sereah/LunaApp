@@ -2,7 +2,7 @@ package com.lunacattus.app.player.routes.main.browser.mvi
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lunacattus.app.data.repository.VideoRepository
+import com.lunacattus.app.data.repository.player.VideoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
