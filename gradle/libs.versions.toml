@@ -1,6 +1,6 @@
 [versions]
-agp = "8.10.1"
-kotlin = "2.0.21"
+agp = "8.12.0"
+kotlin = "2.2.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -8,7 +8,7 @@ espressoCore = "3.5.1"
 appcompat = "1.7.0"
 lifecycleRuntimeKtx = "2.9.2"
 material = "1.12.0"
-kspVersion = "2.0.21-1.0.27"
+kspVersion = "2.2.0-2.0.2"
 hilt = "2.56.2"
 hiltNavigationFragment = "1.2.0"
 media3 = "1.8.0"
@@ -20,19 +20,18 @@ mockk = "1.13.4"
 coroutines-test = "1.6.4"
 robolectric = "4.14.1"
 jacoco = "0.8.13"
-androidxComposeBom = "2025.02.00"
-androidxComposeFoundation = "1.8.2"
+androidxComposeBom = "2025.08.01"
+androidxComposeFoundation = "1.9.0"
 androidxHiltNavigationCompose = "1.2.0"
-animation = "1.8.2"
+animation = "1.9.0"
 activityCompose = "1.10.1"
-navigationCompose = "2.9.0"
+navigationCompose = "2.9.3"
 coil = "2.7.0"
 glide = "4.16.0"
 haze = "1.6.4"
 leakcanaryAndroid = "2.14"
 gson = "2.11.0"
 datastorePreferences = "1.1.7"
-composeBom = "2024.09.00"
 recyclerview = "1.4.0"
 
 [libraries]
@@ -105,7 +104,6 @@ android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", ver
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "kspVersion" }
 room-gradlePlugin = { group = "androidx.room", name = "room-gradle-plugin", version.ref = "roomVersion" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
