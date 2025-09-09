@@ -7,7 +7,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.lunacattus.app.base.common.dpToPx
 import com.lunacattus.app.base.view.ItemSpacingDecoration
 import com.lunacattus.app.base.view.base.BaseFragment
 import com.lunacattus.app.gallery.R
@@ -20,6 +19,7 @@ import com.lunacattus.app.gallery.feature.list.mvi.ListUiIntent
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiState
 import com.lunacattus.app.gallery.feature.list.mvi.ListViewModel
 import com.lunacattus.app.gallery.feature.list.mvi.ListViewModel.Companion.PAGE_SIZE
+import com.lunacattus.common.util.dpToPx
 import dagger.hilt.android.AndroidEntryPoint
 import com.lunacattus.app.base.R as baseR
 
