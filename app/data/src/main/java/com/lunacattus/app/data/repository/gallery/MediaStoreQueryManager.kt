@@ -10,12 +10,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import com.lunacattus.app.base.common.toDateTimeString
-import com.lunacattus.app.base.di.MainScope
 import com.lunacattus.app.domain.model.Gallery
 import com.lunacattus.app.domain.model.GalleryImage
 import com.lunacattus.app.domain.model.GalleryVideo
 import com.lunacattus.app.domain.model.id
+import com.lunacattus.common.di.MainScope
+import com.lunacattus.common.util.toDateTimeString
 import com.lunacattus.logger.Logger
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 
 class MediaStoreQueryManager @AssistedInject constructor(
     context: Context,
-    @MainScope private val scope: CoroutineScope,
+    @param:MainScope private val scope: CoroutineScope,
     @Assisted private val uri: Uri,
     @Assisted private val projection: Array<String>,
     @Assisted private val cursorMapper: (Cursor) -> Gallery?,

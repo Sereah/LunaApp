@@ -1,4 +1,4 @@
-package com.lunacattus.app.base.common
+package com.lunacattus.common.util
 
 import android.content.Context
 import android.util.TypedValue

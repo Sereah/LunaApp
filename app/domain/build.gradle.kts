@@ -10,6 +10,7 @@ android {
 }
 
 dependencies {
+    api(project(":common"))
     api(project(":logger"))
     api(project(":app:base"))
     api("androidx.paging:paging-runtime:3.3.6")

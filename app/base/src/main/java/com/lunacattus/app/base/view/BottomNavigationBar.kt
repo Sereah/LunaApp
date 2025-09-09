@@ -9,7 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.lunacattus.app.base.R
-import com.lunacattus.app.base.common.dpToPx
+import com.lunacattus.common.util.dpToPx
 
 class BottomNavigationBar @JvmOverloads constructor(
     context: Context,
