@@ -12,6 +12,7 @@ import com.lunacattus.common.di.IOScope
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okio.IOException
@@ -23,7 +24,8 @@ import javax.inject.Singleton
 @Singleton
 class DUIWakeUp @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    @param:IOScope private val scope: CoroutineScope
+    @param:IOScope private val scope: CoroutineScope,
+    private val audioRecordManager: AudioRecordManager
 ) {
 
     private val wakeupIntent = AIWakeupIntent()
@@ -41,11 +43,12 @@ class DUIWakeUp @Inject constructor(
     fun start() {
         Logger.d(TAG, "start...")
         wakeupIntent.apply {
-            isUseCustomFeed = true
+//            isUseCustomFeed = true
             setWakeupWord(wakeUpWords, floatArrayOf(0.1f))
         }
         wakeUpEngine.start(wakeupIntent)
         feedPcm()
+        audioRecordManager.start()
     }
 
     fun destroy() {
@@ -54,6 +57,19 @@ class DUIWakeUp @Inject constructor(
     }
 
     private fun feedPcm() {
+        scope.launch {
+            Logger.d(TAG, "feed...")
+            try {
+                audioRecordManager.byteChannel.consumeEach {
+                    wakeUpEngine.feedData(it, it.size)
+                }
+            } catch (e: IOException) {
+                Logger.e(TAG, e.toString())
+            }
+        }
+    }
+
+    private fun readTestPcm() {
         scope.launch {
             Logger.d(TAG, "feed...")
             var inputStream: InputStream? = null
@@ -146,6 +162,6 @@ class DUIWakeUp @Inject constructor(
 
     companion object {
         const val TAG = "DUIWakeUp"
-        val wakeUpWords = arrayOf("ni hao xiao chi")
+        val wakeUpWords = arrayOf("ni hao xiao sai")
     }
 }
