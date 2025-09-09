@@ -20,7 +20,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LunaMedia"
+rootProject.name = "LunaApp"
 include(":app:videoplayer")
 include(":app:camera")
 include(":app:domain")
