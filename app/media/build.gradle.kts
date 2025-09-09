@@ -33,6 +33,7 @@ android {
 dependencies {
     implementation(project(":app:domain"))
     implementation(project(":app:data"))
+    implementation(project(":speech"))
 
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.exoplayer.dash)
