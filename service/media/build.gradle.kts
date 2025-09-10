@@ -30,8 +30,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":speech"))
+    implementation(project(":feature:speech"))
     implementation(project(":logger"))
 
-    debugImplementation(libs.leakcanary.android)
+//    debugImplementation(libs.leakcanary.android)
 }
