@@ -2,9 +2,7 @@ package com.lunacattus.app.media
 
 import android.app.Application
 import com.lunacattus.logger.Logger
-import com.lunacattus.speech.Speech
 import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
 
 @HiltAndroidApp
 class MediaApp : Application() {
