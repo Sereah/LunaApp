@@ -15,8 +15,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import okio.IOException
 import org.json.JSONObject
@@ -34,8 +34,8 @@ class DUIWakeUp @Inject constructor(
     private val wakeupIntent = AIWakeupIntent()
     private lateinit var wakeUpEngine: AIWakeupEngine
 
-    private val _wakeUpState = MutableStateFlow(false)
-    val wakeUpState = _wakeUpState.asStateFlow()
+    private val _wakeUpState = MutableSharedFlow<Unit>()
+    val wakeUpState = _wakeUpState.asSharedFlow()
 
     fun init() {
         Logger.d(TAG, "init...")
@@ -50,7 +50,7 @@ class DUIWakeUp @Inject constructor(
         Logger.d(TAG, "start...")
         wakeupIntent.apply {
             isUseCustomFeed = true
-            setWakeupWord(wakeUpWords, floatArrayOf(0.1f, 0.1f, 0.1f, 0.1f))
+            setWakeupWord(wakeUpWords, floatArrayOf(0.2f, 0.2f, 0.2f, 0.2f, 0.2f))
         }
         wakeUpEngine.start(wakeupIntent)
         feedPcm()
@@ -115,7 +115,9 @@ class DUIWakeUp @Inject constructor(
                 TAG, "onWakeUp, recordId: $recordId, confidence: $confidence, " +
                         "word: $wakeupWord, json: $jsonResult"
             )
-            _wakeUpState.value = true
+            scope.launch {
+                _wakeUpState.emit(Unit)
+            }
         }
 
         /**
@@ -173,6 +175,9 @@ class DUIWakeUp @Inject constructor(
 
     companion object {
         const val TAG = "DUIWakeUp"
-        val wakeUpWords = arrayOf("ni hao xiao sai", "xiao sai tong xue", "xiao sai xiao sai")
+        val wakeUpWords = arrayOf(
+            "ni hao xiao sai", "xiao sai tong xue", "xiao sai xiao sai",
+            "ni hao guan qin", "guan qin tong xue"
+        )
     }
 }

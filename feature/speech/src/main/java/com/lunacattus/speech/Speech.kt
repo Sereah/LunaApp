@@ -79,9 +79,8 @@ class Speech @Inject constructor(
         duiTts.init()
         ioScope.launch {
             duiWakeUp.wakeUpState.collect { active ->
-                if (active) {
-                    duiTts.start(context.getString(R.string.wake_up_answer))
-                }
+                Logger.d(TAG, "collect wake up...")
+                duiTts.start(context.getString(R.string.wake_up_answer))
             }
         }
     }
