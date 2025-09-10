@@ -1,0 +1,4 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.LunaApp" parent="@android:style/Theme.NoTitleBar.Fullscreen" />
+</resources>

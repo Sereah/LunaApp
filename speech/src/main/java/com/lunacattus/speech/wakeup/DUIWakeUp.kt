@@ -43,22 +43,25 @@ class DUIWakeUp @Inject constructor(
     fun start() {
         Logger.d(TAG, "start...")
         wakeupIntent.apply {
-//            isUseCustomFeed = true
+            isUseCustomFeed = true
             setWakeupWord(wakeUpWords, floatArrayOf(0.1f))
         }
         wakeUpEngine.start(wakeupIntent)
         feedPcm()
         audioRecordManager.start()
+//        readTestPcm()
     }
 
     fun destroy() {
+        Logger.d(TAG, "destroy...")
+        audioRecordManager.stop()
         wakeUpEngine.stop()
         wakeUpEngine.destroy()
     }
 
     private fun feedPcm() {
+        Logger.d(TAG, "feedPcm...")
         scope.launch {
-            Logger.d(TAG, "feed...")
             try {
                 audioRecordManager.byteChannel.consumeEach {
                     wakeUpEngine.feedData(it, it.size)
@@ -152,6 +155,7 @@ class DUIWakeUp @Inject constructor(
 
         override fun onInit(status: Int) {
             Logger.d(TAG, "onInit, succuss: ${status == AIConstant.OPT_SUCCESS}")
+            start()
         }
 
         override fun onError(error: AIError?) {

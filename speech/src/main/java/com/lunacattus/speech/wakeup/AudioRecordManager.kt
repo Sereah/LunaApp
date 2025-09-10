@@ -19,27 +19,27 @@ class AudioRecordManager @Inject constructor(
     @param:IOScope private val scope: CoroutineScope
 ) {
 
-    private val minBuffer = AudioRecord.getMinBufferSize(
+    private val minBufferSize = AudioRecord.getMinBufferSize(
         16000,
         AudioFormat.CHANNEL_IN_MONO,
         AudioFormat.ENCODING_PCM_16BIT
     )
-    private val buffer = 3200.coerceAtLeast(minBuffer)
+    private val bufferSize = 3200.coerceAtLeast(minBufferSize)
     private lateinit var recorder: AudioRecord
     private var isRecording = false
 
-    private val _channel = Channel<ByteArray>(Channel.UNLIMITED)
+    private val _channel = Channel<ByteArray>(Channel.CONFLATED)
     val byteChannel: ReceiveChannel<ByteArray> get() = _channel
 
     @SuppressLint("MissingPermission")
     fun start() {
-        Logger.d(TAG, "start, buffer: $buffer")
+        Logger.d(TAG, "start, bufferSize: $bufferSize")
         recorder = AudioRecord(
             MediaRecorder.AudioSource.VOICE_RECOGNITION,
             16000,
             AudioFormat.CHANNEL_IN_MONO,
             AudioFormat.ENCODING_PCM_16BIT,
-            buffer
+            bufferSize
         )
         recorder.startRecording()
         isRecording = true
@@ -53,7 +53,7 @@ class AudioRecordManager @Inject constructor(
     }
 
     private fun readBytes() {
-        val byteBuffer = ByteArray(buffer)
+        val byteBuffer = ByteArray(bufferSize)
         scope.launch {
             while (isRecording) {
                 val bytes = recorder.read(byteBuffer, 0, byteBuffer.size)

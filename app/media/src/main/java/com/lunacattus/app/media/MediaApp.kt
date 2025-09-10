@@ -9,18 +9,10 @@ import javax.inject.Inject
 @HiltAndroidApp
 class MediaApp : Application() {
 
-    @Inject lateinit var speech: Speech
-
     override fun onCreate() {
         super.onCreate()
         Logger.initBaseTag(getString(R.string.app_name))
         Logger.d(TAG, "init.")
-        speech.init()
-    }
-
-    override fun onTerminate() {
-        super.onTerminate()
-        speech.destroy()
     }
 
     companion object {

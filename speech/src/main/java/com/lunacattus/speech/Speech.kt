@@ -1,6 +1,7 @@
 package com.lunacattus.speech
 
 import android.content.Context
+import android.os.Environment
 import com.aispeech.DUILiteConfig
 import com.aispeech.DUILiteSDK
 import com.aispeech.common.Log
@@ -23,31 +24,31 @@ class Speech @Inject constructor(
     private val _authState = MutableStateFlow(false)
     val authState = _authState.asStateFlow()
 
-    fun init() {
+    fun init(authConfig: SpeechAuthConfig) {
         Logger.d(TAG, "init.")
         DUILiteSDK.init(context)
-        auth()
+        auth(authConfig)
     }
 
     fun destroy() {
         duiWakeUp.destroy()
     }
 
-    private fun auth() {
+    private fun auth(config: SpeechAuthConfig) {
         val authConfig = AuthConfig().apply {
             authTimeout = 5000
             isLoadSerial = false
             isLoadMacAddress = false
-            offlineProfileName = "20230920103745013"
+            offlineProfileName = "com.lunacattus.speech"
         }
         val uploadConfig = UploadConfig().apply {
             isUploadEnable = false
         }
         val duiConfig = DUILiteConfig.Builder().apply {
-            setApiKey("23bdcbea884b23bdcbea884b68bfcf87")
-            setProductId("279632188")
-            setProductKey("7b8fdd95562c767257979f5dd87d3318")
-            setProductSecret("8f3ec6dafa59135d6e34e341bcc3a96b")
+            setApiKey(config.apiKey)
+            setProductId(config.productId)
+            setProductKey(config.productKey)
+            setProductSecret(config.productSecret)
             setAuthConfig(authConfig)
             setUploadConfig(uploadConfig)
         }.create()
@@ -56,8 +57,9 @@ class Speech @Inject constructor(
                 Logger.d(TAG, "Auth success.")
                 DUILiteSDK.setDebugMode(Log.V)
                 DUILiteSDK.setNativeLogLevel(Log.V)
+                DUILiteSDK.setGlobalAudioSavePath("/sdcard/aispeech")
                 _authState.value = true
-                duiWakeUp.init()
+                initComponent()
             }
 
             override fun error(code: String?, msg: String?) {
@@ -67,7 +69,18 @@ class Speech @Inject constructor(
         })
     }
 
+    private fun initComponent() {
+        duiWakeUp.init()
+    }
+
     companion object {
         const val TAG = "Speech"
     }
 }
+
+data class SpeechAuthConfig(
+    val apiKey: String = "",
+    val productId: String = "",
+    val productKey: String = "",
+    val productSecret: String = ""
+)
