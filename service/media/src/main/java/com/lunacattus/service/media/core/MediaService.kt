@@ -6,11 +6,14 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import com.lunacattus.common.di.IOScope
 import com.lunacattus.logger.Logger
 import com.lunacattus.service.media.R
 import com.lunacattus.speech.Speech
 import com.lunacattus.speech.SpeechAuthConfig
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -18,6 +21,10 @@ class MediaService : Service() {
 
     @Inject
     lateinit var speech: Speech
+
+    @Inject
+    @IOScope
+    lateinit var ioScope: CoroutineScope
 
     override fun onCreate() {
         super.onCreate()
@@ -35,6 +42,7 @@ class MediaService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Logger.d(TAG, "onStartCommand.")
         startForeground(1, buildNotification())
+        handleAsrMsg()
         return START_STICKY
     }
 
@@ -58,11 +66,19 @@ class MediaService : Service() {
         val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(channel)
         return Notification.Builder(this, channelId)
-            .setContentTitle("Media Service Running")
+            .setContentTitle("Media Service Active")
             .setContentText("")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setOngoing(true)
             .build()
+    }
+
+    private fun handleAsrMsg() {
+        ioScope.launch {
+            speech.asrResult.collect {
+                Logger.d(TAG, it)
+            }
+        }
     }
 
     companion object {
