@@ -17,6 +17,7 @@
         <service
             android:name=".core.MediaService"
             android:exported="true"
+            android:foregroundServiceType="microphone"
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="com.lunacattus.service.media" />
