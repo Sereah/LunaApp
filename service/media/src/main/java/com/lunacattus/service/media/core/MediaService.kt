@@ -1,9 +1,13 @@
 package com.lunacattus.service.media.core
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import com.lunacattus.logger.Logger
+import com.lunacattus.service.media.R
 import com.lunacattus.speech.Speech
 import com.lunacattus.speech.SpeechAuthConfig
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,6 +34,7 @@ class MediaService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Logger.d(TAG, "onStartCommand.")
+        startForeground(1, buildNotification())
         return START_STICKY
     }
 
@@ -41,6 +46,23 @@ class MediaService : Service() {
 
     override fun onBind(intent: Intent): IBinder? {
         return null
+    }
+
+    private fun buildNotification(): Notification {
+        val channelId = "media_service_channel"
+        val channel = NotificationChannel(
+            channelId,
+            "Media Service",
+            NotificationManager.IMPORTANCE_LOW
+        )
+        val manager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(channel)
+        return Notification.Builder(this, channelId)
+            .setContentTitle("Media Service Running")
+            .setContentText("")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setOngoing(true)
+            .build()
     }
 
     companion object {

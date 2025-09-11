@@ -14,7 +14,7 @@ class BootReceiver : BroadcastReceiver() {
             Intent(ACTION_MEDIA_SERVICE).apply {
                 setPackage(context?.packageName)
             }.let {
-                context?.startService(it)
+                context?.startForegroundService(it)
             }
         }
     }
