@@ -8,6 +8,8 @@ import com.aispeech.export.engines2.AILocalTTSEngine
 import com.aispeech.export.intent.AILocalTTSIntent
 import com.aispeech.export.listeners.AILocalTTSListener
 import com.lunacattus.logger.Logger
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,6 +17,9 @@ import javax.inject.Singleton
 class DUITts @Inject constructor() {
 
     private lateinit var engine: AILocalTTSEngine
+
+    private val _ttsState = MutableStateFlow<TtsState>(TtsState.Init)
+    val ttsState = _ttsState.asStateFlow()
 
     @SuppressLint("SdCardPath")
     fun init() {
@@ -37,6 +42,7 @@ class DUITts @Inject constructor() {
         engine.init(ttsConfig, ttsListener)
     }
 
+    @SuppressLint("SdCardPath")
     fun start(text: String) {
         val ttsIntent = AILocalTTSIntent().apply {
             speed = 0.85f  //语速
@@ -75,6 +81,7 @@ class DUITts @Inject constructor() {
 
         override fun onSpeechStart(utteranceId: String?) {
             Logger.d(TAG, "onSpeechStart...")
+            _ttsState.value = TtsState.Running
         }
 
         override fun onSpeechProgress(
@@ -90,6 +97,7 @@ class DUITts @Inject constructor() {
 
         override fun onSpeechFinish(utteranceId: String?) {
             Logger.d(TAG, "onSpeechFinish")
+            _ttsState.value = TtsState.Complete
         }
 
         override fun onTimestampReceived(bytes: ByteArray?, size: Int) {
@@ -101,4 +109,10 @@ class DUITts @Inject constructor() {
     companion object {
         const val TAG = "DUITts"
     }
+}
+
+sealed interface TtsState {
+    data object Init : TtsState
+    data object Running : TtsState
+    data object Complete : TtsState
 }

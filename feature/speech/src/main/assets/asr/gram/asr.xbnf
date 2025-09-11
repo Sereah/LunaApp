@@ -1,0 +1,5 @@
+$CONTACTS=(#CONTACTS#)/k="contacts"/;
+$CALL=[帮我] (打电话|发短信) 给 ($CONTACTS);
+
+$CMD_EXCUTE= ($CALL);
+( \<s\> ( $CMD_EXCUTE ) \<\/s\> )

@@ -7,9 +7,9 @@ import android.media.MediaRecorder
 import com.lunacattus.common.di.IOScope
 import com.lunacattus.logger.Logger
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,8 +28,8 @@ class AudioRecordManager @Inject constructor(
     private lateinit var recorder: AudioRecord
     private var isRecording = false
 
-    private val _channel = Channel<ByteArray>(Channel.Factory.CONFLATED)
-    val byteChannel: ReceiveChannel<ByteArray> get() = _channel
+    private val _byteFlow = MutableSharedFlow<ByteArray>(replay = 0, extraBufferCapacity = 1)
+    val recordFlow = _byteFlow.asSharedFlow()
 
     @SuppressLint("MissingPermission")
     fun start() {
@@ -58,7 +58,7 @@ class AudioRecordManager @Inject constructor(
             while (isRecording) {
                 val bytes = recorder.read(byteBuffer, 0, byteBuffer.size)
                 if (bytes > 0) {
-                    _channel.send(byteBuffer.copyOf(bytes))
+                    _byteFlow.emit(byteBuffer.copyOf(bytes))
                 } else {
                     delay(100)
                 }

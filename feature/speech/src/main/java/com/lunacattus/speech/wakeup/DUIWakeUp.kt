@@ -13,7 +13,6 @@ import com.lunacattus.logger.Logger
 import com.lunacattus.speech.record.AudioRecordManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -36,6 +35,7 @@ class DUIWakeUp @Inject constructor(
 
     private val _wakeUpState = MutableSharedFlow<Unit>()
     val wakeUpState = _wakeUpState.asSharedFlow()
+    private var wakeUpSuccess = false
 
     fun init() {
         Logger.d(TAG, "init...")
@@ -69,7 +69,7 @@ class DUIWakeUp @Inject constructor(
         Logger.d(TAG, "feedPcm...")
         scope.launch {
             try {
-                audioRecordManager.byteChannel.consumeEach {
+                audioRecordManager.recordFlow.collect {
                     wakeUpEngine.feedData(it, it.size)
                 }
             } catch (e: IOException) {
@@ -116,6 +116,7 @@ class DUIWakeUp @Inject constructor(
                         "word: $wakeupWord, json: $jsonResult"
             )
             scope.launch {
+                wakeUpSuccess = true
                 _wakeUpState.emit(Unit)
             }
         }
