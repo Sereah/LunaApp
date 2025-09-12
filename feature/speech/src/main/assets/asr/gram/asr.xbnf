@@ -1,5 +1,8 @@
-$CONTACTS=(#CONTACTS#)/k="contacts"/;
+$CONTACTS=(#CONTACTS#)/k="Contact"/;
 $CALL=[帮我] (打电话|发短信) 给 ($CONTACTS);
 
-$CMD_EXCUTE= ($CALL);
+$SETTING_ITEM=(蓝牙 | WIFI | 设置 | 飞行模式 | 静音模式)/k="Setting"/;
+$OPEN=[帮我] (打开|关闭) $SETTING_ITEM;
+
+$CMD_EXCUTE= ($CALL | $OPEN);
 ( \<s\> ( $CMD_EXCUTE ) \<\/s\> )

@@ -12,6 +12,7 @@ import com.aispeech.export.engines2.AILocalGrammarEngine
 import com.aispeech.export.intent.AILocalASRIntent
 import com.aispeech.export.listeners.AIASRListener
 import com.aispeech.export.listeners.AILocalGrammarListener
+import com.google.gson.JsonParser
 import com.lunacattus.common.di.IOScope
 import com.lunacattus.logger.Logger
 import com.lunacattus.speech.record.AudioRecordManager
@@ -19,9 +20,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okio.IOException
@@ -41,8 +40,8 @@ class DUIAsr @Inject constructor(
     private val _asrState = MutableStateFlow<AsrState>(AsrState.Init)
     val asrState = _asrState.asStateFlow()
 
-    private val _asrResult = Channel<String>(Channel.BUFFERED)
-    val asrResult: ReceiveChannel<String> get() = _asrResult
+    private val _asrResult = Channel<AsrResult>(Channel.BUFFERED)
+    val asrResult: ReceiveChannel<AsrResult> get() = _asrResult
 
     fun init() {
         Logger.d(TAG, "init...")
@@ -60,7 +59,7 @@ class DUIAsr @Inject constructor(
             mode = ASRMode.MODE_ASR
             isUseRealBack = true //实时返回
             isUseCustomFeed = true
-            noSpeechTimeOut = 10_000 //超时10s
+            noSpeechTimeOut = 10_000 //超时5s
             useFiller = true
             vadEnable = true
         }
@@ -143,15 +142,13 @@ class DUIAsr @Inject constructor(
 
         override fun onError(p0: AIError?) {
             Logger.e(TAG, "Asr onError: $p0")
-            _asrState.value = AsrState.Complete
+            _asrState.value = AsrState.Error
         }
 
         override fun onResults(p0: AIResult?) {
             Logger.d(TAG, "Asr result: ${p0?.resultObject.toString()}")
             p0?.let { result ->
-                ioScope.launch {
-                    _asrResult.send(result.resultObject.toString())
-                }
+                mapperResult(result.resultObject.toString())
             }
         }
 
@@ -191,6 +188,53 @@ class DUIAsr @Inject constructor(
 
     }
 
+    private fun mapperResult(json: String) {
+        val obj = JsonParser.parseString(json).asJsonObject
+
+        val result = if (obj.has("grammar")) {
+            // 实时结果
+            val grammar = obj.getAsJsonObject("grammar")
+            val rec = grammar.get("rec").asString
+            AsrResult.Partial(rec)
+        } else {
+            val keyMap: Map<String, SemanticsKey> = SemanticsKey::class.sealedSubclasses
+                .mapNotNull { subclass ->
+                    val obj = subclass.objectInstance
+                    val name = subclass.simpleName
+                    if (obj != null && name != null) name to obj else null
+                }
+                .toMap()
+            // 最终结果
+            val nluRec = if (obj.has("nluRec")) obj.get("nluRec").asString else null
+            val semObj = obj.getAsJsonObject("post")?.getAsJsonObject("sem")
+            val semMap: Map<SemanticsKey, SemanticsValue> = semObj?.entrySet()
+                ?.mapNotNull { entry ->
+                    val key = keyMap[entry.key] ?: return@mapNotNull null
+                    val value: SemanticsValue = when (key) {
+                        SemanticsKey.Setting -> {
+                            val target = when (entry.value.asString) {
+                                "蓝牙" -> Setting.Bluetooth
+                                "WIFI" -> Setting.WIFI
+                                "设置" -> Setting.Setting
+                                "飞行模式" -> Setting.Airplane
+                                "静音模式" -> Setting.Silent
+                                else -> return@mapNotNull null
+                            }
+                            val isOpen = nluRec?.contains("打开") == true
+                            SettingSemantics(isOpen, target)
+                        }
+
+                        SemanticsKey.Contact -> ContactSemantic(entry.value.asString)
+                    }
+                    key to value
+                }?.toMap() ?: emptyMap()
+            AsrResult.Final(semMap, nluRec)
+        }
+        ioScope.launch {
+            _asrResult.send(result)
+        }
+    }
+
     companion object {
         const val TAG = "DUIAsr"
 
@@ -200,7 +244,13 @@ class DUIAsr @Inject constructor(
 }
 
 sealed interface AsrState {
-    data object Init: AsrState
-    data object Running: AsrState
-    data object Complete: AsrState
+    data object Init : AsrState
+    data object Running : AsrState
+    data object Complete : AsrState
+    data object Error : AsrState
+}
+
+sealed interface AsrResult {
+    data class Partial(val rec: String) : AsrResult
+    data class Final(val post: Map<SemanticsKey, SemanticsValue>, val nluRec: String?) : AsrResult
 }

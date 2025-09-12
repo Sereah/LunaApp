@@ -11,6 +11,7 @@ import com.lunacattus.logger.Logger
 import com.lunacattus.service.media.R
 import com.lunacattus.speech.Speech
 import com.lunacattus.speech.SpeechAuthConfig
+import com.lunacattus.speech.asr.AsrResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -76,9 +77,18 @@ class MediaService : Service() {
     private fun handleAsrMsg() {
         ioScope.launch {
             speech.asrResult.collect {
-                Logger.d(TAG, it)
+                when(it) {
+                    is AsrResult.Final -> {
+
+                    }
+                    is AsrResult.Partial -> {}
+                }
             }
         }
+    }
+
+    private fun handlePost() {
+
     }
 
     companion object {

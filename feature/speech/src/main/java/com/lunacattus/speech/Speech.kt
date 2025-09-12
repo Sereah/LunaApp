@@ -8,6 +8,7 @@ import com.aispeech.export.config.AuthConfig
 import com.aispeech.export.config.UploadConfig
 import com.lunacattus.common.di.IOScope
 import com.lunacattus.logger.Logger
+import com.lunacattus.speech.asr.AsrResult
 import com.lunacattus.speech.asr.AsrState
 import com.lunacattus.speech.asr.DUIAsr
 import com.lunacattus.speech.tts.DUITts
@@ -37,7 +38,7 @@ class Speech @Inject constructor(
     private val _speechState = MutableStateFlow<SpeechState>(SpeechState.Init)
     val speechState = _speechState.asStateFlow()
 
-    private val _asrResult = MutableSharedFlow<String>()
+    private val _asrResult = MutableSharedFlow<AsrResult>()
     val asrResult = _asrResult.asSharedFlow()
 
     fun init(authConfig: SpeechAuthConfig) {
@@ -161,15 +162,16 @@ class Speech @Inject constructor(
                             else -> it
                         }
                     }
-                    if (state == AsrState.Complete) {
-                        duiTts.start(context.getString(R.string.asr_answer))
-                    }
                     Logger.d(TAG, "===== ${_speechState.value} =====")
                 }
             }
             launch {
                 duiAsr.asrResult.consumeEach {
+                    Logger.d(TAG, "AsrResult>>>>>>>$it")
                     _asrResult.emit(it)
+                    if (it is AsrResult.Final && it.post.isNotEmpty()) {
+                        duiTts.start(context.getString(R.string.asr_answer))
+                    }
                 }
             }
         }
