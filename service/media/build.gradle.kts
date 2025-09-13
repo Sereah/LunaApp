@@ -35,4 +35,17 @@ dependencies {
     implementation(project(":common"))
 
 //    debugImplementation(libs.leakcanary.android)
+
+    compileOnly(files("ext/framework13.jar"))
+}
+
+gradle.projectsEvaluated {
+    tasks.withType<JavaCompile>().configureEach {
+        val originalClasspath = options.bootstrapClasspath?.files ?: emptySet<File>()
+        val newFileList = mutableListOf<File>().apply {
+            add(project.file("ext/framework13.jar"))
+            addAll(originalClasspath)
+        }
+        options.bootstrapClasspath = files(*newFileList.toTypedArray())
+    }
 }
