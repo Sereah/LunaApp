@@ -1,8 +1,38 @@
-$CONTACTS=(#CONTACTS#)/k="Contact"/;
-$CALL=[帮我] (打电话|发短信) 给 ($CONTACTS);
+# ===== 联系人（动态词表）=====
+$PERSON = (#CONTACTS#)/k="person"/;
 
-$SETTING_ITEM=(蓝牙 | WIFI | 设置 | 飞行模式 | 静音模式)/k="Setting"/;
-$OPEN=[帮我] (打开|关闭) $SETTING_ITEM;
+# ===== 电话动作 =====
+$CALL_ACTION = (打电话给 | 电话给 | 呼叫 | 联系 | 致电 | 拨通 | 拨打)
+/k="action",v="call"/;
 
-$CMD_EXCUTE= ($CALL | $OPEN);
-( \<s\> ( $CMD_EXCUTE ) \<\/s\> )
+# ===== 短信动作 =====
+$SMS_ACTION = (发短信[给] | 发信息给)
+/k="action",v="sms"/;
+
+# ===== PHONE命令=====
+$CMD_PHONE = (($CALL_ACTION | $SMS_ACTION) $PERSON)/domain="phone"/;
+
+
+# ===== App列表 =====
+$APP_LIST = (播放器 | 相机)
+/k="app"/;
+
+# ===== 系统设置项 =====
+$SETTING_ITEM = (蓝牙 | WIFI | 飞行模式 | 静音模式)
+/k="settingItem"/;
+
+# ===== 打开动作 =====
+$OPEN_ACTION = ([帮我]打开 | 开启[应用])
+/k="action",v="open"/;
+
+# ===== 关闭动作 =====
+$CLOSE_ACTION = ([帮我]关闭 | 关掉[应用])
+/k="action",v="close"/;
+
+# ===== CONTROL命令 =====
+$CMD_CONTROL = (($OPEN_ACTION | $CLOSE_ACTION) ($SETTING_ITEM | $APP_LIST))/domain="control"/;
+
+
+$EXECUTE = ($CMD_PHONE | $CMD_CONTROL);
+
+( \<s\> (  $EXECUTE  ) \<\/s\> )

@@ -2,25 +2,70 @@ package com.lunacattus.speech.asr
 
 //同步配置asr.xbnf
 
-sealed interface SemanticsKey {
-    data object Setting: SemanticsKey
-    data object Contact: SemanticsKey
+enum class Domain(val value: String) {
+    PHONE("phone"),
+    CONTROL("control");
+
+    companion object {
+        private val map = entries.associateBy { it.value.lowercase() }
+        fun fromString(s: String) = map[s.lowercase()] ?: throw IllegalArgumentException("Unknown domain: $s")
+    }
 }
 
-interface SemanticsValue
+enum class ActionType(val value: String) {
+    OPEN("open"),
+    CLOSE("close"),
+    CALL("call"),
+    SMS("sms");
 
-//设置项语义
-enum class Setting {
-    Bluetooth, WIFI, Setting, Airplane, Silent
+    companion object {
+        private val map = entries.associateBy { it.value.lowercase() }
+        fun fromString(s: String) = map[s.lowercase()] ?: throw IllegalArgumentException("Unknown action: $s")
+    }
 }
 
-data class SettingSemantics(
-    val isOpen: Boolean,
-    val target: Setting
-) : SemanticsValue
+enum class SettingItem(val value: String) {
+    BT("蓝牙"),
+    WIFI("WIFI"),
+    AIRPLANE("飞行模式"),
+    SILENT("静音模式");
 
-//联系人语义
-data class ContactSemantic(
-    val name: String
-): SemanticsValue
+    companion object {
+        private val map = entries.associateBy { it.value }
+        fun fromString(s: String) = map[s] ?: throw IllegalArgumentException("Unknown setting item: $s")
+    }
+}
+
+enum class AppName(val value: String) {
+    PLAYER("播放器"),
+    CAMERA("相机");
+
+    companion object {
+        private val map = entries.associateBy { it.value }
+        fun fromString(s: String) = map[s] ?: throw IllegalArgumentException("Unknown app: $s")
+    }
+}
+
+// 基类
+open class Command(
+    open val domain: Domain,
+    open val action: ActionType
+)
+
+// phone domain
+data class PhoneCommand(
+    override val domain: Domain,
+    override val action: ActionType,
+    val person: String? = null,
+    val number: String? = null
+) : Command(domain, action)
+
+// control domain
+data class ControlCommand(
+    override val domain: Domain,
+    override val action: ActionType,
+    val app: AppName? = null,
+    val settingItem: SettingItem? = null
+) : Command(domain, action)
+
 

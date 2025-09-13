@@ -12,6 +12,7 @@ import com.aispeech.export.engines2.AILocalGrammarEngine
 import com.aispeech.export.intent.AILocalASRIntent
 import com.aispeech.export.listeners.AIASRListener
 import com.aispeech.export.listeners.AILocalGrammarListener
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.lunacattus.common.di.IOScope
 import com.lunacattus.logger.Logger
@@ -43,6 +44,10 @@ class DUIAsr @Inject constructor(
     private val _asrResult = Channel<AsrResult>(Channel.BUFFERED)
     val asrResult: ReceiveChannel<AsrResult> get() = _asrResult
 
+    private val asrGson = GsonBuilder()
+        .registerTypeAdapter(Command::class.java, CommandDeserializer())
+        .create()
+
     fun init() {
         Logger.d(TAG, "init...")
         grammarEngine = AILocalGrammarEngine.createInstance()
@@ -68,7 +73,7 @@ class DUIAsr @Inject constructor(
     }
 
     private fun buildGrammarRes() {
-        val contactString = "张三 | 李四 | 周峰冰"
+        val contactString = "张三 | 李四 | 周峰冰" // TODO: 获取真实联系人
         val ebnf = EbnfUtil.generateEbnfFromAssets(
             context,
             "asr/gram/asr.xbnf",
@@ -197,38 +202,14 @@ class DUIAsr @Inject constructor(
             val rec = grammar.get("rec").asString
             AsrResult.Partial(rec)
         } else {
-            val keyMap: Map<String, SemanticsKey> = SemanticsKey::class.sealedSubclasses
-                .mapNotNull { subclass ->
-                    val obj = subclass.objectInstance
-                    val name = subclass.simpleName
-                    if (obj != null && name != null) name to obj else null
-                }
-                .toMap()
             // 最终结果
             val nluRec = if (obj.has("nluRec")) obj.get("nluRec").asString else null
             val semObj = obj.getAsJsonObject("post")?.getAsJsonObject("sem")
-            val semMap: Map<SemanticsKey, SemanticsValue> = semObj?.entrySet()
-                ?.mapNotNull { entry ->
-                    val key = keyMap[entry.key] ?: return@mapNotNull null
-                    val value: SemanticsValue = when (key) {
-                        SemanticsKey.Setting -> {
-                            val target = when (entry.value.asString) {
-                                "蓝牙" -> Setting.Bluetooth
-                                "WIFI" -> Setting.WIFI
-                                "设置" -> Setting.Setting
-                                "飞行模式" -> Setting.Airplane
-                                "静音模式" -> Setting.Silent
-                                else -> return@mapNotNull null
-                            }
-                            val isOpen = nluRec?.contains("打开") == true
-                            SettingSemantics(isOpen, target)
-                        }
-
-                        SemanticsKey.Contact -> ContactSemantic(entry.value.asString)
-                    }
-                    key to value
-                }?.toMap() ?: emptyMap()
-            AsrResult.Final(semMap, nluRec)
+            val command = semObj?.let {
+                if (it.isEmpty) return@let null
+                asrGson.fromJson(it.asJsonObject, Command::class.java)
+            }
+            AsrResult.Final(command, nluRec)
         }
         ioScope.launch {
             _asrResult.send(result)
@@ -252,5 +233,5 @@ sealed interface AsrState {
 
 sealed interface AsrResult {
     data class Partial(val rec: String) : AsrResult
-    data class Final(val post: Map<SemanticsKey, SemanticsValue>, val nluRec: String?) : AsrResult
+    data class Final(val command: Command?, val nluRec: String?) : AsrResult
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="wake_up_answer">我在</string>
-    <string name="asr_answer">好的~</string>
+    <string name="asr_answer_good">好的~</string>
+    <string name="asr_answer_bad">我 听不懂 你说的 什么 呢~</string>
 </resources>

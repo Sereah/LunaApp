@@ -28,7 +28,7 @@ class DUITts @Inject constructor() {
             useCache = false //缓存音频文件到目录
             enableOptimization = true
             addSpeakerResource(
-                arrayOf("tts/back_gdfanf_natong_ttsv5_4.2n_230901.bin")
+                arrayOf("tts/lzlinf_lstm_210827.bin")
             ) //合成音色资源
             setDictResource(
                 "tts/v2.1.65_aitts_sent_dict_local.db"

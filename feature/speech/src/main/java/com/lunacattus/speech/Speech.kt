@@ -167,10 +167,14 @@ class Speech @Inject constructor(
             }
             launch {
                 duiAsr.asrResult.consumeEach {
-                    Logger.d(TAG, "AsrResult>>>>>>>$it")
+                    Logger.d(TAG, "Asr =========> $it")
                     _asrResult.emit(it)
-                    if (it is AsrResult.Final && it.post.isNotEmpty()) {
-                        duiTts.start(context.getString(R.string.asr_answer))
+                    if (it is AsrResult.Final) {
+                        if (it.command != null) {
+                            duiTts.start(context.getString(R.string.asr_answer_good))
+                        } else {
+                            duiTts.start(context.getString(R.string.asr_answer_bad))
+                        }
                     }
                 }
             }
