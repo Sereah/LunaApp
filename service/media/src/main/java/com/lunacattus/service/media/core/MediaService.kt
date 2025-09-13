@@ -9,9 +9,9 @@ import android.os.IBinder
 import com.lunacattus.common.di.IOScope
 import com.lunacattus.logger.Logger
 import com.lunacattus.service.media.R
+import com.lunacattus.service.media.speech.AsrHandler
 import com.lunacattus.speech.Speech
 import com.lunacattus.speech.SpeechAuthConfig
-import com.lunacattus.speech.asr.AsrResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -26,6 +26,8 @@ class MediaService : Service() {
     @Inject
     @IOScope
     lateinit var ioScope: CoroutineScope
+
+    @Inject lateinit var asrHandler: AsrHandler
 
     override fun onCreate() {
         super.onCreate()
@@ -43,7 +45,7 @@ class MediaService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Logger.d(TAG, "onStartCommand.")
         startForeground(1, buildNotification())
-        handleAsrMsg()
+        collectFlow()
         return START_STICKY
     }
 
@@ -74,15 +76,10 @@ class MediaService : Service() {
             .build()
     }
 
-    private fun handleAsrMsg() {
+    private fun collectFlow() {
         ioScope.launch {
             speech.asrResult.collect {
-                when(it) {
-                    is AsrResult.Final -> {
-
-                    }
-                    is AsrResult.Partial -> {}
-                }
+                asrHandler.handler(it)
             }
         }
     }
