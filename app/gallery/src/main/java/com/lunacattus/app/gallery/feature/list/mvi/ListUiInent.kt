@@ -1,6 +1,6 @@
 package com.lunacattus.app.gallery.feature.list.mvi
 
-import com.lunacattus.app.base.view.base.IUIIntent
+import com.lunacattus.app.gallery.base.IUIIntent
 
 sealed interface ListUiIntent : IUIIntent {
     data object Init : ListUiIntent

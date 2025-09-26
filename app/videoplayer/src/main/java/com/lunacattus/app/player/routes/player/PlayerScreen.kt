@@ -42,11 +42,11 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.ui.compose.PlayerSurface
-import com.lunacattus.app.base.compose.extensions.clickableWithDebounce
 import com.lunacattus.app.player.MainActivity
 import com.lunacattus.app.player.routes.player.mvi.PlayerViewModel
 import com.lunacattus.app.player.setLightStatusBarIcons
 import com.lunacattus.logger.Logger
+import com.lunacattus.ui_design.compose.extensions.clickableWithDebounce
 import kotlinx.coroutines.delay
 
 @OptIn(UnstableApi::class, ExperimentalMaterial3Api::class)

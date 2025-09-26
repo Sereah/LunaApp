@@ -3,7 +3,7 @@ package com.lunacattus.app.gallery.feature.list
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
-import com.lunacattus.app.base.view.StateCollectorDelegate.CollectConfig
+import com.lunacattus.app.gallery.base.StateCollectorDelegate.CollectConfig
 import com.lunacattus.app.domain.model.Gallery
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiEffect
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiIntent

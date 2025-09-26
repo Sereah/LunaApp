@@ -25,11 +25,19 @@ internal fun Project.configureAndroidCompose(
             "implementation"(libs.findLibrary("androidx.compose.foundation").get())
             "implementation"(libs.findLibrary("androidx.compose.foundation.layout").get())
             "implementation"(libs.findLibrary("androidx.compose.animation").get())
+            "debugImplementation"(libs.findLibrary("androidx.compose.ui.tooling").get())
             if (commonExtension is ApplicationExtension) {
                 "implementation"(libs.findLibrary("androidx.activity.compose").get())
                 "implementation"(libs.findLibrary("androidx.navigation.compose").get())
                 "implementation"(libs.findLibrary("androidx.hilt.navigation.compose").get())
+                "androidTestImplementation"(platform(bom))
+                "androidTestImplementation"(
+                    libs.findLibrary("androidx.compose.ui.test.junit4").get()
+                )
             }
+            "debugImplementation"(
+                libs.findLibrary("androidx.compose.ui.test.manifest").get()
+            )
         }
     }
 }

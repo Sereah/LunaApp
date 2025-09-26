@@ -35,8 +35,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.lunacattus.app.base.compose.components.BottomItem
-import com.lunacattus.app.base.compose.components.HazeAppBarBottomScaffold
 import com.lunacattus.app.domain.model.VideoType
 import com.lunacattus.app.player.routes.main.browser.BrowserGraph
 import com.lunacattus.app.player.routes.main.browser.browserRouter
@@ -52,6 +50,8 @@ import com.lunacattus.app.player.routes.player.mvi.PlayerViewModel
 import com.lunacattus.app.player.routes.player.navToPlayer
 import com.lunacattus.app.player.routes.player.playerRouter
 import com.lunacattus.app.player.theme.AppTheme
+import com.lunacattus.ui_design.compose.components.BottomItem
+import com.lunacattus.ui_design.compose.components.HazeAppBarBottomScaffold
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -39,8 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.lunacattus.app.base.compose.components.overScrollVertical
-import com.lunacattus.app.base.compose.extensions.clickableWithDebounce
 import com.lunacattus.app.domain.model.Video
 import com.lunacattus.app.domain.model.VideoType
 import com.lunacattus.app.player.MainActivity
@@ -49,6 +47,8 @@ import com.lunacattus.app.player.routes.main.browser.mvi.BrowserUiIntent
 import com.lunacattus.app.player.routes.player.mvi.PlayerViewModel
 import com.lunacattus.app.player.theme.AppTheme
 import com.lunacattus.logger.Logger
+import com.lunacattus.ui_design.compose.components.overScrollVertical
+import com.lunacattus.ui_design.compose.extensions.clickableWithDebounce
 
 @Composable
 fun BrowserScreen(

@@ -1,6 +1,7 @@
 import com.lunacattus.convention.configureKotlinAndroid
 import com.lunacattus.convention.libs
 import com.android.build.api.dsl.LibraryExtension
+import com.lunacattus.convention.configureTest
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -17,20 +18,15 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
                 buildTypes {
                     release {
-                        isMinifyEnabled = false
+                        isMinifyEnabled = true
                     }
                     debug {
                         isMinifyEnabled = false
                     }
                 }
 
-                dependencies {
-                    "testImplementation"(libs.findLibrary("junit").get())
-                    "testImplementation"(libs.findLibrary("mockk").get())
-                    "testImplementation"(libs.findLibrary("coroutines.test").get())
-                }
-
                 configureKotlinAndroid(this)
+                configureTest(this)
             }
         }
     }

@@ -53,9 +53,14 @@ gradlePlugin {
             implementationClass = "AndroidLibraryComposeConventionPlugin"
         }
 
-        register("androidView") {
-            id = libs.plugins.architecture.android.view.get().pluginId
-            implementationClass = "AndroidViewConventionPlugin"
+        register("androidApplicationView") {
+            id = libs.plugins.architecture.android.application.view.get().pluginId
+            implementationClass = "AndroidApplicationViewConventionPlugin"
+        }
+
+        register("androidLibraryView") {
+            id = libs.plugins.architecture.android.library.view.get().pluginId
+            implementationClass = "AndroidLibraryViewConventionPlugin"
         }
 
         register("androidApplicationJacoco") {

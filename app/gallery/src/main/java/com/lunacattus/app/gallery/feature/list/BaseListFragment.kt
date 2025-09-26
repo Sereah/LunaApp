@@ -7,21 +7,20 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.lunacattus.app.base.view.ItemSpacingDecoration
-import com.lunacattus.app.base.view.base.BaseFragment
 import com.lunacattus.app.gallery.R
+import com.lunacattus.app.gallery.base.BaseFragment
 import com.lunacattus.app.gallery.databinding.ItemViewpagerPageBinding
-import com.lunacattus.app.gallery.feature.list.adapter.GalleryListAdapter.Companion.TYPE_TITLE
 import com.lunacattus.app.gallery.feature.list.ListFragment.Companion.SPACE_COUNT
 import com.lunacattus.app.gallery.feature.list.adapter.GalleryListAdapter
+import com.lunacattus.app.gallery.feature.list.adapter.GalleryListAdapter.Companion.TYPE_TITLE
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiEffect
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiIntent
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiState
 import com.lunacattus.app.gallery.feature.list.mvi.ListViewModel
 import com.lunacattus.app.gallery.feature.list.mvi.ListViewModel.Companion.PAGE_SIZE
 import com.lunacattus.common.util.dpToPx
+import com.lunacattus.ui_design.view.ItemSpacingDecoration
 import dagger.hilt.android.AndroidEntryPoint
-import com.lunacattus.app.base.R as baseR
 
 @AndroidEntryPoint
 abstract class BaseListFragment :
@@ -51,10 +50,10 @@ abstract class BaseListFragment :
                 args = null,
                 navOptions = navOptions {
                     anim {
-                        enter = baseR.anim.slide_in_right
-                        exit = baseR.anim.slide_out_left
-                        popEnter = baseR.anim.slide_in_left
-                        popExit = baseR.anim.slide_out_right
+                        enter = R.anim.slide_in_right
+                        exit = R.anim.slide_out_left
+                        popEnter = R.anim.slide_in_left
+                        popExit = R.anim.slide_out_right
                     }
                 }
             )

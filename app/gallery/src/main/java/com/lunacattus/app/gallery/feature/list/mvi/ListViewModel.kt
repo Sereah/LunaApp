@@ -1,7 +1,7 @@
 package com.lunacattus.app.gallery.feature.list.mvi
 
 import androidx.lifecycle.viewModelScope
-import com.lunacattus.app.base.view.base.BaseViewModel
+import com.lunacattus.app.gallery.base.BaseViewModel
 import com.lunacattus.app.data.repository.gallery.GalleryRepository
 import com.lunacattus.app.domain.model.Gallery
 import com.lunacattus.app.domain.model.GalleryDate
