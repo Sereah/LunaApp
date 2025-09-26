@@ -4,15 +4,15 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
-import com.lunacattus.app.base.view.BottomNavItem
-import com.lunacattus.app.base.view.base.BaseFragment
 import com.lunacattus.app.gallery.R
+import com.lunacattus.app.gallery.base.BaseFragment
 import com.lunacattus.app.gallery.databinding.FragmentListBinding
 import com.lunacattus.app.gallery.feature.list.adapter.PagerAdapter
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiEffect
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiIntent
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiState
 import com.lunacattus.app.gallery.feature.list.mvi.ListViewModel
+import com.lunacattus.ui_design.view.BottomNavItem
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

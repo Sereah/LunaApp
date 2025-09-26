@@ -121,9 +121,10 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 # build-logic plugins
 architecture-android-application = { id = "architecture.android.application" }
 architecture-android-application-compose = { id = "architecture.android.application.compose" }
-architecture-android-view = { id = "architecture.android.view" }
+architecture-android-application-view = { id = "architecture.android.application.view" }
 architecture-android-library = { id = "architecture.android.library" }
 architecture-android-library-compose = { id = "architecture.android.library.compose" }
+architecture-android-library-view = { id = "architecture.android.library.view" }
 architecture-android-application-jacoco = { id = "architecture.android.application.jacoco" }
 architecture-android-library-jacoco = { id = "architecture.android.library.jacoco" }
 architecture-hilt = { id = "architecture.hilt" }

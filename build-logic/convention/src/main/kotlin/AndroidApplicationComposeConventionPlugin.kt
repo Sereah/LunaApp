@@ -15,7 +15,6 @@ class AndroidApplicationComposeConventionPlugin : Plugin<Project> {
 
             val extensions = extensions.getByType<ApplicationExtension>()
             configureAndroidCompose(extensions)
-            configureTest(extensions, true)
         }
     }
 }

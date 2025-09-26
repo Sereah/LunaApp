@@ -1,6 +1,6 @@
 package com.lunacattus.app.gallery.feature.list.mvi
 
-import com.lunacattus.app.base.view.base.IUIState
+import com.lunacattus.app.gallery.base.IUIState
 import com.lunacattus.app.domain.model.Gallery
 
 sealed interface ListUiState : IUIState {

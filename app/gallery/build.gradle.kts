@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat
 
 plugins {
     alias(libs.plugins.architecture.android.application)
-    alias(libs.plugins.architecture.android.view)
+    alias(libs.plugins.architecture.android.application.view)
     alias(libs.plugins.architecture.hilt)
 }
 
@@ -32,5 +32,6 @@ android {
 dependencies {
     implementation(project(":app:domain"))
     implementation(project(":app:data"))
+    implementation(project(":ui-design"))
     implementation(libs.glide)
 }

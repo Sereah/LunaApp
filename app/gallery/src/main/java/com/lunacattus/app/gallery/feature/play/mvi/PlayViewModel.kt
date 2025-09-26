@@ -1,6 +1,6 @@
 package com.lunacattus.app.gallery.feature.play.mvi
 
-import com.lunacattus.app.base.view.base.BaseViewModel
+import com.lunacattus.app.gallery.base.BaseViewModel
 import com.lunacattus.logger.Logger
 
 class PlayViewModel : BaseViewModel<PlayUiIntent, PlayUiState, PlayUiEffect>() {

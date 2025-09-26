@@ -1,5 +1,6 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.lunacattus.convention.configureKotlinAndroid
+import com.lunacattus.convention.configureTest
 import com.lunacattus.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -20,8 +21,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 }
 
                 signingConfigs {
-                    create("platform_system") {
-                        storeFile = file("$rootDir/keystore/platform_system.jks")
+                    create("system") {
+                        storeFile = file("$rootDir/keystore/system.jks")
                         storePassword = "123456"
                         keyAlias = "system"
                         keyPassword = "123456"
@@ -51,7 +52,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                     }
                     create("system") {
                         dimension = "platform"
-                        signingConfig = signingConfigs.getByName("platform_system")
+                        signingConfig = signingConfigs.getByName("system")
                     }
                 }
 
@@ -60,6 +61,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 }
 
                 configureKotlinAndroid(this)
+                configureTest(this)
             }
         }
     }

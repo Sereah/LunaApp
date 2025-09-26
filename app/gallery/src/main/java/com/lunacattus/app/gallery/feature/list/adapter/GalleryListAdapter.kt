@@ -6,11 +6,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.lunacattus.app.base.view.setOnClickListenerWithDebounce
 import com.lunacattus.app.domain.model.Gallery
 import com.lunacattus.app.gallery.databinding.ItemListImageBinding
 import com.lunacattus.app.gallery.databinding.ItemListTitleBinding
 import com.lunacattus.app.gallery.databinding.ItemListVideoBinding
+import com.lunacattus.ui_design.view.setOnClickListenerWithDebounce
 
 class GalleryListAdapter(
     private val onItemClick: (Gallery) -> Unit

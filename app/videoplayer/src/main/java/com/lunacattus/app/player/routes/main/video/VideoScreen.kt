@@ -39,9 +39,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import com.lunacattus.app.base.compose.components.SwipeToRevealItem
-import com.lunacattus.app.base.compose.components.overScrollVertical
-import com.lunacattus.app.base.compose.extensions.clickableWithDebounce
 import com.lunacattus.app.domain.model.JsonVideo
 import com.lunacattus.app.domain.model.VideoType
 import com.lunacattus.app.player.MainActivity
@@ -51,6 +48,9 @@ import com.lunacattus.app.player.routes.main.video.mvi.VideoUiState
 import com.lunacattus.app.player.routes.player.mvi.MediaItems
 import com.lunacattus.app.player.routes.player.mvi.PlayerViewModel
 import com.lunacattus.app.player.theme.AppTheme
+import com.lunacattus.ui_design.compose.components.SwipeToRevealItem
+import com.lunacattus.ui_design.compose.components.overScrollVertical
+import com.lunacattus.ui_design.compose.extensions.clickableWithDebounce
 
 @Composable
 fun VideoScreen(

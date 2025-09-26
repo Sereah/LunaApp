@@ -1,6 +1,5 @@
 package com.lunacattus.app.domain.repository
 
-import androidx.paging.PagingData
 import com.lunacattus.app.domain.model.Gallery
 import kotlinx.coroutines.flow.Flow
 
