@@ -102,7 +102,7 @@ class Speech @Inject constructor(
                             else -> SpeechState.Active(wakeupActive = true)
                         }
                     }
-                    Logger.d(TAG, "===== ${_speechState.value} =====")
+                    Logger.box(TAG, "${_speechState.value}")
                     duiTts.start(context.getString(R.string.wake_up_answer))
                 }
             }
@@ -131,7 +131,7 @@ class Speech @Inject constructor(
 
                         else -> {}
                     }
-                    Logger.d(TAG, "===== ${_speechState.value} =====")
+                    Logger.box(TAG, "${_speechState.value}")
                     //当回答时wakeup处于激活时才开始asr，避免asr的tts结束时干扰。
                     if (ttsState == TtsState.Complete && _speechState.value is SpeechState.Active) {
                         if ((_speechState.value as SpeechState.Active).wakeupActive) {
@@ -162,7 +162,7 @@ class Speech @Inject constructor(
                             else -> it
                         }
                     }
-                    Logger.d(TAG, "===== ${_speechState.value} =====")
+                    Logger.box(TAG, "${_speechState.value}")
                 }
             }
             launch {

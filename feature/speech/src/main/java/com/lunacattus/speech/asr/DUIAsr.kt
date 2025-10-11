@@ -1,6 +1,5 @@
 package com.lunacattus.speech.asr
 
-import android.annotation.SuppressLint
 import android.content.Context
 import com.aispeech.AIError
 import com.aispeech.AIResult
@@ -25,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okio.IOException
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -48,6 +48,14 @@ class DUIAsr @Inject constructor(
         .registerTypeAdapter(Command::class.java, CommandDeserializer())
         .create()
 
+    private val ebnfDir: File by lazy {
+        File(context.filesDir, "ebnf").apply {
+            if (!exists()) {
+                mkdirs()
+            }
+        }
+    }
+
     fun init() {
         Logger.d(TAG, "init...")
         grammarEngine = AILocalGrammarEngine.createInstance()
@@ -64,7 +72,7 @@ class DUIAsr @Inject constructor(
             mode = ASRMode.MODE_ASR
             isUseRealBack = true //实时返回
             isUseCustomFeed = true
-            noSpeechTimeOut = 10_000 //超时5s
+            noSpeechTimeOut = 10_000 //超时10s
             useFiller = true
             vadEnable = true
         }
@@ -81,7 +89,8 @@ class DUIAsr @Inject constructor(
                 "#CONTACTS#" to contactString
             )
         )
-        grammarEngine.startBuild(ebnf, EBNF_PATH)
+        val path = ebnfDir.path + "/media_service.net.bin"
+        grammarEngine.startBuild(ebnf, path)
     }
 
     private fun initAsr(grammarPath: String) {
@@ -218,9 +227,6 @@ class DUIAsr @Inject constructor(
 
     companion object {
         const val TAG = "DUIAsr"
-
-        @SuppressLint("SdCardPath")
-        private const val EBNF_PATH = "/sdcard/speech/media_service.net.bin"
     }
 }
 

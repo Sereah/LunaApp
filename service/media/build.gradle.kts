@@ -3,6 +3,7 @@ import java.text.SimpleDateFormat
 plugins {
     alias(libs.plugins.architecture.android.application)
     alias(libs.plugins.architecture.hilt)
+    alias(libs.plugins.architecture.android.application.compose)
 }
 
 android {
@@ -36,14 +37,14 @@ dependencies {
 
 //    debugImplementation(libs.leakcanary.android)
 
-    compileOnly(files("ext/framework13.jar"))
+    compileOnly(files("ext/javalib-11.jar"))
 }
 
 gradle.projectsEvaluated {
     tasks.withType<JavaCompile>().configureEach {
         val originalClasspath = options.bootstrapClasspath?.files ?: emptySet<File>()
         val newFileList = mutableListOf<File>().apply {
-            add(project.file("ext/framework13.jar"))
+            add(project.file("ext/javalib-11.jar"))
             addAll(originalClasspath)
         }
         options.bootstrapClasspath = files(*newFileList.toTypedArray())

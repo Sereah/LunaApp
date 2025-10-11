@@ -35,7 +35,6 @@ class DUIWakeUp @Inject constructor(
 
     private val _wakeUpState = MutableSharedFlow<Unit>()
     val wakeUpState = _wakeUpState.asSharedFlow()
-    private var wakeUpSuccess = false
 
     fun init() {
         Logger.d(TAG, "init...")
@@ -56,6 +55,12 @@ class DUIWakeUp @Inject constructor(
         feedPcm()
         audioRecordManager.start()
 //        readTestPcm()
+    }
+
+    fun wakeUp() {
+        scope.launch {
+            _wakeUpState.emit(Unit)
+        }
     }
 
     fun destroy() {
@@ -115,10 +120,7 @@ class DUIWakeUp @Inject constructor(
                 TAG, "onWakeUp, recordId: $recordId, confidence: $confidence, " +
                         "word: $wakeupWord, json: $jsonResult"
             )
-            scope.launch {
-                wakeUpSuccess = true
-                _wakeUpState.emit(Unit)
-            }
+            wakeUp()
         }
 
         /**
