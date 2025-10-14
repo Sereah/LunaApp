@@ -50,7 +50,6 @@ class DUITts @Inject constructor() {
             volume = 300   // 设置合成音频的音量，范围为1～500
             setLmargin(10) //设置头部静音段，范围5-20
             setRmargin(10) //设置尾部静音段，范围5-20
-            setSaveAudioFilePath("/sdcard/aispeech/tts")
             setUseTimeStamp(true)
             setSleepTime(300)
         }
