@@ -8,10 +8,12 @@ import java.util.logging.Level
 
 object Logger {
     private var baseTag: String = "LunaApp"
+    private var showThread = false;
     private val dateFormat get() = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
-    fun initBaseTag(tag: String) {
+    fun initBaseTag(tag: String, showThread: Boolean = true) {
         baseTag = tag
+        this.showThread = showThread;
     }
 
     fun d(tag: String = "", message: String) {
@@ -57,7 +59,11 @@ object Logger {
     private fun log(message: String, level: LogLevel = LogLevel.INFO, tag: String) {
         val timestamp = dateFormat.format(Date())
         val threadName = Thread.currentThread().name
-        val fullTag = "$baseTag [$timestamp] [$threadName] " + if (tag.isNotEmpty()) "[$tag]" else ""
+        val fullTag = if (showThread) {
+            "$baseTag [$timestamp] [$threadName] " + if (tag.isNotEmpty()) "[$tag]" else ""
+        } else {
+            "$baseTag [$timestamp] " + if (tag.isNotEmpty()) "[$tag]" else ""
+        }
 
         when (level) {
             LogLevel.INFO -> Log.i(fullTag, message)
