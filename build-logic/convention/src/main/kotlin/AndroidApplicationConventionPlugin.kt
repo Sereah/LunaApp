@@ -27,6 +27,12 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         keyAlias = "system"
                         keyPassword = "123456"
                     }
+                    create("harmony") {
+                        storeFile = file("$rootDir/keystore/harmony.jks")
+                        storePassword = "123456"
+                        keyAlias = "key0"
+                        keyPassword = "123456"
+                    }
                 }
 
                 buildTypes {
@@ -53,6 +59,10 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                     create("system") {
                         dimension = "platform"
                         signingConfig = signingConfigs.getByName("system")
+                    }
+                    create("harmony") {
+                        dimension = "platform"
+                        signingConfig = signingConfigs.getByName("harmony")
                     }
                 }
 
