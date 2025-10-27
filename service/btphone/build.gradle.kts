@@ -11,6 +11,10 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+
+    packaging {
+        resources.excludes += "META-INF/*.md"
+    }
 }
 
 dependencies {
