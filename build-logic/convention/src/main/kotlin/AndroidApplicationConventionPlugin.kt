@@ -66,6 +66,10 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                     }
                 }
 
+                packaging {
+                    resources.excludes += "META-INF/*.md"
+                }
+
                 dependencies {
                     "implementation"(libs.findLibrary("androidx.core.ktx").get())
                 }

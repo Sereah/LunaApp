@@ -24,10 +24,6 @@ android {
                 "Media-${variant.name}-${variant.versionName}-${timestamp}.apk"
         }
     }
-
-    packaging {
-        resources.excludes += "META-INF/*.md"
-    }
 }
 
 dependencies {

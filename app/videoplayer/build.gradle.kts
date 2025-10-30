@@ -25,10 +25,6 @@ android {
         }
     }
 
-    packaging {
-        resources.excludes += "META-INF/*.md"
-    }
-
 }
 
 dependencies {

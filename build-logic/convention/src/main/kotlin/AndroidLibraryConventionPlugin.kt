@@ -25,6 +25,10 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     }
                 }
 
+                packaging {
+                    resources.excludes += "META-INF/*.md"
+                }
+
                 configureKotlinAndroid(this)
                 configureTest(this)
             }
