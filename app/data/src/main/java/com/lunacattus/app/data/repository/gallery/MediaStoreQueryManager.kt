@@ -1,38 +1,24 @@
 package com.lunacattus.app.data.repository.gallery
 
-import android.content.ContentResolver
 import android.content.ContentUris
-import android.content.Context
-import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
+import com.lunacattus.app.data.repository.ContentProviderQueryManager
 import com.lunacattus.app.domain.model.Gallery
 import com.lunacattus.app.domain.model.GalleryImage
 import com.lunacattus.app.domain.model.GalleryVideo
 import com.lunacattus.app.domain.model.id
-import com.lunacattus.common.di.MainScope
 import com.lunacattus.common.util.toDateTimeString
-import com.lunacattus.logger.Logger
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 
+/**
+ * Manages querying MediaStore for gallery items, using a generic ContentProviderQueryManager.
+ */
 class MediaStoreQueryManager @AssistedInject constructor(
-    context: Context,
-    @param:MainScope private val scope: CoroutineScope,
+    queryManagerFactory: ContentProviderQueryManager.Factory<Gallery>,
     @Assisted private val uri: Uri,
     @Assisted private val projection: Array<String>,
     @Assisted private val cursorMapper: (Cursor) -> Gallery?,
@@ -43,197 +29,37 @@ class MediaStoreQueryManager @AssistedInject constructor(
         fun create(
             uri: Uri,
             projection: Array<String>,
-            cursorMapper: (Cursor) -> Gallery,
+            cursorMapper: (Cursor) -> Gallery?,
         ): MediaStoreQueryManager
     }
 
-    private val _list = MutableStateFlow<List<Gallery>>(emptyList())
-    val list = _list.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-
-    private var hasMore = true
-
-    private val contentResolver = context.contentResolver
-    private val loadingMutex = Mutex()
-
-    private val observer = MediaContentObserver(Handler(Looper.getMainLooper()))
-
-    private inner class MediaContentObserver(handler: Handler) : ContentObserver(handler) {
-        override fun onChange(selfChange: Boolean, changedUri: Uri?) {
-            Logger.d(TAG, "onChange: $changedUri")
-            if (changedUri == null) return
-            scope.launch(Dispatchers.IO) {
-                handleContentChange(changedUri)
-            }
-        }
-    }
+    private val queryManager: ContentProviderQueryManager<Gallery>
 
     init {
-        contentResolver.registerContentObserver(
-            uri,
-            true,
-            observer
+        // The original implementation filters out `OtherFile`. We can do that in the cursorMapper
+        // before it even gets into the query manager.
+        val filteredCursorMapper = { cursor: Cursor ->
+            val item = cursorMapper(cursor)
+            if (item is Gallery.OtherFile) null else item
+        }
+
+        queryManager = queryManagerFactory.create(
+            uri = uri,
+            projection = projection,
+            cursorMapper = filteredCursorMapper,
+            idExtractor = { gallery -> gallery.id }
         )
     }
 
+    val list = queryManager.list
+    val isLoading = queryManager.isLoading
+
     fun cleared() {
-        Logger.d(TAG, "cleared.")
-        contentResolver.unregisterContentObserver(observer)
-        _list.value = emptyList()
-        _isLoading.value = false
-        hasMore = true
+        queryManager.cleared()
     }
 
     suspend fun loadMore(pageSize: Int) {
-        if (_isLoading.value || !hasMore) {
-            Logger.d(TAG, "loadMore skipped: isLoading=${_isLoading.value}, hasMore=$hasMore")
-            return
-        }
-
-        loadingMutex.withLock {
-            if (_isLoading.value || !hasMore) {
-                Logger.d(
-                    TAG,
-                    "loadMore skipped inside mutex: isLoading=${_isLoading.value}, hasMore=$hasMore"
-                )
-                return@withLock
-            }
-            _isLoading.value = true
-        }
-
-        try {
-            val currentSize = _list.value.size
-            val newList = queryPage(currentSize, pageSize)
-            Logger.d(
-                TAG,
-                "loadMore, currentSize: $currentSize, newListSize: ${newList.size}, pageSize: $pageSize"
-            )
-
-            if (newList.isNotEmpty()) {
-                _list.emit((_list.value + newList).filterNot { it is Gallery.OtherFile })
-            }
-            hasMore = newList.size == pageSize
-        } catch (e: Exception) {
-            Logger.e(TAG, "Error during loadMore, $e")
-            e.printStackTrace()
-        } finally {
-            _isLoading.value = false
-            Logger.d(TAG, "loadMore finished, isLoading set to false, hasMore=$hasMore")
-        }
-    }
-
-    private suspend fun handleContentChange(changedUri: Uri) {
-        Logger.d(TAG, "handleContentChange: $changedUri")
-        val id = changedUri.lastPathSegment?.toLongOrNull()
-        val isNewItemPotentially =
-            contentResolver.query(changedUri, arrayOf(projection[0]), null, null, null)
-                ?.use { it.moveToFirst() } == true
-
-        if (isNewItemPotentially) {
-            // Potentially a new item or an update to an existing one
-            val currentMaxId =
-                _list.value.maxOfOrNull { it.id ?: -1L } ?: -1L
-            val newItems = queryNewData(currentMaxId)
-            if (newItems.isNotEmpty()) {
-                loadingMutex.withLock {
-                    val currentIds = _list.value.map { it.id }.toSet()
-                    val trulyNew = newItems.filterNot { currentIds.contains(it.id) }
-                    if (trulyNew.isNotEmpty()) {
-                        _list.emit((trulyNew + _list.value).filterNot { it is Gallery.OtherFile }
-                            .distinctBy { it.id }
-                            .sortedByDescending { it.id })
-                        Logger.d(TAG, "New data detected and prepended: ${trulyNew.size}")
-                    }
-                }
-            } else if (id != null) { // No brand new items, check if it's an update to an existing one
-                contentResolver.query(
-                    ContentUris.withAppendedId(
-                        uri,
-                        id
-                    ), projection, null, null, null
-                )?.use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        val updatedItem = cursorMapper(cursor) ?: return@use
-                        loadingMutex.withLock {
-                            val updatedList = _list.value.map { gallery ->
-                                if (gallery.id == updatedItem.id) updatedItem else gallery
-                            }
-                            if (updatedList != _list.value) {
-                                _list.emit(updatedList.filterNot { it is Gallery.OtherFile })
-                                Logger.d(TAG, "Item updated: $updatedItem")
-                            }
-                        }
-                    } else { // Item was deleted
-                        loadingMutex.withLock {
-                            val originalSize = _list.value.size
-                            val updatedList = _list.value.filterNot { it.id == id }
-                            if (updatedList.size < originalSize) {
-                                _list.emit(updatedList.filterNot { it is Gallery.OtherFile })
-                                Logger.d(TAG, "Item removed: $id")
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (id != null) { // Item was deleted (not found by query)
-            loadingMutex.withLock {
-                val originalSize = _list.value.size
-                val updatedList = _list.value.filterNot { it.id == id }
-                if (updatedList.size < originalSize) {
-                    _list.emit(updatedList.filterNot { it is Gallery.OtherFile })
-                    Logger.d(TAG, "Item removed (not found): $id")
-                }
-            }
-        }
-    }
-
-
-    private suspend fun queryPage(offset: Int, limit: Int): List<Gallery> =
-        withContext(Dispatchers.IO) {
-            val queryArgs = Bundle().apply {
-                putString(
-                    ContentResolver.QUERY_ARG_SQL_SORT_ORDER,
-                    "${projection[0]} DESC"
-                )
-                putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
-                putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
-            }
-            val list = mutableListOf<Gallery>()
-            contentResolver.query(uri, projection, queryArgs, null)?.use { cursor ->
-                while (cursor.moveToNext()) {
-                    cursorMapper(cursor)?.let { gallery ->
-                        list.add(gallery)
-                    }
-                }
-            }
-            Logger.d(TAG, "queryPage: ${list.size} from $offset, limit $limit")
-            list
-        }
-
-    private suspend fun queryNewData(minID: Long): List<Gallery> = withContext(Dispatchers.IO) {
-        if (minID == -1L && _list.value.isNotEmpty()) {
-            Logger.d(
-                TAG,
-                "queryNewData called with minID -1 but list is not empty. This might be an issue."
-            )
-            return@withContext emptyList()
-        }
-
-        val selection = "${projection[0]} > ?"
-        val selectionArgs = arrayOf(minID.toString())
-        val sortOrder = "${projection[0]} DESC"
-        val list = mutableListOf<Gallery>()
-        contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)?.use { cursor ->
-            while (cursor.moveToNext()) {
-                cursorMapper(cursor)?.let { gallery ->
-                    list.add(gallery)
-                }
-            }
-        }
-        Logger.d(TAG, "queryNewData (newer than $minID): ${list.size}")
-        list
+        queryManager.loadMore(pageSize)
     }
 
     companion object {

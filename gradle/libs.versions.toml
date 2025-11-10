@@ -34,6 +34,7 @@ leakcanaryAndroid = "2.14"
 gson = "2.11.0"
 datastorePreferences = "1.1.7"
 recyclerview = "1.4.0"
+permissionX = "1.8.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -91,6 +92,7 @@ androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", versi
 androidx-media3-exoplayer-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3" }
 androidx-media3-exoplayer-compose = { module = "androidx.media3:media3-ui-compose", version.ref = "media3" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+permissionX = { module = "com.guolindev.permissionx:permissionx", version.ref = "permissionX" }
 
 # test
 junit = { group = "junit", name = "junit", version.ref = "junit" }

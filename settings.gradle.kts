@@ -25,7 +25,6 @@ include(":app:domain")
 include(":app:data")
 include(":app:videoplayer")
 include(":app:gallery")
-include(":app:media")
 
 include(":service:media")
 
@@ -34,5 +33,4 @@ include(":feature:speech")
 include(":logger")
 include(":common")
 include(":ui-design")
-include(":app:launcher")
 include(":service:btphone")

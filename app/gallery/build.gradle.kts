@@ -30,4 +30,5 @@ dependencies {
     implementation(project(":app:data"))
     implementation(project(":ui-design"))
     implementation(libs.glide)
+    implementation(libs.permissionX)
 }
