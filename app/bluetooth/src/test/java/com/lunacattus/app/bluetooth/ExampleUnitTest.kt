@@ -1,4 +1,4 @@
-package com.lunacattus.ui_design
+package com.lunacattus.app.bluetooth
 
 import org.junit.Test
 

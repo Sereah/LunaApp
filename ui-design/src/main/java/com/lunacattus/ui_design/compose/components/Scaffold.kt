@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
+import dev.chrisbanes.haze.HazeProgressive
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
@@ -70,21 +71,21 @@ fun Sample() {
             title = "home",
             icon = Icons.Rounded.Home,
             selectedColor = Color.Black,
-            unSelectColor = Color.White,
+            unSelectColor = Color.LightGray,
             route = "home"
         ),
         BottomItem(
             title = "person",
             icon = Icons.Rounded.Person,
             selectedColor = Color.Black,
-            unSelectColor = Color.White,
+            unSelectColor = Color.LightGray,
             route = "home"
         ),
         BottomItem(
             title = "setting",
             icon = Icons.Rounded.Settings,
             selectedColor = Color.Black,
-            unSelectColor = Color.White,
+            unSelectColor = Color.LightGray,
             route = "home"
         )
     )
@@ -118,6 +119,7 @@ fun Sample() {
         },
         appBarBackgroundColor = Color.White,
         appBarDividerColor = Color(0X90B8B8BB),
+        appBarLinearGradient = true,
         bottomItems = itemList,
         bottomIconSize = 30.dp,
         bottomTitleSize = 18.sp,
@@ -149,6 +151,32 @@ fun Sample() {
     }
 }
 
+/**
+ * 一个带有毛玻璃（haze）效果的脚手架 Composable，提供了顶部应用栏和底部导航栏。
+ *
+ * 该组件设计用于在半透明、模糊的应用栏和底部栏后面显示内容。
+ * 模糊效果由 `haze` 库提供。为了使效果可见，内容区域应该是可滚动的。
+ *
+ * @param modifier 应用于脚手架的修饰符。
+ * @param appBarLeftComposable 显示在应用栏左侧的 Composable。
+ * @param appBarMiddleComposable 显示在应用栏中间的 Composable。
+ * @param appBarRightComposable 显示在应用栏右侧的 Composable。
+ * @param appBarBackgroundColor 应用栏的背景颜色。此颜色也用作毛玻璃效果的着色。
+ * @param appBarDividerColor 应用栏底部分割线的颜色。
+ * @param appBarHeight 应用栏的高度。
+ * @param appBarLinearGradient 是否使用线性渐变来实现毛玻璃效果，如果为true，则[appBarBackgroundColor]和[appBarDividerColor]将被忽略。
+ * @param bottomBackgroundColor 底部导航栏的背景颜色。默认为 [appBarBackgroundColor]。
+ * @param bottomDividerColor 底部导航栏顶部分割线的颜色。默认为 [appBarDividerColor]。
+ * @param bottomHeight 底部导航栏的高度。默认为 [appBarHeight]。
+ * @param bottomIconSize 底部导航栏中图标的大小。
+ * @param bottomTitleSize 底部导航栏中标题的字体大小。
+ * @param bottomItems 要在底部导航栏中显示的 [BottomItem] 列表。
+ * @param bottomSelectItemIndex 底部导航栏中当前选定项的索引。
+ * @param bottomOnSelectItem 当选择底部导航栏中的项目时调用的回调。
+ * @param onListOffsetVerticalChange 提供内容列表的垂直滚动偏移量的回调。
+ * @param onListOffSetIndexChange 提供内容列表中第一个可见项的索引的回调。
+ * @param content 要在脚手架中显示的主要内容，通常是可滚动的列表。
+ */
 @Composable
 fun HazeAppBarBottomScaffold(
     modifier: Modifier = Modifier,
@@ -158,6 +186,7 @@ fun HazeAppBarBottomScaffold(
     appBarBackgroundColor: Color = Color.Unspecified,
     appBarDividerColor: Color = Color.Unspecified,
     appBarHeight: Dp = 90.dp,
+    appBarLinearGradient: Boolean = false,
     bottomBackgroundColor: Color = appBarBackgroundColor,
     bottomDividerColor: Color = appBarDividerColor,
     bottomHeight: Dp = appBarHeight,
@@ -188,11 +217,16 @@ fun HazeAppBarBottomScaffold(
                 .height(appBarHeight)
                 .fillMaxWidth()
                 .hazeEffect(state = hazeState) {
+                    if (appBarLinearGradient) {
+                        progressive =
+                            HazeProgressive.verticalGradient(startIntensity = 1f, endIntensity = 0f)
+                    }
                     style = HazeStyle(
                         backgroundColor = appBarBackgroundColor,
                         tint = HazeTint(color = appBarBackgroundColor.copy(alpha = 0.8f)),
                         blurRadius = 24.dp
                     )
+                    blurEnabled = true
                 }
                 .pointerInput(Unit) {
                     detectDragGestures { _, _ -> }
@@ -201,8 +235,8 @@ fun HazeAppBarBottomScaffold(
             leftComposable = appBarLeftComposable,
             middleComposable = appBarMiddleComposable,
             rightComposable = appBarRightComposable,
-            backgroundColor = appBarBackgroundColor,
-            dividerColor = appBarDividerColor
+            backgroundColor = if (appBarLinearGradient) Color.Unspecified else appBarBackgroundColor,
+            dividerColor = if (appBarLinearGradient) Color.Unspecified else appBarDividerColor
         )
 
         Box(
@@ -224,6 +258,7 @@ fun HazeAppBarBottomScaffold(
                         tint = HazeTint(color = bottomBackgroundColor.copy(alpha = 0.85f)),
                         blurRadius = 24.dp
                     )
+                    blurEnabled = true
                 }
                 .pointerInput(Unit) {
                     detectDragGestures { _, _ -> }
