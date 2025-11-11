@@ -32,3 +32,14 @@ dependencies {
         )
     )
 }
+
+gradle.projectsEvaluated {
+    tasks.withType<JavaCompile>().configureEach {
+        val originalClasspath = options.bootstrapClasspath?.files ?: emptySet<File>()
+        val newFileList = mutableListOf<File>().apply {
+            add(project.file("ext/framework-12.jar"))
+            addAll(originalClasspath)
+        }
+        options.bootstrapClasspath = files(*newFileList.toTypedArray())
+    }
+}

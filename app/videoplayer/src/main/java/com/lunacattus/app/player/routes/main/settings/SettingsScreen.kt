@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.lunacattus.ui_design.compose.components.BottomConfirmDialog
+import com.lunacattus.ui_design.compose.components.dialog.BottomConfirmDialog
 
 @Composable
 fun SettingsScreen(
