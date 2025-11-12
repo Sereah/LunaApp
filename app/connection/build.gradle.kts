@@ -22,7 +22,7 @@ android {
         val timestamp = SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis())
         variant.outputs.configureEach {
             (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-                "BtTool-${variant.name}-${variant.versionName}-${timestamp}.apk"
+                "Connection-${variant.name}-${variant.versionName}-${timestamp}.apk"
         }
     }
 }

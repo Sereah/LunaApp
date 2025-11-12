@@ -26,58 +26,66 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lunacattus.app.connection.routes.main.bluetooth.mvi.BluetoothUiEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lunacattus.app.connection.routes.main.bluetooth.mvi.BluetoothSideEffect
 import com.lunacattus.app.connection.routes.main.bluetooth.mvi.BluetoothUiIntent
 import com.lunacattus.app.connection.routes.main.bluetooth.mvi.BluetoothUiState
+import com.lunacattus.app.connection.routes.main.bluetooth.mvi.BluetoothViewModel
+import com.lunacattus.app.connection.routes.main.bluetooth.mvi.ItemData
 import com.lunacattus.app.connection.theme.AppTheme
 import com.lunacattus.ui_design.compose.components.CircleLoader
 import com.lunacattus.ui_design.compose.components.dialog.MessageDialog
 import com.lunacattus.ui_design.compose.components.overScrollVertical
 import com.lunacattus.ui_design.compose.extensions.clickableWithDebounce
+import kotlinx.coroutines.flow.Flow
+
+@Composable
+fun BluetoothRoute(viewModel: BluetoothViewModel) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    BluetoothScreen(
+        uiState,
+        viewModel::processUiIntent,
+        viewModel.sideEffect
+    )
+}
 
 @Composable
 fun BluetoothScreen(
     uiState: BluetoothUiState,
     sendUiIntent: (BluetoothUiIntent) -> Unit,
-    uiEffect: BluetoothUiEffect
+    uiEffect: Flow<BluetoothSideEffect>
 ) {
 
-    val itemList = listOf(ItemData.Profile, ItemData.Address, ItemData.Name)
+    val itemList = ItemData.entries
     val context = LocalContext.current
-    var dialog by remember { mutableStateOf<ItemData?>(null) }
 
     LaunchedEffect(uiEffect) {
-        when (uiEffect) {
-            is BluetoothUiEffect.Error -> {
-                Toast.makeText(context, uiEffect.error, Toast.LENGTH_LONG).show()
+        uiEffect.collect {
+            when (it) {
+                is BluetoothSideEffect.ShowToast -> {
+                    Toast.makeText(context, it.msg, Toast.LENGTH_LONG).show()
+                }
             }
-
-            BluetoothUiEffect.Idle -> {}
         }
     }
 
-    if (dialog != null) {
+    if (uiState.dialogItem != null) {
         MessageDialog(
             onDismissRequest = {
-                dialog = null
+                sendUiIntent(BluetoothUiIntent.DismissDialog)
             },
-            message = when (dialog) {
-                ItemData.Profile -> uiState.profiles
-                ItemData.Address -> uiState.address
-                ItemData.Name -> uiState.name
-                else -> ""
+            message = when (uiState.dialogItem) {
+                ItemData.Profile -> uiState.info.profiles
+                ItemData.Address -> uiState.info.address
+                ItemData.Name -> uiState.info.name
             },
-            title = dialog!!.title,
-
+            title = uiState.dialogItem.title
         )
     }
 
@@ -94,18 +102,14 @@ fun BluetoothScreen(
                 cycleDuration = 1000
             )
         }
-    } else {
-        Content(itemList, sendUiIntent) {
-            dialog = it
-        }
     }
+    Content(itemList, sendUiIntent)
 }
 
 @Composable
 private fun Content(
     itemList: List<ItemData>,
-    sendUiIntent: (BluetoothUiIntent) -> Unit,
-    onItemClick: (ItemData) -> Unit
+    sendUiIntent: (BluetoothUiIntent) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -123,14 +127,9 @@ private fun Content(
                         modifier = Modifier.size(30.dp)
                     )
                 },
-                title = "获取${it}"
+                title = "获取${it.title}"
             ) {
-                when (it) {
-                    ItemData.Profile -> sendUiIntent.invoke(BluetoothUiIntent.GetBluetoothProfile)
-                    ItemData.Address -> sendUiIntent(BluetoothUiIntent.GetAddress)
-                    ItemData.Name -> sendUiIntent(BluetoothUiIntent.GetName)
-                }
-                onItemClick.invoke(it)
+                sendUiIntent(BluetoothUiIntent.LoadItem(it))
             }
         }
     }
@@ -174,10 +173,4 @@ fun Item(
             Spacer(modifier = Modifier.width(8.dp))
         }
     }
-}
-
-enum class ItemData(val title: String) {
-    Profile("Profile"),
-    Address("Address"),
-    Name("Name")
 }
