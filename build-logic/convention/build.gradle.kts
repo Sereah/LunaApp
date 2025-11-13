@@ -34,52 +34,52 @@ dependencies {
 gradlePlugin {
     plugins {
         register("androidApplication") {
-            id = libs.plugins.architecture.android.application.asProvider().get().pluginId
+            id = libs.plugins.app.android.application.asProvider().get().pluginId
             implementationClass = "AndroidApplicationConventionPlugin"
         }
 
         register("androidLibrary") {
-            id = libs.plugins.architecture.android.library.asProvider().get().pluginId
+            id = libs.plugins.app.android.library.asProvider().get().pluginId
             implementationClass = "AndroidLibraryConventionPlugin"
         }
 
         register("androidApplicationCompose") {
-            id = libs.plugins.architecture.android.application.compose.get().pluginId
+            id = libs.plugins.app.android.application.compose.get().pluginId
             implementationClass = "AndroidApplicationComposeConventionPlugin"
         }
 
         register("androidLibraryCompose") {
-            id = libs.plugins.architecture.android.library.compose.get().pluginId
+            id = libs.plugins.app.android.library.compose.get().pluginId
             implementationClass = "AndroidLibraryComposeConventionPlugin"
         }
 
         register("androidApplicationView") {
-            id = libs.plugins.architecture.android.application.view.get().pluginId
+            id = libs.plugins.app.android.application.view.get().pluginId
             implementationClass = "AndroidApplicationViewConventionPlugin"
         }
 
         register("androidLibraryView") {
-            id = libs.plugins.architecture.android.library.view.get().pluginId
+            id = libs.plugins.app.android.library.view.get().pluginId
             implementationClass = "AndroidLibraryViewConventionPlugin"
         }
 
         register("androidApplicationJacoco") {
-            id = libs.plugins.architecture.android.application.jacoco.get().pluginId
+            id = libs.plugins.app.android.application.jacoco.get().pluginId
             implementationClass = "AndroidApplicationJacocoConventionPlugin"
         }
 
         register("androidLibraryJacoco") {
-            id = libs.plugins.architecture.android.library.jacoco.get().pluginId
+            id = libs.plugins.app.android.library.jacoco.get().pluginId
             implementationClass = "AndroidLibraryJacocoConventionPlugin"
         }
 
         register("hilt") {
-            id = libs.plugins.architecture.hilt.get().pluginId
+            id = libs.plugins.app.hilt.get().pluginId
             implementationClass = "HiltConventionPlugin"
         }
 
         register("room") {
-            id = libs.plugins.architecture.android.room.get().pluginId
+            id = libs.plugins.app.android.room.get().pluginId
             implementationClass = "AndroidRoomConventionPlugin"
         }
     }

@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.architecture.android.library)
-    alias(libs.plugins.architecture.hilt)
+    alias(libs.plugins.app.android.library)
+    alias(libs.plugins.app.hilt)
 }
 
 android {

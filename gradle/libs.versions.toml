@@ -121,13 +121,13 @@ kotlin-parcelize = { id = "kotlin-parcelize" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 # build-logic plugins
-architecture-android-application = { id = "architecture.android.application" }
-architecture-android-application-compose = { id = "architecture.android.application.compose" }
-architecture-android-application-view = { id = "architecture.android.application.view" }
-architecture-android-library = { id = "architecture.android.library" }
-architecture-android-library-compose = { id = "architecture.android.library.compose" }
-architecture-android-library-view = { id = "architecture.android.library.view" }
-architecture-android-application-jacoco = { id = "architecture.android.application.jacoco" }
-architecture-android-library-jacoco = { id = "architecture.android.library.jacoco" }
-architecture-hilt = { id = "architecture.hilt" }
-architecture-android-room = { id = "architecture.android.room" }
+app-android-application = { id = "app.android.application" }
+app-android-application-compose = { id = "app.android.application.compose" }
+app-android-application-view = { id = "app.android.application.view" }
+app-android-library = { id = "app.android.library" }
+app-android-library-compose = { id = "app.android.library.compose" }
+app-android-library-view = { id = "app.android.library.view" }
+app-android-application-jacoco = { id = "app.android.application.jacoco" }
+app-android-library-jacoco = { id = "app.android.library.jacoco" }
+app-hilt = { id = "app.hilt" }
+app-android-room = { id = "app.android.room" }

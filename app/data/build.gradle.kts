@@ -1,8 +1,8 @@
 plugins {
-    alias(libs.plugins.architecture.android.library)
-    alias(libs.plugins.architecture.android.library.jacoco)
-    alias(libs.plugins.architecture.hilt)
-    alias(libs.plugins.architecture.android.room)
+    alias(libs.plugins.app.android.library)
+    alias(libs.plugins.app.android.library.jacoco)
+    alias(libs.plugins.app.hilt)
+    alias(libs.plugins.app.android.room)
 }
 
 android {

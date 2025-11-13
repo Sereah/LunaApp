@@ -1,0 +1,29 @@
+<resources>
+
+    <!-- 淡入淡出 -->
+    <style name="AnimationFade">
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_out</item>
+    </style>
+
+    <!-- 从左边滑入，滑出到左边 -->
+    <style name="AnimationLeft">
+        <item name="android:windowEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_left</item>
+    </style>
+
+    <!-- 从左边滑入，滑出到右边 -->
+    <style name="AnimationLeftToRight">
+        <item name="android:windowEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_right</item>
+    </style>
+
+
+    <!-- 从底部滑入，滑出到底部 -->
+    <style name="AnimationBottom">
+        <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
+    </style>
+
+
+</resources>
