@@ -21,18 +21,20 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "LunaApp"
-include(":app:domain")
-include(":app:data")
-include(":app:videoplayer")
-include(":app:gallery")
-
-include(":service:media")
-
-include(":feature:speech")
 
 include(":logger")
 include(":common")
 include(":ui-design")
+
+include(":app:videoplayer")
 include(":app:connection")
 include(":app:media")
 include(":app:statemachinedemo")
+
+include(":app:gallery:presentation")
+include(":app:gallery:domain")
+include(":app:gallery:data")
+
+include(":service:media")
+
+include(":feature:speech")

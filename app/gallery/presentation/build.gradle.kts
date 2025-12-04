@@ -2,38 +2,33 @@ import java.text.SimpleDateFormat
 
 plugins {
     alias(libs.plugins.app.android.application)
-    alias(libs.plugins.app.android.application.compose)
-    alias(libs.plugins.app.android.application.jacoco)
+    alias(libs.plugins.app.android.application.view)
     alias(libs.plugins.app.hilt)
-    alias(libs.plugins.framework.jar)
-}
-
-frameworkJar {
-    version = "12"
 }
 
 android {
-    namespace = "com.lunacattus.app.connection"
+    namespace = "com.lunacattus.app.gallery"
 
     defaultConfig {
-        applicationId = "com.lunacattus.app.connection"
+        applicationId = "com.lunacattus.app.gallery"
         versionCode = 1
         versionName = "1.0"
     }
-
 
     applicationVariants.configureEach {
         val variant = this
         val timestamp = SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis())
         variant.outputs.configureEach {
             (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-                "Connection-${variant.name}-${variant.versionName}-${timestamp}.apk"
+                "Galleray-${variant.name}-${variant.versionName}-${timestamp}.apk"
         }
     }
 }
 
 dependencies {
+    implementation(project(":app:gallery:domain"))
+    implementation(project(":app:gallery:data"))
     implementation(project(":ui-design"))
-    implementation(project(":common"))
-    implementation(project(":logger"))
+    implementation(libs.glide)
+    implementation(libs.permissionX)
 }

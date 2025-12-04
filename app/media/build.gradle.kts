@@ -15,8 +15,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":app:domain"))
-    implementation(project(":app:data"))
+    implementation(project(":common"))
+    implementation(project(":logger"))
     implementation(project(":ui-design"))
     implementation(libs.glide)
     implementation(libs.permissionX)

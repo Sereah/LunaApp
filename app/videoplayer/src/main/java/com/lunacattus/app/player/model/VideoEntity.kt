@@ -1,0 +1,40 @@
+package com.lunacattus.app.player.model
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "VideoEntity")
+data class VideoEntity(
+    @PrimaryKey
+    val id: String,
+    val title: String,
+    val subTitle: String,
+    val description: String,
+    val coverPic: String,
+    val uri: String,
+    val type: String,
+)
+
+fun Video.mapper(): VideoEntity {
+    return VideoEntity(
+        id = id,
+        title = this.title,
+        subTitle = this.subtitle,
+        description = this.description,
+        coverPic = coverPic,
+        uri = this.uri,
+        type = VideoType.toString(type)
+    )
+}
+
+fun VideoEntity.mapper(): Video {
+    return Video(
+        id = id,
+        description = description,
+        uri = uri,
+        subtitle = subTitle,
+        coverPic = coverPic,
+        title = title,
+        type = VideoType.fromString(this.type)
+    )
+}

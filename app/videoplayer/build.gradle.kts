@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.app.android.application.compose)
     alias(libs.plugins.app.android.application.jacoco)
     alias(libs.plugins.app.hilt)
+    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.app.android.room)
 }
 
 android {
@@ -28,10 +30,11 @@ android {
 }
 
 dependencies {
-    implementation(project(":app:domain"))
-    implementation(project(":app:data"))
+    implementation(project(":common"))
+    implementation(project(":logger"))
     implementation(project(":ui-design"))
 
+    implementation(libs.gson)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.exoplayer.dash)
     implementation(libs.androidx.media3.exoplayer.compose)
