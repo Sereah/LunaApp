@@ -131,3 +131,4 @@ app-android-application-jacoco = { id = "app.android.application.jacoco" }
 app-android-library-jacoco = { id = "app.android.library.jacoco" }
 app-hilt = { id = "app.hilt" }
 app-android-room = { id = "app.android.room" }
+framework-jar = { id = "framework.jar" }

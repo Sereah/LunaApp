@@ -82,5 +82,10 @@ gradlePlugin {
             id = libs.plugins.app.android.room.get().pluginId
             implementationClass = "AndroidRoomConventionPlugin"
         }
+
+        register("frameworkJar") {
+            id = libs.plugins.framework.jar.get().pluginId
+            implementationClass = "FrameworkJarConventionPlugin"
+        }
     }
 }
