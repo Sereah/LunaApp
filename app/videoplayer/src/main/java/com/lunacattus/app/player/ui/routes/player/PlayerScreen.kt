@@ -46,7 +46,7 @@ import com.lunacattus.app.player.ui.MainActivity
 import com.lunacattus.app.player.ui.routes.player.mvi.PlayerViewModel
 import com.lunacattus.app.player.ui.setLightStatusBarIcons
 import com.lunacattus.logger.Logger
-import com.lunacattus.ui_design.compose.extensions.clickableWithDebounce
+import com.lunacattus.ui_design.compose.clickableWithDebounce
 import kotlinx.coroutines.delay
 
 @OptIn(UnstableApi::class, ExperimentalMaterial3Api::class)

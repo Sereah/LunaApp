@@ -1,4 +1,4 @@
-package com.lunacattus.ui_design.compose.components.dialog
+package com.lunacattus.ui_design.compose.dialog
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
-import com.lunacattus.ui_design.compose.extensions.clickableWithDebounce
+import com.lunacattus.ui_design.compose.clickableWithDebounce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

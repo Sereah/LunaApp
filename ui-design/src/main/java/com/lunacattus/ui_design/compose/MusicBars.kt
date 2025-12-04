@@ -1,4 +1,4 @@
-package com.lunacattus.ui_design.compose.components
+package com.lunacattus.ui_design.compose
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.LinearEasing

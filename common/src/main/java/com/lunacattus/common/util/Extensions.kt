@@ -2,6 +2,7 @@ package com.lunacattus.common.util
 
 import android.content.Context
 import android.util.TypedValue
+import android.view.View
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -30,4 +31,18 @@ fun Float.dpToPx(context: Context): Float {
         this,
         context.resources.displayMetrics
     )
+}
+
+inline fun View.setOnClickListenerWithDebounce(
+    debounceTime: Long = 500,
+    crossinline action: (View) -> Unit
+) {
+    var lastClickTime = 0L
+    setOnClickListener {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastClickTime >= debounceTime) {
+            lastClickTime = currentTime
+            action(it)
+        }
+    }
 }

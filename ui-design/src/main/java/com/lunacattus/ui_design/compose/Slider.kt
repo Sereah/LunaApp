@@ -1,4 +1,4 @@
-package com.lunacattus.ui_design.compose.components
+package com.lunacattus.ui_design.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource

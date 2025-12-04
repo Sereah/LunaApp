@@ -1,4 +1,4 @@
-package com.lunacattus.ui_design.compose.extensions
+package com.lunacattus.ui_design.compose
 
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.clickable

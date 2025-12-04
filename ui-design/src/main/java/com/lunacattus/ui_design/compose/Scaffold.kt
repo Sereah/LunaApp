@@ -1,4 +1,4 @@
-package com.lunacattus.ui_design.compose.components
+package com.lunacattus.ui_design.compose
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState

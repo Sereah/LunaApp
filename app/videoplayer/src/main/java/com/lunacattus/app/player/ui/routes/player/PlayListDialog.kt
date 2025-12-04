@@ -31,8 +31,8 @@ import androidx.media3.common.MediaItem
 import com.lunacattus.app.player.R
 import com.lunacattus.app.player.model.VideoType
 import com.lunacattus.app.player.ui.theme.AppTheme
-import com.lunacattus.ui_design.compose.components.MusicBars
-import com.lunacattus.ui_design.compose.extensions.clickableWithDebounce
+import com.lunacattus.ui_design.compose.MusicBars
+import com.lunacattus.ui_design.compose.clickableWithDebounce
 
 @Composable
 fun PlayListDialog(

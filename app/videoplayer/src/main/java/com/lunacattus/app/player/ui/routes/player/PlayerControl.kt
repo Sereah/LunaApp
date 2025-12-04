@@ -33,7 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lunacattus.app.player.R
-import com.lunacattus.ui_design.compose.components.VideoSlider
+import com.lunacattus.ui_design.compose.VideoSlider
 
 @Composable
 fun PlayerControlView(

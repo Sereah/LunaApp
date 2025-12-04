@@ -19,7 +19,7 @@ class FrameworkJarConventionPlugin : Plugin<Project> {
         // 3. 在项目评估后，使用配置的版本
         project.afterEvaluate {
             val frameworkVersion = extension.version ?: "12" // 如果未指定，则默认为版本 "12"
-            val frameworkJarFile = rootProject.file("ext/framework-$frameworkVersion.jar")
+            val frameworkJarFile = rootProject.file("frameworkLibs/framework-$frameworkVersion.jar")
 
             if (!frameworkJarFile.exists()) {
                 throw IllegalStateException("Framework jar not found at: ${frameworkJarFile.path}")

@@ -51,8 +51,8 @@ import com.lunacattus.app.player.ui.routes.player.mvi.PlayerViewModel
 import com.lunacattus.app.player.ui.routes.player.navToPlayer
 import com.lunacattus.app.player.ui.routes.player.playerRouter
 import com.lunacattus.app.player.ui.theme.AppTheme
-import com.lunacattus.ui_design.compose.components.BottomItem
-import com.lunacattus.ui_design.compose.components.HazeAppBarBottomScaffold
+import com.lunacattus.ui_design.compose.BottomItem
+import com.lunacattus.ui_design.compose.HazeAppBarBottomScaffold
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

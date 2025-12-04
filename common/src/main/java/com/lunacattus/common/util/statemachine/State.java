@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lunacattus.common.util;
+package com.lunacattus.common.util.statemachine;
 
 import android.annotation.SuppressLint;
 import android.os.Message;
@@ -65,7 +65,7 @@ public class State implements IState {
      * want to provide a setName or some other mechanism for setting
      * another name if the class name is not appropriate.
      *
-     * @see com.lunacattus.common.util.IState#processMessage(Message)
+     * @see IState#processMessage(Message)
      */
     @Override
     public String getName() {

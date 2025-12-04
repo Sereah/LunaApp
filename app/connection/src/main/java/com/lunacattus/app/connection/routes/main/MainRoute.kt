@@ -22,8 +22,8 @@ import com.lunacattus.app.connection.routes.main.bluetooth.bluetoothRouter
 import com.lunacattus.app.connection.routes.main.wifi.WifiGraph
 import com.lunacattus.app.connection.routes.main.wifi.wifiRouter
 import com.lunacattus.app.connection.theme.AppTheme
-import com.lunacattus.ui_design.compose.components.BottomItem
-import com.lunacattus.ui_design.compose.components.HazeAppBarBottomScaffold
+import com.lunacattus.ui_design.compose.BottomItem
+import com.lunacattus.ui_design.compose.HazeAppBarBottomScaffold
 
 @Composable
 fun MainRoute(rootNavController: NavHostController) {

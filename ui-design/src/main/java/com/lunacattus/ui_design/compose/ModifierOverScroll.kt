@@ -1,6 +1,6 @@
 @file:Suppress("unused", "RedundantValueArgument")
 
-package com.lunacattus.ui_design.compose.components
+package com.lunacattus.ui_design.compose
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationState

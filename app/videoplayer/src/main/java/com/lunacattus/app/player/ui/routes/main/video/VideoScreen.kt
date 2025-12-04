@@ -48,9 +48,9 @@ import com.lunacattus.app.player.ui.routes.main.video.mvi.VideoUiState
 import com.lunacattus.app.player.ui.routes.player.mvi.MediaItems
 import com.lunacattus.app.player.ui.routes.player.mvi.PlayerViewModel
 import com.lunacattus.app.player.ui.theme.AppTheme
-import com.lunacattus.ui_design.compose.components.SwipeToRevealItem
-import com.lunacattus.ui_design.compose.components.overScrollVertical
-import com.lunacattus.ui_design.compose.extensions.clickableWithDebounce
+import com.lunacattus.ui_design.compose.SwipeToRevealItem
+import com.lunacattus.ui_design.compose.overScrollVertical
+import com.lunacattus.ui_design.compose.clickableWithDebounce
 
 @Composable
 fun VideoScreen(

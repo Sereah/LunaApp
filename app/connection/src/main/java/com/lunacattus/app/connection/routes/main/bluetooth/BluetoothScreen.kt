@@ -39,10 +39,10 @@ import com.lunacattus.app.connection.routes.main.bluetooth.mvi.BluetoothUiState
 import com.lunacattus.app.connection.routes.main.bluetooth.mvi.BluetoothViewModel
 import com.lunacattus.app.connection.routes.main.bluetooth.mvi.ItemData
 import com.lunacattus.app.connection.theme.AppTheme
-import com.lunacattus.ui_design.compose.components.CircleLoader
-import com.lunacattus.ui_design.compose.components.dialog.MessageDialog
-import com.lunacattus.ui_design.compose.components.overScrollVertical
-import com.lunacattus.ui_design.compose.extensions.clickableWithDebounce
+import com.lunacattus.ui_design.compose.CircleLoader
+import com.lunacattus.ui_design.compose.dialog.MessageDialog
+import com.lunacattus.ui_design.compose.overScrollVertical
+import com.lunacattus.ui_design.compose.clickableWithDebounce
 import kotlinx.coroutines.flow.Flow
 
 @Composable

@@ -47,8 +47,8 @@ import com.lunacattus.app.player.ui.routes.main.browser.mvi.BrowserUiIntent
 import com.lunacattus.app.player.ui.routes.player.mvi.PlayerViewModel
 import com.lunacattus.app.player.ui.theme.AppTheme
 import com.lunacattus.logger.Logger
-import com.lunacattus.ui_design.compose.components.overScrollVertical
-import com.lunacattus.ui_design.compose.extensions.clickableWithDebounce
+import com.lunacattus.ui_design.compose.overScrollVertical
+import com.lunacattus.ui_design.compose.clickableWithDebounce
 
 @Composable
 fun BrowserScreen(

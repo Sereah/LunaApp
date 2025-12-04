@@ -10,7 +10,7 @@ import com.lunacattus.app.domain.model.Gallery
 import com.lunacattus.app.gallery.databinding.ItemListImageBinding
 import com.lunacattus.app.gallery.databinding.ItemListTitleBinding
 import com.lunacattus.app.gallery.databinding.ItemListVideoBinding
-import com.lunacattus.ui_design.view.setOnClickListenerWithDebounce
+import com.lunacattus.common.util.setOnClickListenerWithDebounce
 
 class GalleryListAdapter(
     private val onItemClick: (Gallery) -> Unit
