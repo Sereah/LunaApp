@@ -1,4 +1,4 @@
-package com.lunacattus.app.connection.routes.main.bluetooth.mvi
+package com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi
 
 data class BluetoothUiState(
     val loading: Boolean = false,

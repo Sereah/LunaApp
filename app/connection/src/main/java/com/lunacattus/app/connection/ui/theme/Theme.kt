@@ -1,4 +1,4 @@
-package com.lunacattus.app.connection.theme
+package com.lunacattus.app.connection.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable

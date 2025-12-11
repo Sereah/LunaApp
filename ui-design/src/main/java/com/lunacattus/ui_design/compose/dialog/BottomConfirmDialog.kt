@@ -17,6 +17,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -36,6 +37,32 @@ import com.lunacattus.ui_design.compose.clickableWithDebounce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@Immutable
+data class BottomConfirmDialogColors(
+    val confirmTextColor: Color,
+    val cancelTextColor: Color,
+    val dialogBackgroundColor: Color,
+    val dividerColor: Color,
+    val rippleColor: Color
+)
+
+object BottomConfirmDialogDefaults {
+    @Composable
+    fun colors(
+        confirmTextColor: Color = Color.Red.copy(alpha = 0.5f),
+        cancelTextColor: Color = Color(0xC87C7C7D),
+        dialogBackgroundColor: Color = Color.White,
+        dividerColor: Color = Color(0xF7B8B8BB),
+        rippleColor: Color = Color.Black.copy(alpha = 0.8f)
+    ): BottomConfirmDialogColors = BottomConfirmDialogColors(
+        confirmTextColor = confirmTextColor,
+        cancelTextColor = cancelTextColor,
+        dialogBackgroundColor = dialogBackgroundColor,
+        dividerColor = dividerColor,
+        rippleColor = rippleColor
+    )
+}
+
 /**
  * 一个可定制的确认对话框，从底部弹出，并带有动画效果。
  *
@@ -43,11 +70,7 @@ import kotlinx.coroutines.launch
  * @param cancelText 取消按钮的文本。
  * @param onConFirm 点击确认按钮时的回调。
  * @param onDismiss 对话框因任何原因（确认、取消、点击外部、按返回键）关闭时的回调。
- * @param confirmTextColor 确认按钮文本的颜色。
- * @param cancelTextColor 取消按钮文本的颜色。
- * @param dialogBackgroundColor 对话框的背景颜色。
- * @param dividerColor 分割线的颜色。
- * @param rippleColor 点击波纹效果的颜色。
+ * @param colors 对话框的颜色配置。
  * @param dismissOnClickOutside 是否允许点击对话框外部区域来关闭对话框。
  * @param dimAmount 对话框背景的昏暗程度，范围从 0.0f（完全透明）到 1.0f（完全不透明）。
  */
@@ -57,11 +80,7 @@ fun BottomConfirmDialog(
     cancelText: String = "cancel",
     onConFirm: () -> Unit,
     onDismiss: () -> Unit,
-    confirmTextColor: Color = Color.Red.copy(alpha = 0.5f),
-    cancelTextColor: Color = Color(0xC87C7C7D),
-    dialogBackgroundColor: Color = Color.White,
-    dividerColor: Color = Color(0xF7B8B8BB),
-    rippleColor: Color = Color.Black.copy(alpha = 0.8f),
+    colors: BottomConfirmDialogColors = BottomConfirmDialogDefaults.colors(),
     dismissOnClickOutside: Boolean = true,
     dimAmount: Float = 0.2f
 ) {
@@ -123,7 +142,7 @@ fun BottomConfirmDialog(
                     modifier = Modifier
                         .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
                         .fillMaxWidth()
-                        .background(dialogBackgroundColor, RoundedCornerShape(10.dp))
+                        .background(colors.dialogBackgroundColor, RoundedCornerShape(10.dp))
                         // 阻止点击事件传递到外部 Box
                         .clickableWithDebounce {}
                 ) {
@@ -135,7 +154,7 @@ fun BottomConfirmDialog(
                             .clickableWithDebounce(
                                 indication = ripple(
                                     bounded = true,
-                                    color = rippleColor
+                                    color = colors.rippleColor
                                 )
                             ) {
                                 scope.launch {
@@ -149,12 +168,12 @@ fun BottomConfirmDialog(
                         Text(
                             text = confirmText,
                             fontSize = 18.sp,
-                            color = confirmTextColor,
+                            color = colors.confirmTextColor,
                             textAlign = TextAlign.Center,
                         )
                     }
                     HorizontalDivider(
-                        color = dividerColor,
+                        color = colors.dividerColor,
                         thickness = 0.5.dp,
                     )
                     Box(
@@ -165,7 +184,7 @@ fun BottomConfirmDialog(
                             .clickableWithDebounce(
                                 indication = ripple(
                                     bounded = true,
-                                    color = rippleColor
+                                    color = colors.rippleColor
                                 )
                             ) {
                                 dismissWithAnimation()
@@ -175,7 +194,7 @@ fun BottomConfirmDialog(
                         Text(
                             text = cancelText,
                             fontSize = 18.sp,
-                            color = cancelTextColor,
+                            color = colors.cancelTextColor,
                             textAlign = TextAlign.Center,
                         )
                     }

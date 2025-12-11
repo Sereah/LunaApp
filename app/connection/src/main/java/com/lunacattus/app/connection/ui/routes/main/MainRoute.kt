@@ -1,4 +1,4 @@
-package com.lunacattus.app.connection.routes.main
+package com.lunacattus.app.connection.ui.routes.main
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,11 +17,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.lunacattus.app.connection.routes.main.bluetooth.BluetoothGraph
-import com.lunacattus.app.connection.routes.main.bluetooth.bluetoothRouter
-import com.lunacattus.app.connection.routes.main.wifi.WifiGraph
-import com.lunacattus.app.connection.routes.main.wifi.wifiRouter
-import com.lunacattus.app.connection.theme.AppTheme
+import com.lunacattus.app.connection.ui.routes.main.bluetooth.BluetoothGraph
+import com.lunacattus.app.connection.ui.routes.main.bluetooth.bluetoothRouter
+import com.lunacattus.app.connection.ui.routes.main.wifi.WifiGraph
+import com.lunacattus.app.connection.ui.routes.main.wifi.wifiRouter
+import com.lunacattus.app.connection.ui.theme.AppTheme
 import com.lunacattus.ui_design.compose.BottomItem
 import com.lunacattus.ui_design.compose.HazeAppBarBottomScaffold
 

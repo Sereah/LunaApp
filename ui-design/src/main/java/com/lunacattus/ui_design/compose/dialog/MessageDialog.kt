@@ -25,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -44,15 +45,33 @@ import com.lunacattus.ui_design.compose.clickableWithDebounce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@Immutable
+data class MessageDialogColors(
+    val containerColor: Color,
+    val titleColor: Color,
+    val messageColor: Color
+)
+
+object MessageDialogDefaults {
+    @Composable
+    fun colors(
+        containerColor: Color = MaterialTheme.colorScheme.surface,
+        titleColor: Color = MaterialTheme.colorScheme.onSurface,
+        messageColor: Color = MaterialTheme.colorScheme.onSurfaceVariant
+    ): MessageDialogColors = MessageDialogColors(
+        containerColor = containerColor,
+        titleColor = titleColor,
+        messageColor = messageColor
+    )
+}
+
 /**
  * 一个居中显示的、可定制的消息对话框，带有弹出和消失的动画效果。
  *
  * @param onDismissRequest 当请求关闭对话框时调用的回调（例如，点击外部区域或按返回键）。
  * @param title 对话框的可选标题。
  * @param message 要在对话框中显示的多行文本消息。
- * @param containerColor 对话框容器的背景颜色。
- * @param titleColor 标题文本的颜色。
- * @param messageColor 消息文本的颜色。
+ * @param colors 对话框的颜色配置，包括容器、标题和消息文本的颜色。
  * @param cornerRadius 对话框的圆角半径。
  * @param maxHeight 对话框内容区域的最大高度。如果内容超过此高度，将变得可滚动。
  * @param dimAmount 对话框背景的昏暗程度，范围从 0.0f（完全透明）到 1.0f（完全不透明）。
@@ -62,9 +81,7 @@ fun MessageDialog(
     onDismissRequest: () -> Unit,
     title: String? = null,
     message: String,
-    containerColor: Color = MaterialTheme.colorScheme.surface,
-    titleColor: Color = MaterialTheme.colorScheme.onSurface,
-    messageColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    colors: MessageDialogColors = MessageDialogDefaults.colors(),
     cornerRadius: Dp = 16.dp,
     maxHeight: Dp = 400.dp,
     dimAmount: Float = 0.2f
@@ -105,11 +122,11 @@ fun MessageDialog(
             AnimatedVisibility(
                 visibleState = visibleState,
                 enter = fadeIn(animationSpec = tween(animationDuration)) + scaleIn(
-                    initialScale = 0.8f,
+                    initialScale = 0.2f,
                     animationSpec = tween(animationDuration)
                 ),
                 exit = fadeOut(animationSpec = tween(animationDuration)) + scaleOut(
-                    targetScale = 0.8f,
+                    targetScale = 0.2f,
                     animationSpec = tween(animationDuration)
                 )
             ) {
@@ -120,7 +137,7 @@ fun MessageDialog(
                         .clickableWithDebounce {} // 阻止点击事件传递到外部
                     ,
                     shape = RoundedCornerShape(cornerRadius),
-                    color = containerColor
+                    color = colors.containerColor
                 ) {
                     Column(
                         modifier = Modifier.padding(24.dp),
@@ -129,7 +146,7 @@ fun MessageDialog(
                         if (title != null) {
                             Text(
                                 text = title,
-                                color = titleColor,
+                                color = colors.titleColor,
                                 style = MaterialTheme.typography.headlineSmall.copy(fontSize = 18.sp),
                                 textAlign = TextAlign.Center
                             )
@@ -139,7 +156,7 @@ fun MessageDialog(
                             Box(modifier = Modifier.heightIn(max = maxHeight)) {
                                 Text(
                                     text = message,
-                                    color = messageColor,
+                                    color = colors.messageColor,
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.verticalScroll(rememberScrollState())
                                 )

@@ -1,8 +1,10 @@
-package com.lunacattus.app.connection.routes.main.bluetooth.mvi
+package com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.app.connection.domain.BluetoothRepository
+import com.lunacattus.app.connection.ui.ActivityEvent
+import com.lunacattus.app.connection.ui.ActivitySideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,16 +53,15 @@ class BluetoothViewModel @Inject constructor(
                                 dialogItem = item
                             )
 
-                            ItemData.Name -> copy(info = info.copy(name = data), dialogItem = item)
+                            ItemData.Name -> copy(
+                                info = info.copy(name = data),
+                                dialogItem = item
+                            )
                         }
                     }
                 }
             } catch (e: Exception) {
-                _sideEffect.emit(
-                    BluetoothSideEffect.ShowToast(
-                        e.localizedMessage ?: "Unknown error"
-                    )
-                )
+                ActivitySideEffect.send(ActivityEvent.LogError(e))
             } finally {
                 reduce { copy(loading = false) }
             }

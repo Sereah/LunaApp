@@ -1,7 +1,9 @@
-package com.lunacattus.app.connection.theme
+package com.lunacattus.app.connection.ui.theme
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideOut
 import androidx.compose.ui.unit.IntOffset
@@ -36,14 +38,18 @@ val slideOutFromLeft = slideOut(
 
 val stayStillIn = slideIn(
     animationSpec = tween(durationMillis = 1000, easing = LinearEasing),
-    initialOffset = { fullSize ->
+    initialOffset = { _ ->
         IntOffset(0, 0)
     }
 )
 
 val stayStillOut = slideOut(
     animationSpec = tween(durationMillis = 1000, easing = LinearEasing),
-    targetOffset = { fullSize ->
+    targetOffset = { _ ->
         IntOffset(0, 0)
     }
 )
+
+val immediatelyIn = fadeIn(tween(0))
+
+val immediatelyOut = fadeOut(tween(0))

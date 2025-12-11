@@ -1,11 +1,11 @@
-package com.lunacattus.app.connection.routes.main.wifi
+package com.lunacattus.app.connection.ui.routes.main.wifi
 
 import androidx.compose.runtime.remember
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.lunacattus.app.connection.routes.base.NavRoute
+import com.lunacattus.app.connection.ui.routes.base.NavRoute
 
 data object WifiGraph : NavRoute {
     override val route: String

@@ -1,4 +1,4 @@
-package com.lunacattus.app.connection.theme
+package com.lunacattus.app.connection.ui.theme
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color

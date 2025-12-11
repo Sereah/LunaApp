@@ -5,11 +5,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.lunacattus.app.connection.routes.main.MainRoute
-import com.lunacattus.app.connection.theme.AppTheme
+import com.lunacattus.app.connection.ui.ActivityEvent
+import com.lunacattus.app.connection.ui.ActivitySideEffect
+import com.lunacattus.app.connection.ui.routes.main.MainRoute
+import com.lunacattus.app.connection.ui.theme.AppTheme
+import com.lunacattus.ui_design.compose.dialog.OverlayToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,6 +34,23 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             AppTheme {
+
+                var toastEvent by remember { mutableStateOf<Pair<String, Long>?>(null) }
+
+                LaunchedEffect(Unit) {
+                    ActivitySideEffect.events.collect {
+                        toastEvent = when (it) {
+                            is ActivityEvent.LogError -> {
+                                it.throwable.toString() to it.id
+                            }
+
+                            is ActivityEvent.ShowToast -> {
+                                it.message to it.id
+                            }
+                        }
+                    }
+                }
+
                 val rootNavController = rememberNavController()
                 NavHost(
                     navController = rootNavController,
@@ -33,6 +60,11 @@ class MainActivity : ComponentActivity() {
                         MainRoute(rootNavController)
                     }
                 }
+
+                OverlayToast(
+                    modifier = Modifier.fillMaxSize(),
+                    toastEvent
+                )
             }
         }
     }
