@@ -22,6 +22,10 @@ import com.lunacattus.app.connection.ui.routes.main.bluetooth.bluetoothRouter
 import com.lunacattus.app.connection.ui.routes.main.wifi.WifiGraph
 import com.lunacattus.app.connection.ui.routes.main.wifi.wifiRouter
 import com.lunacattus.app.connection.ui.theme.AppTheme
+import com.lunacattus.app.connection.ui.theme.slideInFromLeft
+import com.lunacattus.app.connection.ui.theme.slideInFromRight
+import com.lunacattus.app.connection.ui.theme.slideOutFromLeft
+import com.lunacattus.app.connection.ui.theme.slideOutFromRight
 import com.lunacattus.ui_design.compose.BottomItem
 import com.lunacattus.ui_design.compose.HazeAppBarBottomScaffold
 
@@ -60,7 +64,11 @@ fun MainRoute(rootNavController: NavHostController) {
     ) {
         NavHost(
             navController = mainNavController,
-            startDestination = BluetoothGraph.route
+            startDestination = BluetoothGraph.route,
+            enterTransition = { slideInFromRight },
+            exitTransition = { slideOutFromLeft },
+            popEnterTransition = { slideInFromLeft },
+            popExitTransition = { slideOutFromRight }
         ) {
             bluetoothRouter(mainNavController, rootNavController)
             wifiRouter(mainNavController, rootNavController)

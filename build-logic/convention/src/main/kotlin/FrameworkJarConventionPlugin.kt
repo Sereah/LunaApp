@@ -4,7 +4,6 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
-import java.io.File
 
 // 1. 定义一个 extension class 来持有版本信息
 open class FrameworkJarExtension {
@@ -21,20 +20,26 @@ class FrameworkJarConventionPlugin : Plugin<Project> {
             val frameworkVersion = extension.version ?: "12" // 如果未指定，则默认为版本 "12"
             val frameworkJarFile = rootProject.file("frameworkLibs/framework-$frameworkVersion.jar")
 
-            if (!frameworkJarFile.exists()) {
-                throw IllegalStateException("Framework jar not found at: ${frameworkJarFile.path}")
+            require(frameworkJarFile.exists()) {
+                "Framework jar not found at: ${frameworkJarFile.path}"
+            }
+
+            val dependencyFiles = mutableListOf(frameworkJarFile)
+
+            if ((frameworkVersion.toIntOrNull() ?: 0) >= 13) {
+                val bluetoothJarFile = rootProject.file("frameworkLibs/bluetooth-$frameworkVersion.jar")
+                require(bluetoothJarFile.exists()) {
+                    "Bluetooth jar not found at: ${bluetoothJarFile.path}"
+                }
+                dependencyFiles.add(bluetoothJarFile)
             }
 
             dependencies {
-                "compileOnly"(files(frameworkJarFile))
+                "compileOnly"(files(dependencyFiles))
             }
             tasks.withType<JavaCompile>().configureEach {
                 val originalClasspath = options.bootstrapClasspath?.files ?: emptySet()
-                val newFileList = mutableListOf<File>().apply {
-                    add(frameworkJarFile)
-                    addAll(originalClasspath)
-                }
-                options.bootstrapClasspath = files(*newFileList.toTypedArray())
+                options.bootstrapClasspath = files(dependencyFiles, originalClasspath)
             }
         }
     }

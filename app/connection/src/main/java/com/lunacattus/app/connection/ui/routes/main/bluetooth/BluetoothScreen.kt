@@ -1,11 +1,8 @@
 package com.lunacattus.app.connection.ui.routes.main.bluetooth
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,11 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.NavigateNext
-import androidx.compose.material.icons.rounded.FilterNone
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.BluetoothConnected
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
@@ -33,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,21 +37,26 @@ import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothSideE
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiIntent
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiState
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothViewModel
-import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.ItemData
 import com.lunacattus.app.connection.ui.theme.AppTheme
-import com.lunacattus.ui_design.compose.CircleLoader
+import com.lunacattus.ui_design.compose.CustomSwitch
+import com.lunacattus.ui_design.compose.SwitchDefaults
 import com.lunacattus.ui_design.compose.clickableWithDebounce
-import com.lunacattus.ui_design.compose.dialog.MessageDialog
 import com.lunacattus.ui_design.compose.overScrollVertical
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun BluetoothRoute(viewModel: BluetoothViewModel) {
+fun BluetoothRoute(
+    viewModel: BluetoothViewModel,
+    navToBtDiscovery: () -> Unit,
+    navToBtBonded: () -> Unit
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     BluetoothScreen(
         uiState,
         viewModel::processUiIntent,
-        viewModel.sideEffect
+        viewModel.sideEffect,
+        navToBtDiscovery,
+        navToBtBonded
     )
 }
 
@@ -64,64 +65,32 @@ fun BluetoothScreen(
     uiState: BluetoothUiState,
     sendUiIntent: (BluetoothUiIntent) -> Unit,
     uiEffect: Flow<BluetoothSideEffect>,
+    navToBtDiscovery: () -> Unit = {},
+    navToBtBonded: () -> Unit = {}
 ) {
 
-    val itemList = ItemData.entries
+    var btState by remember { mutableStateOf(0) }
 
-    var showDialog by remember { mutableStateOf(false) }
-    var showLoading by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        sendUiIntent.invoke(BluetoothUiIntent.LoadInfo)
+    }
 
     LaunchedEffect(uiState) {
-        showDialog = uiState.dialogItem != null
-        showLoading = uiState.loading
+        btState = uiState.btState
     }
 
     LaunchedEffect(uiEffect) {
         uiEffect.collect {}
     }
-
-    if (showDialog) {
-        MessageDialog(
-            onDismissRequest = {
-                sendUiIntent(BluetoothUiIntent.DismissDialog)
-            },
-            message = when (uiState.dialogItem) {
-                ItemData.Profile -> uiState.info.profiles
-                ItemData.Address -> uiState.info.address
-                ItemData.Name -> uiState.info.name
-                else -> ""
-            },
-            title = uiState.dialogItem?.title
-        )
-    }
-
-    AnimatedVisibility(
-        visible = showLoading,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            CircleLoader(
-                color = Color(0xFF8BC34A),
-                secondColor = null,
-                modifier = Modifier
-                    .size(100.dp)
-                    .align(Alignment.Center),
-                isVisible = true,
-                tailLength = 300f,
-                cycleDuration = 1000
-            )
-        }
-    }
-    Content(itemList, sendUiIntent)
+    Content(btState, sendUiIntent, navToBtDiscovery, navToBtBonded)
 }
 
 @Composable
 private fun Content(
-    itemList: List<ItemData>,
-    sendUiIntent: (BluetoothUiIntent) -> Unit
+    btState: Int,
+    sendUiIntent: (BluetoothUiIntent) -> Unit,
+    navToBtDiscovery: () -> Unit,
+    navToBtBonded: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -130,18 +99,56 @@ private fun Content(
         contentPadding = PaddingValues(vertical = 100.dp, horizontal = 10.dp),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
-        items(items = itemList) {
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .background(
+                        AppTheme.colors.card,
+                        RoundedCornerShape(10.dp)
+                    )
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Text("蓝牙开关", fontSize = 18.sp, color = AppTheme.colors.primary)
+                Spacer(Modifier.weight(1f))
+                CustomSwitch(
+                    colors = SwitchDefaults.colors()
+                        .copy(checkedTrackColor = AppTheme.colors.button),
+                    enabled = btState == BluetoothAdapter.STATE_ON || btState == BluetoothAdapter.STATE_OFF,
+                    checked = btState == BluetoothAdapter.STATE_ON || btState == BluetoothAdapter.STATE_TURNING_ON,
+                    onCheckedChanged = {
+                        sendUiIntent(BluetoothUiIntent.SwitchEnable)
+                    }
+                )
+            }
+        }
+        item {
             Item(
                 icon = {
                     Icon(
-                        imageVector = Icons.Rounded.FilterNone,
+                        imageVector = Icons.Rounded.Add,
                         contentDescription = null,
                         modifier = Modifier.size(30.dp)
                     )
                 },
-                title = "获取${it.title}"
+                title = "连接新设备"
             ) {
-                sendUiIntent(BluetoothUiIntent.LoadItem(it))
+                navToBtDiscovery()
+            }
+            Item(
+                icon = {
+                    Icon(
+                        imageVector = Icons.Rounded.BluetoothConnected,
+                        contentDescription = null,
+                        modifier = Modifier.size(30.dp)
+                    )
+                },
+                title = "已绑定的设备"
+            ) {
+                navToBtBonded()
             }
         }
     }
@@ -158,7 +165,7 @@ fun Item(
             .fillMaxWidth()
             .height(60.dp)
             .background(
-                AppTheme.colors.primary.copy(alpha = 0.2f),
+                AppTheme.colors.card,
                 RoundedCornerShape(10.dp)
             )
             .padding(10.dp)

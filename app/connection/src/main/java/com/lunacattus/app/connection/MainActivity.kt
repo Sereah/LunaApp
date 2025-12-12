@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,6 +54,9 @@ class MainActivity : ComponentActivity() {
 
                 val rootNavController = rememberNavController()
                 NavHost(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(AppTheme.colors.background),
                     navController = rootNavController,
                     startDestination = "mainNav"
                 ) {

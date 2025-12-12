@@ -9,7 +9,7 @@ plugins {
 }
 
 frameworkJar {
-    version = "12"
+    version = "13"
 }
 
 android {
@@ -20,7 +20,6 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
-
 
     applicationVariants.configureEach {
         val variant = this
