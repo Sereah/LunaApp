@@ -8,4 +8,5 @@ sealed interface BluetoothUiIntent {
     data class Discovery(val enable: Boolean) : BluetoothUiIntent
     data class PairNewDevice(val device: BluetoothDevice) : BluetoothUiIntent
     data object LoadBondedDevices : BluetoothUiIntent
+    data class OnClickDeviceSetting(val device: BluetoothDevice): BluetoothUiIntent
 }

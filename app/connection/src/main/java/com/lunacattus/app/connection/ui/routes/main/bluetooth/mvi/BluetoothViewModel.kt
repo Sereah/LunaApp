@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,6 +26,8 @@ class BluetoothViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<BluetoothSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
+    private val _selectedDevice = MutableStateFlow<BluetoothDevice?>(null)
+    val selectedDevice = _selectedDevice.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -61,6 +62,9 @@ class BluetoothViewModel @Inject constructor(
             is BluetoothUiIntent.PairNewDevice -> pairNewDevice(intent.device)
             is BluetoothUiIntent.LoadBondedDevices -> getBondedDevices()
             is BluetoothUiIntent.LoadInfo -> loadInfo()
+            is BluetoothUiIntent.OnClickDeviceSetting -> {
+                _selectedDevice.update { intent.device }
+            }
         }
     }
 

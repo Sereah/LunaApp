@@ -25,7 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -69,7 +69,7 @@ fun BluetoothScreen(
     navToBtBonded: () -> Unit = {}
 ) {
 
-    var btState by remember { mutableStateOf(0) }
+    var btState by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
         sendUiIntent.invoke(BluetoothUiIntent.LoadInfo)
@@ -95,6 +95,7 @@ private fun Content(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
+            .background(AppTheme.colors.background)
             .overScrollVertical(),
         contentPadding = PaddingValues(vertical = 100.dp, horizontal = 10.dp),
         verticalArrangement = Arrangement.spacedBy(15.dp)
@@ -138,6 +139,8 @@ private fun Content(
             ) {
                 navToBtDiscovery()
             }
+        }
+        item {
             Item(
                 icon = {
                     Icon(

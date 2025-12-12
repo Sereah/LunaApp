@@ -1,5 +1,6 @@
 package com.lunacattus.app.connection.ui.routes.main
 
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -11,10 +12,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.BluetoothGraph
@@ -65,12 +69,8 @@ fun MainRoute(rootNavController: NavHostController) {
         NavHost(
             navController = mainNavController,
             startDestination = BluetoothGraph.route,
-            enterTransition = { slideInFromRight },
-            exitTransition = { slideOutFromLeft },
-            popEnterTransition = { slideInFromLeft },
-            popExitTransition = { slideOutFromRight }
         ) {
-            bluetoothRouter(mainNavController, rootNavController)
+            bluetoothRouter(mainNavController)
             wifiRouter(mainNavController, rootNavController)
         }
     }
@@ -94,5 +94,19 @@ fun bottomItems(): List<BottomItem> {
             unSelectColor = AppTheme.colors.inversePrimary,
             route = WifiGraph.route
         )
+    )
+}
+
+fun NavGraphBuilder.animatedComposable(
+    route: String,
+    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit
+) {
+    composable(
+        route = route,
+        enterTransition = { slideInFromRight },
+        exitTransition = { slideOutFromLeft },
+        popEnterTransition = { slideInFromLeft },
+        popExitTransition = { slideOutFromRight },
+        content = content
     )
 }

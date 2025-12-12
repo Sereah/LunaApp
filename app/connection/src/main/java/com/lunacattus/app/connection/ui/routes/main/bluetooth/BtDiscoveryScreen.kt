@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBackIosNew
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -86,12 +89,23 @@ fun BtDiscoveryScreen(
 
     LazyColumn(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(AppTheme.colors.background),
         contentPadding = PaddingValues(vertical = 100.dp, horizontal = 10.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         item {
             Column {
+                Icon(
+                    imageVector = Icons.Rounded.ArrowBackIosNew,
+                    contentDescription = null,
+                    modifier = Modifier.size(30.dp).clickableWithDebounce {
+                        onBack()
+                    }
+                )
+                Spacer(Modifier.height(20.dp))
+                Text("扫描新设备", fontSize = 24.sp, color = AppTheme.colors.primary)
+                Spacer(Modifier.height(10.dp))
                 Text("设备名称", fontSize = 20.sp, color = AppTheme.colors.primary)
                 Text(
                     text = localDeviceName,
