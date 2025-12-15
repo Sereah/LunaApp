@@ -138,6 +138,7 @@ class BluetoothViewModel @Inject constructor(
             }
             val success = repository.pairDevice(device.device)
             if (success) {
+                ActivitySideEffect.send(ActivityEvent.ShowToast("配对成功"))
                 _sideEffect.emit(BluetoothSideEffect.BackDiscoveryScreen)
             }
         }

@@ -89,7 +89,7 @@ private fun BondedTitle(onBack: () -> Unit) {
             }
     )
     Spacer(Modifier.height(20.dp))
-    Text("已连接的设备", fontSize = 24.sp, color = AppTheme.colors.primary)
+    Text("已绑定的设备", fontSize = 24.sp, color = AppTheme.colors.primary)
     Spacer(Modifier.height(10.dp))
 }
 
