@@ -1,13 +1,12 @@
 package com.lunacattus.app.connection.ui.routes.main.bluetooth
 
-import androidx.compose.runtime.remember
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.lunacattus.app.connection.ui.routes.base.NavRoute
-import com.lunacattus.app.connection.ui.routes.main.animatedComposable
+import com.lunacattus.app.connection.ui.routes.base.animatedComposable
+import com.lunacattus.app.connection.ui.routes.base.graphViewModel
 
 data object BluetoothGraph : NavRoute {
     override val route: String
@@ -40,42 +39,31 @@ fun NavGraphBuilder.bluetoothRouter(
         route = BluetoothGraph.route,
         startDestination = BluetoothRoute.route,
     ) {
-        composable(BluetoothRoute.route) {
-            val graph = remember(it) {
-                mainNavController.getBackStackEntry(BluetoothGraph.route)
-            }
+        composable(BluetoothRoute.route) { entry ->
             BluetoothRoute(
-                hiltViewModel(graph),
+                viewModel = entry.graphViewModel(mainNavController, BluetoothGraph.route),
                 navToBtDiscovery = { mainNavController.navigate(BtDiscoveryRoute.route) },
                 navToBtBonded = { mainNavController.navigate(BtBondedRoute.route) }
             )
         }
-        animatedComposable(BtDiscoveryRoute.route) {
-            val graph = remember(it) {
-                mainNavController.getBackStackEntry(BluetoothGraph.route)
-            }
-            BtDiscoveryRoute(hiltViewModel(graph)) {
-                mainNavController.popBackStack()
-            }
+        animatedComposable(BtDiscoveryRoute.route) { entry ->
+            BtDiscoveryRoute(
+                viewModel = entry.graphViewModel(mainNavController, BluetoothGraph.route),
+                onBack = { mainNavController.popBackStack() }
+            )
         }
-        animatedComposable(BtBondedRoute.route) {
-            val graph = remember(it) {
-                mainNavController.getBackStackEntry(BluetoothGraph.route)
-            }
+        animatedComposable(BtBondedRoute.route) { entry ->
             BtBondedRoute(
-                hiltViewModel(graph),
+                viewModel = entry.graphViewModel(mainNavController, BluetoothGraph.route),
                 navToDeviceDetail = {
                     mainNavController.navigate(DeviceDetailRoute.route)
                 },
                 onBack = { mainNavController.popBackStack() }
             )
         }
-        animatedComposable(DeviceDetailRoute.route) {
-            val graph = remember(it) {
-                mainNavController.getBackStackEntry(BluetoothGraph.route)
-            }
+        animatedComposable(DeviceDetailRoute.route) { entry ->
             DeviceDetailRoute(
-                hiltViewModel(viewModelStoreOwner = graph),
+                viewModel = entry.graphViewModel(mainNavController, BluetoothGraph.route),
                 onBack = {
                     mainNavController.popBackStack()
                 }

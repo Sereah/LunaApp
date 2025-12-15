@@ -78,7 +78,7 @@ fun MainRoute(rootNavController: NavHostController) {
 
 
 @Composable
-fun bottomItems(): List<BottomItem> {
+private fun bottomItems(): List<BottomItem> {
     return listOf(
         BottomItem(
             title = "Bluetooth",
@@ -94,19 +94,5 @@ fun bottomItems(): List<BottomItem> {
             unSelectColor = AppTheme.colors.inversePrimary,
             route = WifiGraph.route
         )
-    )
-}
-
-fun NavGraphBuilder.animatedComposable(
-    route: String,
-    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit
-) {
-    composable(
-        route = route,
-        enterTransition = { slideInFromRight },
-        exitTransition = { slideOutFromLeft },
-        popEnterTransition = { slideInFromLeft },
-        popExitTransition = { slideOutFromRight },
-        content = content
     )
 }

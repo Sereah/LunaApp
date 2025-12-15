@@ -1,5 +1,6 @@
 package com.lunacattus.app.connection.ui.routes.main.bluetooth
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -94,87 +95,105 @@ fun BtDiscoveryScreen(
         contentPadding = PaddingValues(vertical = 100.dp, horizontal = 10.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        item {
-            Column {
-                Icon(
-                    imageVector = Icons.Rounded.ArrowBackIosNew,
-                    contentDescription = null,
-                    modifier = Modifier.size(30.dp).clickableWithDebounce {
-                        onBack()
-                    }
-                )
-                Spacer(Modifier.height(20.dp))
-                Text("扫描新设备", fontSize = 24.sp, color = AppTheme.colors.primary)
-                Spacer(Modifier.height(10.dp))
-                Text("设备名称", fontSize = 20.sp, color = AppTheme.colors.primary)
-                Text(
-                    text = localDeviceName,
-                    fontSize = 15.sp,
-                    color = AppTheme.colors.inversePrimary
-                )
-                Spacer(Modifier.height(15.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.height(40.dp)
-                ) {
-                    Text("可用设备", fontSize = 16.sp, color = AppTheme.colors.primary)
-                    AnimatedVisibility(
-                        uiState.discovery,
-                        enter = immediatelyIn,
-                        exit = immediatelyOut
-                    ) {
-                        Spinner(Modifier.size(40.dp))
-                    }
-                    AnimatedVisibility(
-                        !uiState.discovery,
-                        enter = immediatelyIn,
-                        exit = immediatelyOut
-                    ) {
-                        Text(
-                            "刷新",
-                            fontSize = 14.sp,
-                            color = AppTheme.colors.icon,
-                            modifier = Modifier
-                                .padding(start = 10.dp)
-                                .clickableWithDebounce {
-                                    sendUiIntent.invoke(BluetoothUiIntent.Discovery(true))
-                                }
-                        )
-                    }
-                }
-            }
-        }
+        item { DiscoveryTitle(onBack, localDeviceName, uiState, sendUiIntent) }
         items(items = foundDevices, key = { it.address }) { device ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .background(
-                        AppTheme.colors.card,
-                        RoundedCornerShape(10.dp)
-                    )
-                    .padding(horizontal = 10.dp)
-                    .clickableWithDebounce {
-                        sendUiIntent.invoke(BluetoothUiIntent.PairNewDevice(device))
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+            DiscoveryDeviceItem(device, sendUiIntent)
+        }
+    }
+}
+
+@Composable
+private fun DiscoveryTitle(
+    onBack: () -> Unit,
+    localDeviceName: String,
+    uiState: BluetoothUiState,
+    sendUiIntent: (BluetoothUiIntent) -> Unit
+) {
+    Column {
+        Icon(
+            imageVector = Icons.Rounded.ArrowBackIosNew,
+            contentDescription = null,
+            modifier = Modifier
+                .size(30.dp)
+                .clickableWithDebounce {
+                    onBack()
+                }
+        )
+        Spacer(Modifier.height(20.dp))
+        Text("扫描新设备", fontSize = 24.sp, color = AppTheme.colors.primary)
+        Spacer(Modifier.height(10.dp))
+        Text("设备名称", fontSize = 20.sp, color = AppTheme.colors.primary)
+        Text(
+            text = localDeviceName,
+            fontSize = 15.sp,
+            color = AppTheme.colors.inversePrimary
+        )
+        Spacer(Modifier.height(15.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.height(40.dp)
+        ) {
+            Text("可用设备", fontSize = 16.sp, color = AppTheme.colors.primary)
+            AnimatedVisibility(
+                uiState.discovery,
+                enter = immediatelyIn,
+                exit = immediatelyOut
+            ) {
+                Spinner(Modifier.size(40.dp))
+            }
+            AnimatedVisibility(
+                !uiState.discovery,
+                enter = immediatelyIn,
+                exit = immediatelyOut
             ) {
                 Text(
-                    device.name ?: device.address,
-                    fontSize = 15.sp,
-                    color = AppTheme.colors.inversePrimary
+                    "刷新",
+                    fontSize = 14.sp,
+                    color = AppTheme.colors.icon,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .clickableWithDebounce {
+                            sendUiIntent.invoke(BluetoothUiIntent.Discovery(true))
+                        }
                 )
-                Spacer(Modifier.weight(1f))
-                AnimatedVisibility(
-                    device.bondState == BluetoothDevice.BOND_BONDING,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    Spinner(Modifier.size(40.dp))
-                }
             }
         }
     }
+}
 
+@SuppressLint("MissingPermission")
+@Composable
+private fun DiscoveryDeviceItem(
+    device: BluetoothDevice,
+    sendUiIntent: (BluetoothUiIntent) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .background(
+                AppTheme.colors.card,
+                RoundedCornerShape(10.dp)
+            )
+            .padding(horizontal = 10.dp)
+            .clickableWithDebounce {
+                sendUiIntent.invoke(BluetoothUiIntent.PairNewDevice(device))
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Text(
+            device.name ?: device.address,
+            fontSize = 15.sp,
+            color = AppTheme.colors.inversePrimary
+        )
+        Spacer(Modifier.weight(1f))
+        AnimatedVisibility(
+            device.bondState == BluetoothDevice.BOND_BONDING,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Spinner(Modifier.size(40.dp))
+        }
+    }
 }

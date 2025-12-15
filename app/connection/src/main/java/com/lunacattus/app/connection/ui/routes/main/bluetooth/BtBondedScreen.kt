@@ -1,5 +1,6 @@
 package com.lunacattus.app.connection.ui.routes.main.bluetooth
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiIntent
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiState
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothViewModel
+import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BondDevice
 import com.lunacattus.app.connection.ui.theme.AppTheme
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 
@@ -68,73 +70,87 @@ fun BtBondedScreen(
         contentPadding = PaddingValues(vertical = 100.dp, horizontal = 10.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        item {
-            Icon(
-                imageVector = Icons.Rounded.ArrowBackIosNew,
-                contentDescription = null,
-                modifier = Modifier.size(30.dp).clickableWithDebounce {
-                    onBack()
-                }
-            )
-            Spacer(Modifier.height(20.dp))
-            Text("已连接的设备", fontSize = 24.sp, color = AppTheme.colors.primary)
-            Spacer(Modifier.height(10.dp))
-        }
+        item { BondedTitle(onBack) }
         items(items = uiState.bondedDeviceList, key = { it.device.address }) { device ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-                    .background(
-                        AppTheme.colors.card,
-                        RoundedCornerShape(10.dp)
-                    )
-                    .padding(horizontal = 10.dp)
-                    .clickableWithDebounce(!device.connecting && !device.disconnecting) {
-                        if (device.isConnected) {
-                            sendUiIntent.invoke(BluetoothUiIntent.DisconnectDevice(device))
-                        } else {
-                            sendUiIntent.invoke(BluetoothUiIntent.ConnectDevice(device))
-                        }
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text(
-                    device.device.name ?: device.device.address,
-                    fontSize = 18.sp,
-                    color = AppTheme.colors.primary
-                )
-                Spacer(Modifier.weight(1f))
-                Text(
-                    when {
-                        device.connecting -> "连接中"
-                        device.disconnecting -> "断开中"
-                        device.isConnected -> "已连接"
-                        else -> "未连接"
-                    },
-                    fontSize = 15.sp,
-                    color = if (device.isConnected) AppTheme.colors.button else AppTheme.colors.inversePrimary
-                )
-                VerticalDivider(
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp, vertical = 15.dp)
-                        .width(0.5.dp)
-                        .background(AppTheme.colors.divider)
-                )
-                Icon(
-                    imageVector = Icons.Rounded.Settings,
-                    contentDescription = null,
-                    tint = AppTheme.colors.inversePrimary,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickableWithDebounce {
-                            sendUiIntent.invoke(BluetoothUiIntent.OnClickDeviceSetting(device))
-                            navToDeviceDetail()
-                        }
-                )
-            }
+            BondedDeviceItem(device, sendUiIntent, navToDeviceDetail)
         }
     }
+}
 
+@Composable
+private fun BondedTitle(onBack: () -> Unit) {
+    Icon(
+        imageVector = Icons.Rounded.ArrowBackIosNew,
+        contentDescription = null,
+        modifier = Modifier
+            .size(30.dp)
+            .clickableWithDebounce {
+                onBack()
+            }
+    )
+    Spacer(Modifier.height(20.dp))
+    Text("已连接的设备", fontSize = 24.sp, color = AppTheme.colors.primary)
+    Spacer(Modifier.height(10.dp))
+}
+
+@SuppressLint("MissingPermission")
+@Composable
+private fun BondedDeviceItem(
+    device: BondDevice,
+    sendUiIntent: (BluetoothUiIntent) -> Unit,
+    navToDeviceDetail: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .background(
+                AppTheme.colors.card,
+                RoundedCornerShape(10.dp)
+            )
+            .padding(horizontal = 10.dp)
+            .clickableWithDebounce(!device.connecting && !device.disconnecting) {
+                if (device.isConnected) {
+                    sendUiIntent.invoke(BluetoothUiIntent.DisconnectDevice(device))
+                } else {
+                    sendUiIntent.invoke(BluetoothUiIntent.ConnectDevice(device))
+                }
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Text(
+            device.device.name ?: device.device.address,
+            fontSize = 18.sp,
+            color = AppTheme.colors.primary
+        )
+        Spacer(Modifier.weight(1f))
+        Text(
+            when {
+                device.connecting -> "连接中"
+                device.disconnecting -> "断开中"
+                device.isConnected -> "已连接"
+                else -> "未连接"
+            },
+            fontSize = 15.sp,
+            color = if (device.isConnected) AppTheme.colors.button else AppTheme.colors.inversePrimary
+        )
+        VerticalDivider(
+            modifier = Modifier
+                .padding(horizontal = 10.dp, vertical = 15.dp)
+                .width(0.5.dp)
+                .background(AppTheme.colors.divider)
+        )
+        Icon(
+            imageVector = Icons.Rounded.Settings,
+            contentDescription = null,
+            tint = AppTheme.colors.inversePrimary,
+            modifier = Modifier
+                .size(24.dp)
+                .clickableWithDebounce {
+                    sendUiIntent.invoke(BluetoothUiIntent.OnClickDeviceSetting(device))
+                    navToDeviceDetail()
+                }
+        )
+    }
 }
