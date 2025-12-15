@@ -9,21 +9,31 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
+import com.lunacattus.common.di.IOScope
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.util.UUID
+import java.util.concurrent.Executors
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 
 @Singleton
 class BluetoothRepository @Inject constructor(
-    @param:ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
+    @param:IOScope private val ioScope: CoroutineScope
 ) {
 
+    @Suppress("DEPRECATION")
     private var adapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
     private val _uuids = MutableStateFlow<List<String>>(emptyList())
     val uuids = _uuids.asStateFlow()
@@ -33,6 +43,8 @@ class BluetoothRepository @Inject constructor(
     val isDiscovery = _isDiscovery.asStateFlow()
     private val _foundDevices = MutableStateFlow<List<BluetoothDevice>>(emptyList())
     val foundDevices = _foundDevices.asStateFlow()
+    private val _deviceConnectStateChange = MutableSharedFlow<Pair<String, Boolean>>()
+    val deviceConnectStateChange = _deviceConnectStateChange.asSharedFlow()
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -55,7 +67,10 @@ class BluetoothRepository @Inject constructor(
 
                 BluetoothDevice.ACTION_FOUND -> {
                     val device =
-                        intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                        intent.getParcelableExtra(
+                            BluetoothDevice.EXTRA_DEVICE,
+                            BluetoothDevice::class.java
+                        )
                     Logger.d(TAG, "device: $device")
                     if (device != null && device.name?.isNotEmpty() == true) {
                         _foundDevices.update { list ->
@@ -71,7 +86,10 @@ class BluetoothRepository @Inject constructor(
                 }
 
                 BluetoothDevice.ACTION_UUID -> {
-                    val uuids = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID)
+                    val uuids = intent.getParcelableArrayExtra(
+                        BluetoothDevice.EXTRA_UUID,
+                        Array<UUID>::class.java
+                    )
                         ?.map { it.toString() }
                     Logger.d(TAG, "uuids: $uuids")
                     _uuids.value = uuids ?: emptyList()
@@ -79,6 +97,26 @@ class BluetoothRepository @Inject constructor(
             }
         }
     }
+
+    private val deviceConnectStateCallback =
+        object : BluetoothAdapter.BluetoothConnectionCallback() {
+            override fun onDeviceConnected(device: BluetoothDevice) {
+                Logger.d(TAG, "onDeviceConnected: $device")
+                ioScope.launch {
+                    _deviceConnectStateChange.emit(device.address to true)
+                }
+            }
+
+            override fun onDeviceDisconnected(
+                device: BluetoothDevice,
+                reason: Int
+            ) {
+                Logger.d(TAG, "onDeviceDisconnected: $device, reason: $reason")
+                ioScope.launch {
+                    _deviceConnectStateChange.emit(device.address to false)
+                }
+            }
+        }
 
     init {
         Logger.d(TAG, "init, bt state: ${adapter.state}")
@@ -98,8 +136,10 @@ class BluetoothRepository @Inject constructor(
                 ContextCompat.RECEIVER_EXPORTED
             )
         }
+        registerBluetoothConnectionCallback()
     }
 
+    @Suppress("DEPRECATION")
     fun switchEnable(enable: Boolean) {
         Logger.d(TAG, "switchEnable: $enable")
         if (enable) {
@@ -120,51 +160,19 @@ class BluetoothRepository @Inject constructor(
     }
 
     suspend fun pairDevice(device: BluetoothDevice): Boolean {
-        Logger.d(TAG, "pairDevice: $device")
-        if (device.bondState == BluetoothDevice.BOND_BONDED) {
-            return true
-        }
+        if (device.isBonded()) return true
 
         return suspendCancellableCoroutine { continuation ->
-            val bondStateReceiver = object : BroadcastReceiver() {
-                override fun onReceive(context: Context, intent: Intent) {
-                    if (intent.action != BluetoothDevice.ACTION_BOND_STATE_CHANGED) return
-                    val receivedDevice = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                    if (receivedDevice?.address != device.address) return
-                    val bondState = intent.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR)
-                    when (bondState) {
-                        BluetoothDevice.BOND_BONDED -> {
-                            if (continuation.isActive) {
-                                continuation.resume(true)
-                            }
-                            context.unregisterReceiver(this)
-                        }
-                        BluetoothDevice.BOND_NONE -> {
-                            if (continuation.isActive) {
-                                continuation.resume(false)
-                            }
-                            context.unregisterReceiver(this)
-                        }
-                    }
-                }
-            }
+            val receiver = createBondStateReceiver(device, continuation)
 
             context.registerReceiver(
-                bondStateReceiver,
+                receiver,
                 IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
             )
-
-            continuation.invokeOnCancellation {
-                try {
-                    context.unregisterReceiver(bondStateReceiver)
-                } catch (e: IllegalArgumentException) { }
-            }
+            continuation.invokeOnCancellation { context.unregisterReceiver(receiver) }
 
             if (!device.createBond()) {
-                if (continuation.isActive) {
-                    continuation.resume(false)
-                }
-                context.unregisterReceiver(bondStateReceiver)
+                context.unregisterReceiver(receiver)
             }
         }
     }
@@ -192,6 +200,26 @@ class BluetoothRepository @Inject constructor(
         return adapter.name
     }
 
+    fun disconnectDevice(device: BluetoothDevice) {
+        device.disconnect()
+    }
+
+    fun connectDevice(device: BluetoothDevice) {
+        device.connect()
+    }
+
+    fun forgetDevice(device: BluetoothDevice) {
+        device.removeBond()
+    }
+
+    private fun registerBluetoothConnectionCallback() {
+        adapter.registerBluetoothConnectionCallback(
+            Executors.newSingleThreadExecutor(),
+            deviceConnectStateCallback
+        )
+    }
+
+    @Suppress("DEPRECATION")
     private fun profileIdToString(profileId: Int): String {
         return when (profileId) {
             BluetoothProfile.HEADSET -> "HEADSET"
@@ -224,6 +252,63 @@ class BluetoothRepository @Inject constructor(
             BluetoothProfile.BATTERY -> "BATTERY"
             else -> "UNKNOWN_PROFILE ($profileId)"
         }
+    }
+
+    private fun BluetoothDevice.isBonded(): Boolean {
+        return bondState == BluetoothDevice.BOND_BONDED
+    }
+
+    private fun createBondStateReceiver(
+        target: BluetoothDevice,
+        continuation: CancellableContinuation<Boolean>
+    ): BroadcastReceiver = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            if (!isTargetBondChange(intent, target)) return
+
+            handleBondState(
+                intent.getIntExtra(
+                    BluetoothDevice.EXTRA_BOND_STATE,
+                    BluetoothDevice.ERROR
+                ),
+                continuation,
+                this
+            )
+        }
+    }
+
+    private fun isTargetBondChange(
+        intent: Intent,
+        target: BluetoothDevice
+    ): Boolean {
+        if (intent.action != BluetoothDevice.ACTION_BOND_STATE_CHANGED) return false
+
+        val device = intent.getParcelableExtra(
+            BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java
+        )
+        return device?.address == target.address
+    }
+
+    private fun handleBondState(
+        bondState: Int,
+        continuation: CancellableContinuation<Boolean>,
+        receiver: BroadcastReceiver
+    ) {
+        when (bondState) {
+            BluetoothDevice.BOND_BONDED -> resumeAndUnregister(continuation, receiver, true)
+            BluetoothDevice.BOND_NONE -> resumeAndUnregister(continuation, receiver, false)
+        }
+    }
+
+    private fun resumeAndUnregister(
+        continuation: CancellableContinuation<Boolean>,
+        receiver: BroadcastReceiver,
+        result: Boolean
+    ) {
+        if (continuation.isActive) {
+            continuation.resume(result)
+        }
+        context.unregisterReceiver(receiver)
     }
 
     companion object {

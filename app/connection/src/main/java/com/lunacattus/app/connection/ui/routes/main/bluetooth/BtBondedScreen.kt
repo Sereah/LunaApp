@@ -80,7 +80,7 @@ fun BtBondedScreen(
             Text("已连接的设备", fontSize = 24.sp, color = AppTheme.colors.primary)
             Spacer(Modifier.height(10.dp))
         }
-        items(items = uiState.bondedDeviceList, key = { it.address }) { device ->
+        items(items = uiState.bondedDeviceList, key = { it.device.address }) { device ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -90,21 +90,31 @@ fun BtBondedScreen(
                         RoundedCornerShape(10.dp)
                     )
                     .padding(horizontal = 10.dp)
-                    .clickableWithDebounce {
+                    .clickableWithDebounce(!device.connecting && !device.disconnecting) {
+                        if (device.isConnected) {
+                            sendUiIntent.invoke(BluetoothUiIntent.DisconnectDevice(device))
+                        } else {
+                            sendUiIntent.invoke(BluetoothUiIntent.ConnectDevice(device))
+                        }
                     },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
-                    device.name ?: device.address,
+                    device.device.name ?: device.device.address,
                     fontSize = 18.sp,
                     color = AppTheme.colors.primary
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
-                    if (device.isConnected()) "已连接" else "未连接",
+                    when {
+                        device.connecting -> "连接中"
+                        device.disconnecting -> "断开中"
+                        device.isConnected -> "已连接"
+                        else -> "未连接"
+                    },
                     fontSize = 15.sp,
-                    color = AppTheme.colors.inversePrimary
+                    color = if (device.isConnected) AppTheme.colors.button else AppTheme.colors.inversePrimary
                 )
                 VerticalDivider(
                     modifier = Modifier

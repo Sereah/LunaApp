@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,7 +27,7 @@ class BluetoothViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<BluetoothSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
-    private val _selectedDevice = MutableStateFlow<BluetoothDevice?>(null)
+    private val _selectedDevice = MutableStateFlow<BondDevice?>(null)
     val selectedDevice = _selectedDevice.asStateFlow()
 
     init {
@@ -52,6 +53,23 @@ class BluetoothViewModel @Inject constructor(
                     reduce { copy(discoveryDeviceList = it) }
                 }
             }
+            launch {
+                repository.deviceConnectStateChange.collectLatest { (address, isConnected) ->
+                    Logger.d(TAG, "collect deviceConnectStateChange: $address")
+                    reduce {
+                        copy(bondedDeviceList = bondedDeviceList.map {
+                            if (it.device.address == address) {
+                                it.copy(isConnected = isConnected)
+                            } else {
+                                it
+                            }
+                        })
+                    }
+                    if (address == _selectedDevice.value?.device?.address) {
+                        _selectedDevice.update { it?.copy(isConnected = isConnected, connecting = false, disconnecting = false) }
+                    }
+                }
+            }
         }
     }
 
@@ -64,6 +82,21 @@ class BluetoothViewModel @Inject constructor(
             is BluetoothUiIntent.LoadInfo -> loadInfo()
             is BluetoothUiIntent.OnClickDeviceSetting -> {
                 _selectedDevice.update { intent.device }
+            }
+
+            is BluetoothUiIntent.DisconnectDevice -> {
+                _selectedDevice.update { it?.copy(connecting = false, disconnecting = true) }
+                repository.disconnectDevice(intent.device.device)
+            }
+
+            is BluetoothUiIntent.ConnectDevice -> {
+                _selectedDevice.update { it?.copy(connecting = true, disconnecting = false) }
+                repository.connectDevice(intent.device.device)
+            }
+
+            is BluetoothUiIntent.ForgetDevice -> {
+                repository.forgetDevice(intent.device.device)
+                _selectedDevice.update { null }
             }
         }
     }
@@ -96,7 +129,11 @@ class BluetoothViewModel @Inject constructor(
     }
 
     private fun getBondedDevices() {
-        reduce { copy(bondedDeviceList = repository.getBondedDevices()) }
+        reduce {
+            copy(bondedDeviceList = repository.getBondedDevices().map {
+                BondDevice(it, it.isConnected())
+            })
+        }
     }
 
     private fun loadInfo() {

@@ -13,6 +13,7 @@ data class ColorScheme(
     val icon: Color,
     val button: Color,
     val divider: Color,
+    val warning: Color,
 )
 
 internal val appDarkThemeColor = ColorScheme(
@@ -22,7 +23,8 @@ internal val appDarkThemeColor = ColorScheme(
     inversePrimary = Color.Gray,
     icon = Color(0xFF3B86F7),
     button = Color(0xFF65C466),
-    divider = Color(0xFFE7E7E8)
+    divider = Color(0xFFE7E7E8),
+    warning = Color(0xFFFF0000),
 )
 
 internal val appLightThemeColor = ColorScheme(
@@ -32,5 +34,6 @@ internal val appLightThemeColor = ColorScheme(
     inversePrimary = Color(0xFF7F7F7F),
     icon = Color(0xFF3B86F7),
     button = Color(0xFF65C466),
-    divider = Color(0xFFE7E7E8)
+    divider = Color(0xFFE7E7E8),
+    warning = Color(0xFFE91E63),
 )
