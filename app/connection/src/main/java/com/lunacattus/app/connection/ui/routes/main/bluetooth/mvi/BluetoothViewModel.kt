@@ -1,7 +1,6 @@
 package com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi
 
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.app.connection.domain.BluetoothRepository
@@ -48,9 +47,9 @@ class BluetoothViewModel @Inject constructor(
                 }
             }
             launch {
-                repository.foundDevices.collect {
-                    Logger.d(TAG, "collect discoveryDeviceList: $it")
-                    reduce { copy(discoveryDeviceList = it) }
+                repository.foundDevices.collect { list ->
+                    Logger.d(TAG, "collect discoveryDeviceList: $list")
+                    reduce { copy(discoveryDeviceList = list.map { DiscoveryDevice(it) }) }
                 }
             }
             launch {
@@ -66,7 +65,13 @@ class BluetoothViewModel @Inject constructor(
                         })
                     }
                     if (address == _selectedDevice.value?.device?.address) {
-                        _selectedDevice.update { it?.copy(isConnected = isConnected, connecting = false, disconnecting = false) }
+                        _selectedDevice.update {
+                            it?.copy(
+                                isConnected = isConnected,
+                                connecting = false,
+                                disconnecting = false
+                            )
+                        }
                     }
                 }
             }
@@ -98,6 +103,7 @@ class BluetoothViewModel @Inject constructor(
                 repository.forgetDevice(intent.device.device)
                 _selectedDevice.update { null }
             }
+            is BluetoothUiIntent.RequestUuid -> requestUuid(intent.device)
         }
     }
 
@@ -119,12 +125,28 @@ class BluetoothViewModel @Inject constructor(
         repository.discoveryDevices(enable)
     }
 
-    private fun pairNewDevice(device: BluetoothDevice) {
+    private fun pairNewDevice(device: DiscoveryDevice) {
         viewModelScope.launch {
-            val success = repository.pairDevice(device)
+            reduce {
+                copy(discoveryDeviceList = discoveryDeviceList.map {
+                    if (it.device.address == device.device.address) {
+                        it.copy(isBonding = true)
+                    } else {
+                        it
+                    }
+                })
+            }
+            val success = repository.pairDevice(device.device)
             if (success) {
                 _sideEffect.emit(BluetoothSideEffect.BackDiscoveryScreen)
             }
+        }
+    }
+
+    private fun requestUuid(device: BondDevice) {
+        viewModelScope.launch {
+            val result = repository.fetchUuids(device.device)
+            Logger.d(TAG, "requestUuid: $result")
         }
     }
 

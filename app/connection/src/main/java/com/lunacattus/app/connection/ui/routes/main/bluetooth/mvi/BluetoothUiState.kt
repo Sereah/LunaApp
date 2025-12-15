@@ -7,7 +7,7 @@ data class BluetoothUiState(
     val loading: Boolean = false,
     val btState: Int = BluetoothAdapter.STATE_OFF,
     val discovery: Boolean = false,
-    val discoveryDeviceList: List<BluetoothDevice> = emptyList(),
+    val discoveryDeviceList: List<DiscoveryDevice> = emptyList(),
     val bondedDeviceList: List<BondDevice> = emptyList(),
     val info: BtInfo = BtInfo(),
 )
@@ -24,4 +24,9 @@ data class BondDevice(
     val isConnected: Boolean,
     val connecting: Boolean = false,
     val disconnecting: Boolean = false
+)
+
+data class DiscoveryDevice(
+    val device: BluetoothDevice,
+    val isBonding: Boolean = false
 )

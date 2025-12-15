@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,16 +28,25 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lunacattus.app.connection.ui.ActivityEvent
+import com.lunacattus.app.connection.ui.ActivitySideEffect
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiIntent
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothViewModel
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BondDevice
 import com.lunacattus.app.connection.ui.theme.AppTheme
 import com.lunacattus.ui_design.compose.clickableWithDebounce
+import com.lunacattus.ui_design.compose.dialog.MessageContent
+import com.lunacattus.ui_design.compose.dialog.MessageDialog
+import kotlinx.coroutines.launch
 
 @Composable
 fun DeviceDetailRoute(viewModel: BluetoothViewModel, onBack: () -> Unit) {
@@ -52,12 +62,17 @@ fun DeviceDetailRoute(viewModel: BluetoothViewModel, onBack: () -> Unit) {
     }
 }
 
+@SuppressLint("MissingPermission")
 @Composable
 fun DeviceDetailScreen(
     selectedDevice: BondDevice,
     sendUiIntent: (BluetoothUiIntent) -> Unit,
     onBack: () -> Unit
 ) {
+
+    val scope = rememberCoroutineScope()
+    var showMessageDialog by remember { mutableStateOf(false) }
+    val deviceUuids = selectedDevice.device.uuids?.map { it.uuid.toString() }
 
     LazyColumn(
         modifier = Modifier
@@ -72,8 +87,41 @@ fun DeviceDetailScreen(
         item { DeviceIconAndName(selectedDevice, onBack) }
         //连接控制
         item { DeviceControl(selectedDevice, sendUiIntent, onBack) }
+        //获取UUID列表
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(color = AppTheme.colors.card, shape = RoundedCornerShape(12.dp))
+                    .padding(horizontal = 15.dp)
+                    .clickableWithDebounce {
+                        if (deviceUuids == null) {
+                            scope.launch {
+                                ActivitySideEffect.send(ActivityEvent.ShowToast("UUID为空, 已启动SDP服务发现，稍后再试"))
+                            }
+                            sendUiIntent.invoke(BluetoothUiIntent.RequestUuid(selectedDevice))
+                        } else {
+                            showMessageDialog = true
+                        }
+                    },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text("获取UUID列表", fontSize = 17.sp)
+            }
+        }
         //设备地址
         item { AddressBottom(selectedDevice) }
+    }
+
+    if (showMessageDialog && deviceUuids != null) {
+        MessageDialog(
+            onDismissRequest = {
+                showMessageDialog = false
+            },
+            message = MessageContent.Lines(deviceUuids)
+        )
     }
 }
 

@@ -45,6 +45,11 @@ import com.lunacattus.ui_design.compose.clickableWithDebounce
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+sealed interface MessageContent {
+    data class Text(val value: String) : MessageContent
+    data class Lines(val values: List<String>) : MessageContent
+}
+
 @Immutable
 data class MessageDialogColors(
     val containerColor: Color,
@@ -70,7 +75,9 @@ object MessageDialogDefaults {
  *
  * @param onDismissRequest 当请求关闭对话框时调用的回调（例如，点击外部区域或按返回键）。
  * @param title 对话框的可选标题。
- * @param message 要在对话框中显示的多行文本消息。
+ * @param message
+ * 对话框的消息内容，支持单段文本或多行列表，
+ * 具体行为由 [MessageContent] 的实现类型决定。
  * @param colors 对话框的颜色配置，包括容器、标题和消息文本的颜色。
  * @param cornerRadius 对话框的圆角半径。
  * @param maxHeight 对话框内容区域的最大高度。如果内容超过此高度，将变得可滚动。
@@ -80,7 +87,7 @@ object MessageDialogDefaults {
 fun MessageDialog(
     onDismissRequest: () -> Unit,
     title: String? = null,
-    message: String,
+    message: MessageContent,
     colors: MessageDialogColors = MessageDialogDefaults.colors(),
     cornerRadius: Dp = 16.dp,
     maxHeight: Dp = 400.dp,
@@ -153,15 +160,38 @@ fun MessageDialog(
                             Spacer(Modifier.height(16.dp))
                         }
                         CompositionLocalProvider(LocalOverscrollFactory provides null) {
-                            Box(modifier = Modifier.heightIn(max = maxHeight)) {
-                                Text(
-                                    text = message,
-                                    color = colors.messageColor,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.verticalScroll(rememberScrollState())
-                                )
+                            Box(
+                                modifier = Modifier
+                                    .heightIn(max = maxHeight)
+                            ) {
+                                when (message) {
+                                    is MessageContent.Text -> {
+                                        Text(
+                                            text = message.value,
+                                            color = colors.messageColor,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.verticalScroll(rememberScrollState())
+                                        )
+                                    }
+
+                                    is MessageContent.Lines -> {
+                                        Column(
+                                            modifier = Modifier.verticalScroll(rememberScrollState())
+                                        ) {
+                                            message.values.forEach { line ->
+                                                Text(
+                                                    text = line,
+                                                    color = colors.messageColor,
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                                Spacer(Modifier.height(4.dp)) // 行间距
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
+
                     }
                 }
             }
@@ -181,7 +211,7 @@ private fun MessageDialogShortPreview() {
         MessageDialog(
             onDismissRequest = {},
             title = "Short Message",
-            message = "This is a short message that fits perfectly within the dialog."
+            message = MessageContent.Text("This is a short message.")
         )
     }
 }
@@ -202,7 +232,27 @@ private fun MessageDialogLongPreview() {
         MessageDialog(
             onDismissRequest = {},
             title = "Long Message Title",
-            message = longMessage
+            message = MessageContent.Text(longMessage)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MessageDialogListTextPreview() {
+    val list = List(200) {
+        "$it========$it"
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Gray),
+        contentAlignment = Alignment.Center
+    ) {
+        MessageDialog(
+            onDismissRequest = {},
+            title = "Long Message Title",
+            message = MessageContent.Lines(list)
         )
     }
 }

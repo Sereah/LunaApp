@@ -39,6 +39,7 @@ import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothSideE
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiIntent
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiState
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothViewModel
+import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.DiscoveryDevice
 import com.lunacattus.app.connection.ui.theme.AppTheme
 import com.lunacattus.app.connection.ui.theme.immediatelyIn
 import com.lunacattus.app.connection.ui.theme.immediatelyOut
@@ -65,7 +66,7 @@ fun BtDiscoveryScreen(
     onBack: () -> Unit,
 ) {
 
-    var foundDevices by remember { mutableStateOf(emptyList<BluetoothDevice>()) }
+    var foundDevices by remember { mutableStateOf(emptyList<DiscoveryDevice>()) }
     var localDeviceName by remember { mutableStateOf("") }
 
     DisposableEffect(Unit) {
@@ -96,7 +97,7 @@ fun BtDiscoveryScreen(
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         item { DiscoveryTitle(onBack, localDeviceName, uiState, sendUiIntent) }
-        items(items = foundDevices, key = { it.address }) { device ->
+        items(items = foundDevices, key = { it.device.address }) { device ->
             DiscoveryDeviceItem(device, sendUiIntent)
         }
     }
@@ -164,7 +165,7 @@ private fun DiscoveryTitle(
 @SuppressLint("MissingPermission")
 @Composable
 private fun DiscoveryDeviceItem(
-    device: BluetoothDevice,
+    device: DiscoveryDevice,
     sendUiIntent: (BluetoothUiIntent) -> Unit
 ) {
     Row(
@@ -183,13 +184,13 @@ private fun DiscoveryDeviceItem(
         horizontalArrangement = Arrangement.Start
     ) {
         Text(
-            device.name ?: device.address,
+            device.device.name ?: device.device.address,
             fontSize = 15.sp,
             color = AppTheme.colors.inversePrimary
         )
         Spacer(Modifier.weight(1f))
         AnimatedVisibility(
-            device.bondState == BluetoothDevice.BOND_BONDING,
+            device.isBonding,
             enter = fadeIn(),
             exit = fadeOut()
         ) {
