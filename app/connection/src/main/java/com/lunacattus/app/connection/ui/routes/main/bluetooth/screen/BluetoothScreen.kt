@@ -1,4 +1,4 @@
-package com.lunacattus.app.connection.ui.routes.main.bluetooth
+package com.lunacattus.app.connection.ui.routes.main.bluetooth.screen
 
 import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.background
@@ -85,7 +85,7 @@ fun BluetoothScreen(
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         item { BtSwitchItem(uiState.btState, sendUiIntent) }
-        items(items = functionList()) { function ->
+        items(items = functionList(), key = { it.type }) { function ->
             FunctionItem(function.icon, function.title) {
                 when (function.type) {
                     Type.ADD_NEW -> navToBtDiscovery()

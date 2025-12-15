@@ -1,4 +1,4 @@
-package com.lunacattus.app.connection.ui.routes.main.bluetooth
+package com.lunacattus.app.connection.ui.routes.main.bluetooth.screen
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice

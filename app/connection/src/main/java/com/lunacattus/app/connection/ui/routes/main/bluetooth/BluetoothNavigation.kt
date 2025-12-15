@@ -7,6 +7,10 @@ import androidx.navigation.navigation
 import com.lunacattus.app.connection.ui.routes.base.NavRoute
 import com.lunacattus.app.connection.ui.routes.base.animatedComposable
 import com.lunacattus.app.connection.ui.routes.base.graphViewModel
+import com.lunacattus.app.connection.ui.routes.main.bluetooth.screen.BluetoothRoute
+import com.lunacattus.app.connection.ui.routes.main.bluetooth.screen.BtBondedRoute
+import com.lunacattus.app.connection.ui.routes.main.bluetooth.screen.BtDiscoveryRoute
+import com.lunacattus.app.connection.ui.routes.main.bluetooth.screen.DeviceDetailRoute
 
 data object BluetoothGraph : NavRoute {
     override val route: String
