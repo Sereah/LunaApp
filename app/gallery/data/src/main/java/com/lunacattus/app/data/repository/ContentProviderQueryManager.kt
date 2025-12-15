@@ -9,13 +9,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import com.lunacattus.common.di.MainScope
 import com.lunacattus.logger.Logger
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,7 +38,6 @@ import kotlinx.coroutines.withContext
  */
 class ContentProviderQueryManager<T : Any> @AssistedInject constructor(
     context: Context,
-    @param:MainScope private val scope: CoroutineScope,
     @Assisted private val uri: Uri,
     @Assisted private val projection: Array<String>,
     @Assisted private val cursorMapper: (Cursor) -> T?,
@@ -66,6 +66,7 @@ class ContentProviderQueryManager<T : Any> @AssistedInject constructor(
     private val loadingMutex = Mutex()
 
     private val observer = MediaContentObserver(Handler(Looper.getMainLooper()))
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private inner class MediaContentObserver(handler: Handler) : ContentObserver(handler) {
         override fun onChange(selfChange: Boolean, changedUri: Uri?) {
@@ -91,6 +92,7 @@ class ContentProviderQueryManager<T : Any> @AssistedInject constructor(
         _list.value = emptyList()
         _isLoading.value = false
         hasMore = true
+        scope.cancel()
     }
 
     suspend fun loadMore(pageSize: Int) {

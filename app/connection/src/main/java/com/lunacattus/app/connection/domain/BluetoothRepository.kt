@@ -9,17 +9,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
-import com.lunacattus.common.di.IOScope
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -30,7 +28,6 @@ import kotlin.coroutines.resume
 @Singleton
 class BluetoothRepository @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    @param:IOScope private val ioScope: CoroutineScope
 ) {
 
     @Suppress("DEPRECATION")
@@ -43,8 +40,32 @@ class BluetoothRepository @Inject constructor(
     val isDiscovery = _isDiscovery.asStateFlow()
     private val _foundDevices = MutableStateFlow<List<BluetoothDevice>>(emptyList())
     val foundDevices = _foundDevices.asStateFlow()
-    private val _deviceConnectStateChange = MutableSharedFlow<Pair<String, Boolean>>()
-    val deviceConnectStateChange = _deviceConnectStateChange.asSharedFlow()
+    private val executor = Executors.newSingleThreadExecutor()
+
+    val deviceConnectStateChange: Flow<Pair<String, Boolean>> = callbackFlow {
+
+        val callback = object : BluetoothAdapter.BluetoothConnectionCallback() {
+            override fun onDeviceConnected(device: BluetoothDevice) {
+                Logger.d(TAG, "onDeviceConnected: $device")
+                trySend(device.address to true)
+            }
+
+            override fun onDeviceDisconnected(
+                device: BluetoothDevice,
+                reason: Int
+            ) {
+                Logger.d(TAG, "onDeviceDisconnected: $device, reason: $reason")
+                trySend(device.address to false)
+            }
+        }
+
+        adapter.registerBluetoothConnectionCallback(executor, callback)
+
+        awaitClose {
+            Logger.d(TAG, "deviceConnectStateChange callback awaitClose")
+            adapter.unregisterBluetoothConnectionCallback(callback)
+        }
+    }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -98,26 +119,6 @@ class BluetoothRepository @Inject constructor(
         }
     }
 
-    private val deviceConnectStateCallback =
-        object : BluetoothAdapter.BluetoothConnectionCallback() {
-            override fun onDeviceConnected(device: BluetoothDevice) {
-                Logger.d(TAG, "onDeviceConnected: $device")
-                ioScope.launch {
-                    _deviceConnectStateChange.emit(device.address to true)
-                }
-            }
-
-            override fun onDeviceDisconnected(
-                device: BluetoothDevice,
-                reason: Int
-            ) {
-                Logger.d(TAG, "onDeviceDisconnected: $device, reason: $reason")
-                ioScope.launch {
-                    _deviceConnectStateChange.emit(device.address to false)
-                }
-            }
-        }
-
     init {
         Logger.d(TAG, "init, bt state: ${adapter.state}")
         _state.value = adapter.state
@@ -136,7 +137,6 @@ class BluetoothRepository @Inject constructor(
                 ContextCompat.RECEIVER_EXPORTED
             )
         }
-        registerBluetoothConnectionCallback()
     }
 
     @Suppress("DEPRECATION")
@@ -210,13 +210,6 @@ class BluetoothRepository @Inject constructor(
 
     fun forgetDevice(device: BluetoothDevice) {
         device.removeBond()
-    }
-
-    private fun registerBluetoothConnectionCallback() {
-        adapter.registerBluetoothConnectionCallback(
-            Executors.newSingleThreadExecutor(),
-            deviceConnectStateCallback
-        )
     }
 
     @Suppress("DEPRECATION")

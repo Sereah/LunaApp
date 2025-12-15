@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import com.lunacattus.common.di.IOScope
 import com.lunacattus.logger.Logger
 import com.lunacattus.service.media.R
 import com.lunacattus.service.media.speech.AsrHandler
@@ -14,6 +13,9 @@ import com.lunacattus.speech.Speech
 import com.lunacattus.speech.SpeechAuthConfig
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,11 +25,9 @@ class MediaService : Service() {
     @Inject
     lateinit var speech: Speech
 
-    @Inject
-    @IOScope
-    lateinit var ioScope: CoroutineScope
-
     @Inject lateinit var asrHandler: AsrHandler
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
@@ -50,9 +50,10 @@ class MediaService : Service() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         Logger.d(TAG, "onDestroy.")
         speech.destroy()
+        scope.cancel()
+        super.onDestroy()
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -77,7 +78,7 @@ class MediaService : Service() {
     }
 
     private fun collectFlow() {
-        ioScope.launch {
+        scope.launch {
             speech.asrResult.collect {
                 asrHandler.handler(it)
             }
