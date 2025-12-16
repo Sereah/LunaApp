@@ -1,11 +1,10 @@
 package com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi
 
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothUuid
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.app.connection.domain.BluetoothRepository
-import com.lunacattus.app.connection.domain.toProfileString
+import com.lunacattus.app.connection.domain.name
 import com.lunacattus.app.connection.ui.ActivityEvent
 import com.lunacattus.app.connection.ui.ActivitySideEffect
 import com.lunacattus.logger.Logger
@@ -110,7 +109,10 @@ class BluetoothViewModel @Inject constructor(
 
     private fun requestUuid(device: BondDevice) {
         val uuidList = device.device.uuids?.map { uuid ->
-            uuid.toProfileString()
+            DeviceUUID(
+                name = uuid.name(),
+                uuid = uuid
+            )
         }
         if (uuidList == null) {
             viewModelScope.launch {

@@ -2,6 +2,7 @@ package com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.os.ParcelUuid
 
 data class BluetoothUiState(
     val loading: Boolean = false,
@@ -23,11 +24,20 @@ data class BtInfo(
 data class BondDevice(
     val device: BluetoothDevice,
     val connectType: BondDeviceConnectType,
-    val uuidList: List<String> = emptyList()
+    val uuidList: List<DeviceUUID> = emptyList()
 )
 
 enum class BondDeviceConnectType {
     Connecting, Connected, Disconnecting, Disconnected
+}
+
+data class DeviceUUID(
+    val name: String = "UNKNOWN",
+    val uuid: ParcelUuid,
+) {
+    override fun toString(): String {
+        return "$name: $uuid"
+    }
 }
 
 data class DiscoveryDevice(

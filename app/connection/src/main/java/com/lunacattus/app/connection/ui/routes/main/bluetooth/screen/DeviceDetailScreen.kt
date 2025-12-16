@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PhoneAndroid
@@ -38,12 +39,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lunacattus.app.connection.domain.isCommonUuid
+import com.lunacattus.app.connection.domain.isVendorUuid
 import com.lunacattus.app.connection.ui.ActivityEvent
 import com.lunacattus.app.connection.ui.ActivitySideEffect
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiIntent
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothViewModel
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BondDevice
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BondDeviceConnectType
+import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.DeviceUUID
 import com.lunacattus.app.connection.ui.theme.AppTheme
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 import com.lunacattus.ui_design.compose.dialog.MessageContent
@@ -75,6 +79,9 @@ fun DeviceDetailScreen(
 
     val scope = rememberCoroutineScope()
     var showMessageDialog by remember { mutableStateOf(false) }
+    val showItemUuidList = selectedDevice.uuidList.filter {
+        it.uuid.isCommonUuid() || it.uuid.isVendorUuid()
+    }
 
     LaunchedEffect(Unit) {
         sendUiIntent.invoke(BluetoothUiIntent.RequestUuid(selectedDevice))
@@ -85,7 +92,7 @@ fun DeviceDetailScreen(
             .fillMaxSize()
             .background(AppTheme.colors.background),
         contentPadding = PaddingValues(vertical = 100.dp, horizontal = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(30.dp)
+        verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         //返回按钮和页面标题
         item { DetailTitle(onBack) }
@@ -99,6 +106,19 @@ fun DeviceDetailScreen(
                 showMessageDialog = true
             }
         }
+        items(items = showItemUuidList, key = { it.uuid }) { uuid ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .background(color = AppTheme.colors.card, shape = RoundedCornerShape(12.dp))
+                    .padding(horizontal = 15.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(uuid.name, fontSize = 15.sp)
+            }
+        }
         //设备地址
         item { AddressBottom(selectedDevice) }
     }
@@ -109,7 +129,7 @@ fun DeviceDetailScreen(
                 showMessageDialog = false
             },
             title = "UUID列表",
-            message = MessageContent.Lines(selectedDevice.uuidList)
+            message = MessageContent.Lines(selectedDevice.uuidList.map { it.toString() })
         )
     }
 }
@@ -240,11 +260,12 @@ private fun DeviceControl(
 @Composable
 private fun UUIDItem(
     scope: CoroutineScope,
-    deviceUuids: List<String>,
+    deviceUuids: List<DeviceUUID>,
     showDialogShow: () -> Unit
 ) {
     Row(
         modifier = Modifier
+            .padding(vertical = 20.dp)
             .fillMaxWidth()
             .height(50.dp)
             .background(color = AppTheme.colors.card, shape = RoundedCornerShape(12.dp))
@@ -261,7 +282,7 @@ private fun UUIDItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        Text("获取UUID列表", fontSize = 17.sp)
+        Text("查看UUID列表", fontSize = 17.sp)
     }
 }
 
