@@ -33,6 +33,7 @@ import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiInt
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiState
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothViewModel
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BondDevice
+import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BondDeviceConnectType
 import com.lunacattus.app.connection.ui.theme.AppTheme
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 
@@ -100,6 +101,8 @@ private fun BondedDeviceItem(
     sendUiIntent: (BluetoothUiIntent) -> Unit,
     navToDeviceDetail: () -> Unit
 ) {
+    val isConnected = device.connectType == BondDeviceConnectType.Connected
+    val isDisconnected = device.connectType == BondDeviceConnectType.Disconnected
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -109,8 +112,8 @@ private fun BondedDeviceItem(
                 RoundedCornerShape(10.dp)
             )
             .padding(horizontal = 10.dp)
-            .clickableWithDebounce(!device.connecting && !device.disconnecting) {
-                if (device.isConnected) {
+            .clickableWithDebounce(isDisconnected || isConnected) {
+                if (isConnected) {
                     sendUiIntent.invoke(BluetoothUiIntent.DisconnectDevice(device))
                 } else {
                     sendUiIntent.invoke(BluetoothUiIntent.ConnectDevice(device))
@@ -126,14 +129,15 @@ private fun BondedDeviceItem(
         )
         Spacer(Modifier.weight(1f))
         Text(
-            when {
-                device.connecting -> "连接中"
-                device.disconnecting -> "断开中"
-                device.isConnected -> "已连接"
-                else -> "未连接"
+            when (device.connectType) {
+                BondDeviceConnectType.Connecting -> "连接中"
+                BondDeviceConnectType.Connected -> "已连接"
+                BondDeviceConnectType.Disconnecting -> "断开中"
+                BondDeviceConnectType.Disconnected -> "未连接"
             },
             fontSize = 15.sp,
-            color = if (device.isConnected) AppTheme.colors.button else AppTheme.colors.inversePrimary
+            color = if (device.connectType == BondDeviceConnectType.Connected)
+                AppTheme.colors.button else AppTheme.colors.inversePrimary
         )
         VerticalDivider(
             modifier = Modifier

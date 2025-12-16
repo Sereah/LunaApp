@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,7 @@ import com.lunacattus.app.connection.ui.ActivitySideEffect
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiIntent
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothViewModel
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BondDevice
+import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BondDeviceConnectType
 import com.lunacattus.app.connection.ui.theme.AppTheme
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 import com.lunacattus.ui_design.compose.dialog.MessageContent
@@ -51,19 +53,19 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DeviceDetailRoute(viewModel: BluetoothViewModel, onBack: () -> Unit) {
-    val selectedDevice by viewModel.selectedDevice.collectAsStateWithLifecycle()
+    val uiSate by viewModel.uiState.collectAsStateWithLifecycle()
+    val selectedDevice = uiSate.currentDetailDevice
     if (selectedDevice == null) {
         onBack()
     } else {
         DeviceDetailScreen(
-            selectedDevice!!,
+            selectedDevice,
             viewModel::processUiIntent,
             onBack
         )
     }
 }
 
-@SuppressLint("MissingPermission")
 @Composable
 fun DeviceDetailScreen(
     selectedDevice: BondDevice,
@@ -73,7 +75,10 @@ fun DeviceDetailScreen(
 
     val scope = rememberCoroutineScope()
     var showMessageDialog by remember { mutableStateOf(false) }
-    val deviceUuids = selectedDevice.device.uuids?.map { it.uuid.toString() }
+
+    LaunchedEffect(Unit) {
+        sendUiIntent.invoke(BluetoothUiIntent.RequestUuid(selectedDevice))
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -90,7 +95,7 @@ fun DeviceDetailScreen(
         item { DeviceControl(selectedDevice, sendUiIntent, onBack) }
         //获取UUID列表
         item {
-            UUIDItem(scope, deviceUuids, sendUiIntent, selectedDevice) {
+            UUIDItem(scope, selectedDevice.uuidList) {
                 showMessageDialog = true
             }
         }
@@ -98,13 +103,13 @@ fun DeviceDetailScreen(
         item { AddressBottom(selectedDevice) }
     }
 
-    if (showMessageDialog && deviceUuids != null) {
+    if (showMessageDialog && selectedDevice.uuidList.isNotEmpty()) {
         MessageDialog(
             onDismissRequest = {
                 showMessageDialog = false
             },
             title = "UUID列表",
-            message = MessageContent.Lines(deviceUuids)
+            message = MessageContent.Lines(selectedDevice.uuidList)
         )
     }
 }
@@ -156,9 +161,10 @@ private fun DeviceControl(
     sendUiIntent: (BluetoothUiIntent) -> Unit,
     onBack: () -> Unit
 ) {
-    val isConnected = selectedDevice.isConnected
-    val isConnecting = selectedDevice.connecting
-    val isDisconnecting = selectedDevice.disconnecting
+    val connectState = selectedDevice.connectType
+    val isConnected = connectState == BondDeviceConnectType.Connected
+    val isDisconnected = connectState == BondDeviceConnectType.Disconnected
+    val isDisconnecting = connectState == BondDeviceConnectType.Disconnecting
 
     val actionIntent = if (isConnected) {
         BluetoothUiIntent.DisconnectDevice(selectedDevice)
@@ -166,14 +172,15 @@ private fun DeviceControl(
         BluetoothUiIntent.ConnectDevice(selectedDevice)
     }
 
-    val actionIcon = if (isConnected) Icons.Rounded.Close else Icons.Rounded.Add
-    val actionText = when {
-        isConnecting -> "连接中"
-        isDisconnecting -> "断开中"
-        isConnected -> "断开"
-        else -> "连接"
+    val actionIcon = if (isConnected || isDisconnecting) Icons.Rounded.Close else Icons.Rounded.Add
+    val actionText = when (connectState) {
+        BondDeviceConnectType.Connecting -> "连接中"
+        BondDeviceConnectType.Connected -> "断开"
+        BondDeviceConnectType.Disconnecting -> "断开中"
+        BondDeviceConnectType.Disconnected -> "连接"
     }
-    val actionColor = if (isConnecting || isDisconnecting) AppTheme.colors.inversePrimary else AppTheme.colors.icon
+    val actionColor =
+        if (isConnected || isDisconnected) AppTheme.colors.icon else AppTheme.colors.inversePrimary
 
     Row(
         modifier = Modifier
@@ -209,7 +216,7 @@ private fun DeviceControl(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .clickableWithDebounce(enable = !isConnecting && !isDisconnecting) {
+                .clickableWithDebounce(enable = isDisconnected || isConnected) {
                     sendUiIntent.invoke(actionIntent)
                 },
             verticalArrangement = Arrangement.Center,
@@ -233,9 +240,7 @@ private fun DeviceControl(
 @Composable
 private fun UUIDItem(
     scope: CoroutineScope,
-    deviceUuids: List<String>?,
-    sendUiIntent: (BluetoothUiIntent) -> Unit,
-    selectedDevice: BondDevice,
+    deviceUuids: List<String>,
     showDialogShow: () -> Unit
 ) {
     Row(
@@ -245,11 +250,10 @@ private fun UUIDItem(
             .background(color = AppTheme.colors.card, shape = RoundedCornerShape(12.dp))
             .padding(horizontal = 15.dp)
             .clickableWithDebounce {
-                if (deviceUuids == null) {
+                if (deviceUuids.isEmpty()) {
                     scope.launch {
-                        ActivitySideEffect.send(ActivityEvent.ShowToast("UUID为空, 已启动SDP服务发现，稍后再试"))
+                        ActivitySideEffect.send(ActivityEvent.ShowToast("UUID为空"))
                     }
-                    sendUiIntent.invoke(BluetoothUiIntent.RequestUuid(selectedDevice))
                 } else {
                     showDialogShow.invoke()
                 }

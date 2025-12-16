@@ -1,9 +1,11 @@
 package com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi
 
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothUuid
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.app.connection.domain.BluetoothRepository
+import com.lunacattus.app.connection.domain.toProfileString
 import com.lunacattus.app.connection.ui.ActivityEvent
 import com.lunacattus.app.connection.ui.ActivitySideEffect
 import com.lunacattus.logger.Logger
@@ -26,8 +28,6 @@ class BluetoothViewModel @Inject constructor(
 
     private val _sideEffect = MutableSharedFlow<BluetoothSideEffect>()
     val sideEffect = _sideEffect.asSharedFlow()
-    private val _selectedDevice = MutableStateFlow<BondDevice?>(null)
-    val selectedDevice = _selectedDevice.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -52,29 +52,7 @@ class BluetoothViewModel @Inject constructor(
                     reduce { copy(discoveryDeviceList = list.map { DiscoveryDevice(it) }) }
                 }
             }
-            launch {
-                repository.deviceConnectStateChange.collectLatest { (address, isConnected) ->
-                    Logger.d(TAG, "collect deviceConnectStateChange: $address")
-                    reduce {
-                        copy(bondedDeviceList = bondedDeviceList.map {
-                            if (it.device.address == address) {
-                                it.copy(isConnected = isConnected, disconnecting = false, connecting = false)
-                            } else {
-                                it
-                            }
-                        })
-                    }
-                    if (address == _selectedDevice.value?.device?.address) {
-                        _selectedDevice.update {
-                            it?.copy(
-                                isConnected = isConnected,
-                                connecting = false,
-                                disconnecting = false
-                            )
-                        }
-                    }
-                }
-            }
+            launch { processDeviceConnectState() }
         }
     }
 
@@ -85,38 +63,10 @@ class BluetoothViewModel @Inject constructor(
             is BluetoothUiIntent.PairNewDevice -> pairNewDevice(intent.device)
             is BluetoothUiIntent.LoadBondedDevices -> getBondedDevices()
             is BluetoothUiIntent.LoadInfo -> loadInfo()
-            is BluetoothUiIntent.OnClickDeviceSetting -> {
-                _selectedDevice.update { intent.device }
-            }
-
-            is BluetoothUiIntent.DisconnectDevice -> {
-                _selectedDevice.update { it?.copy(connecting = false, disconnecting = true) }
-                reduce {
-                    copy(bondedDeviceList = bondedDeviceList.map {
-                        if (intent.device.device.address == it.device.address) {
-                            it.copy(connecting = false, disconnecting = true)
-                        } else it
-                    })
-                }
-                repository.disconnectDevice(intent.device.device)
-            }
-
-            is BluetoothUiIntent.ConnectDevice -> {
-                _selectedDevice.update { it?.copy(connecting = true, disconnecting = false) }
-                reduce {
-                    copy(bondedDeviceList = bondedDeviceList.map {
-                        if (intent.device.device.address == it.device.address) {
-                            it.copy(connecting = true, disconnecting = false)
-                        } else it
-                    })
-                }
-                repository.connectDevice(intent.device.device)
-            }
-
-            is BluetoothUiIntent.ForgetDevice -> {
-                repository.forgetDevice(intent.device.device)
-                _selectedDevice.update { null }
-            }
+            is BluetoothUiIntent.OnClickDeviceSetting -> updateSelectDevice(intent.device)
+            is BluetoothUiIntent.DisconnectDevice -> disconnectDevice(intent.device)
+            is BluetoothUiIntent.ConnectDevice -> connectDevice(intent.device)
+            is BluetoothUiIntent.ForgetDevice -> forgetDevice(intent.device)
             is BluetoothUiIntent.RequestUuid -> requestUuid(intent.device)
         }
     }
@@ -159,16 +109,31 @@ class BluetoothViewModel @Inject constructor(
     }
 
     private fun requestUuid(device: BondDevice) {
-        viewModelScope.launch {
-            val result = repository.fetchUuids(device.device)
-            Logger.d(TAG, "requestUuid: $result")
+        val uuidList = device.device.uuids?.map { uuid ->
+            uuid.toProfileString()
+        }
+        if (uuidList == null) {
+            viewModelScope.launch {
+                val result = repository.fetchUuids(device.device)
+                Logger.d(TAG, "requestUuid: $result")
+            }
+        } else {
+            reduce {
+                copy(currentDetailDevice = currentDetailDevice?.copy(uuidList = uuidList))
+            }
         }
     }
 
     private fun getBondedDevices() {
         reduce {
             copy(bondedDeviceList = repository.getBondedDevices().map {
-                BondDevice(it, it.isConnected())
+                BondDevice(
+                    it, connectType = if (it.isConnected()) {
+                        BondDeviceConnectType.Connected
+                    } else {
+                        BondDeviceConnectType.Disconnected
+                    }
+                )
             })
         }
     }
@@ -193,6 +158,76 @@ class BluetoothViewModel @Inject constructor(
                 ActivitySideEffect.send(ActivityEvent.LogError(e))
             } finally {
                 reduce { copy(loading = false) }
+            }
+        }
+    }
+
+    private fun updateSelectDevice(device: BondDevice) {
+        reduce {
+            copy(currentDetailDevice = device)
+        }
+    }
+
+    private fun disconnectDevice(device: BondDevice) {
+        reduce {
+            copy(
+                bondedDeviceList = bondedDeviceList.map {
+                    if (device.device.address == it.device.address) {
+                        it.copy(connectType = BondDeviceConnectType.Disconnecting)
+                    } else it
+                },
+                currentDetailDevice = if (device.device.address == currentDetailDevice?.device?.address) {
+                    currentDetailDevice.copy(connectType = BondDeviceConnectType.Disconnecting)
+                } else currentDetailDevice
+            )
+        }
+        repository.disconnectDevice(device.device)
+    }
+
+    private fun connectDevice(device: BondDevice) {
+        reduce {
+            copy(
+                bondedDeviceList = bondedDeviceList.map {
+                    if (device.device.address == it.device.address) {
+                        it.copy(connectType = BondDeviceConnectType.Connecting)
+                    } else it
+                },
+                currentDetailDevice = if (device.device.address == currentDetailDevice?.device?.address) {
+                    currentDetailDevice.copy(connectType = BondDeviceConnectType.Connecting)
+                } else currentDetailDevice
+            )
+        }
+        repository.connectDevice(device.device)
+    }
+
+    private fun forgetDevice(device: BondDevice) {
+        repository.forgetDevice(device.device)
+        reduce {
+            copy(currentDetailDevice = null)
+        }
+    }
+
+    private suspend fun processDeviceConnectState() {
+        repository.deviceConnectStateChange.collectLatest { (address, isConnected) ->
+            Logger.d(TAG, "collect deviceConnectStateChange: $address")
+            val connectType = if (isConnected) {
+                BondDeviceConnectType.Connected
+            } else {
+                BondDeviceConnectType.Disconnected
+            }
+            reduce {
+                copy(
+                    bondedDeviceList = bondedDeviceList.map {
+                        if (it.device.address == address) {
+                            it.copy(connectType = connectType)
+                        } else {
+                            it
+                        }
+                    },
+                    currentDetailDevice = if (address == currentDetailDevice?.device?.address) {
+                        currentDetailDevice.copy(connectType = connectType)
+                    } else currentDetailDevice
+                )
             }
         }
     }
