@@ -4,7 +4,6 @@ import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.logging.Level
 
 object Logger {
     private var baseTag: String = "LunaApp"
@@ -53,6 +52,18 @@ object Logger {
         }
 
         log(boxed, LogLevel.INFO, tag)
+    }
+
+    fun getArray(bytes: ByteArray, offset: Int, length: Int): String {
+        val sb = StringBuilder()
+        for (i in offset..<length) {
+            var tmp = Integer.toHexString(255 and bytes[i].toInt())
+            if (tmp.length == 1) {
+                tmp = "0$tmp"
+            }
+            sb.append("$tmp ")
+        }
+        return sb.toString()
     }
 
 

@@ -67,6 +67,10 @@ class BluetoothViewModel @Inject constructor(
             is BluetoothUiIntent.ConnectDevice -> connectDevice(intent.device)
             is BluetoothUiIntent.ForgetDevice -> forgetDevice(intent.device)
             is BluetoothUiIntent.RequestUuid -> requestUuid(intent.device)
+            is BluetoothUiIntent.ConnectVendorUuid -> connectVendorUuid(
+                intent.address,
+                intent.deviceUUID
+            )
         }
     }
 
@@ -122,6 +126,14 @@ class BluetoothViewModel @Inject constructor(
         } else {
             reduce {
                 copy(currentDetailDevice = currentDetailDevice?.copy(uuidList = uuidList))
+            }
+        }
+    }
+
+    private fun connectVendorUuid(address: String, deviceUUID: DeviceUUID) {
+        viewModelScope.launch {
+            repository.connectRfcomm(address, deviceUUID.uuid.uuid).collect {
+                Logger.d(TAG, "connect rfcomm result: $it")
             }
         }
     }
@@ -211,7 +223,7 @@ class BluetoothViewModel @Inject constructor(
 
     private suspend fun processDeviceConnectState() {
         repository.deviceConnectStateChange.collectLatest { (address, isConnected) ->
-            Logger.d(TAG, "collect deviceConnectStateChange: $address")
+            Logger.d(TAG, "collect deviceConnectStateChange: $address, isConnected: $isConnected")
             val connectType = if (isConnected) {
                 BondDeviceConnectType.Connected
             } else {

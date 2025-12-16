@@ -112,7 +112,17 @@ fun DeviceDetailScreen(
                     .fillMaxWidth()
                     .height(40.dp)
                     .background(color = AppTheme.colors.card, shape = RoundedCornerShape(12.dp))
-                    .padding(horizontal = 15.dp),
+                    .padding(horizontal = 15.dp)
+                    .clickableWithDebounce {
+                        if (uuid.uuid.isVendorUuid()) {
+                            sendUiIntent.invoke(
+                                BluetoothUiIntent.ConnectVendorUuid(
+                                    selectedDevice.device.address,
+                                    uuid
+                                )
+                            )
+                        }
+                    },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {

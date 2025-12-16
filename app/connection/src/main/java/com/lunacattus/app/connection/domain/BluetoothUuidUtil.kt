@@ -171,7 +171,7 @@ private val UUID_META_MAP: Map<ParcelUuid, BluetoothUuidMeta> by lazy {
             category = BluetoothUuidCategory.VENDOR
         ),
         ParcelUuid.fromString(CarplayDeviceUUID) to BluetoothUuidMeta(
-            name = "CARPLAY_DEVICE",
+            name = "CarPlay",
             category = BluetoothUuidCategory.VENDOR
         )
     )

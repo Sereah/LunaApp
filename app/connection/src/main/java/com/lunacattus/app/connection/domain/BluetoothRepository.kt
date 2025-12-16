@@ -18,7 +18,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.UUID
 import java.util.concurrent.Executors
@@ -166,7 +168,7 @@ class BluetoothRepository @Inject constructor(
         }
     }
 
-    fun fetchUuids(device: BluetoothDevice) : Boolean {
+    fun fetchUuids(device: BluetoothDevice): Boolean {
         Logger.d(TAG, "fetchUuids: $device")
         return device.fetchUuidsWithSdp()
     }
@@ -218,6 +220,22 @@ class BluetoothRepository @Inject constructor(
     fun forgetDevice(device: BluetoothDevice) {
         device.removeBond()
     }
+
+    fun connectRfcomm(address: String, uuid: UUID): Flow<RfcommEvent> = channelFlow {
+        val session = RfcommSession(adapter)
+
+        val job = launch {
+            session.events.collect { send(it) }
+        }
+
+        session.connect(address, uuid)
+
+        awaitClose {
+            job.cancel()
+            session.close()
+        }
+    }
+
 
     @Suppress("DEPRECATION")
     private fun profileIdToString(profileId: Int): String {
