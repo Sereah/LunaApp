@@ -39,8 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.lunacattus.app.connection.domain.isCommonUuid
-import com.lunacattus.app.connection.domain.isVendorUuid
+import com.lunacattus.app.connection.domain.bluetooth.isCommonUuid
+import com.lunacattus.app.connection.domain.bluetooth.isVendorUuid
 import com.lunacattus.app.connection.ui.ActivityEvent
 import com.lunacattus.app.connection.ui.ActivitySideEffect
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi.BluetoothUiIntent
@@ -114,14 +114,12 @@ fun DeviceDetailScreen(
                     .background(color = AppTheme.colors.card, shape = RoundedCornerShape(12.dp))
                     .padding(horizontal = 15.dp)
                     .clickableWithDebounce {
-                        if (uuid.uuid.isVendorUuid()) {
-                            sendUiIntent.invoke(
-                                BluetoothUiIntent.ConnectVendorUuid(
-                                    selectedDevice.device.address,
-                                    uuid
-                                )
+                        sendUiIntent.invoke(
+                            BluetoothUiIntent.ConnectUuid(
+                                selectedDevice.device.address,
+                                uuid
                             )
-                        }
+                        )
                     },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start

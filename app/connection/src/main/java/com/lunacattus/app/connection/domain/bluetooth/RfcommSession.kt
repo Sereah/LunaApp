@@ -1,4 +1,4 @@
-package com.lunacattus.app.connection.domain
+package com.lunacattus.app.connection.domain.bluetooth
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
@@ -123,7 +123,6 @@ class RfcommSession(
                 Logger.d(TAG, "rfcomm connecting: $uuid")
                 s.connect()
                 socket = s
-                Logger.d(TAG, "rfcomm connected: $uuid")
 
                 _events.emit(RfcommEvent.Connected(uuid, address))
                 startTransport(uuid, s)

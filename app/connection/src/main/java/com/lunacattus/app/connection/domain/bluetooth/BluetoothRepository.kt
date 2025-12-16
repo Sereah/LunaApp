@@ -1,4 +1,4 @@
-package com.lunacattus.app.connection.domain
+package com.lunacattus.app.connection.domain.bluetooth
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
@@ -32,10 +32,8 @@ import kotlin.coroutines.resume
 @SuppressLint("MissingPermission")
 class BluetoothRepository @Inject constructor(
     @param:ApplicationContext private val context: Context,
+    private val adapter: BluetoothAdapter
 ) {
-
-    @Suppress("DEPRECATION")
-    private var adapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
     private val _state = MutableStateFlow(STATE_OFF)
     val state = _state.asStateFlow()
     private val _isDiscovery = MutableStateFlow(false)

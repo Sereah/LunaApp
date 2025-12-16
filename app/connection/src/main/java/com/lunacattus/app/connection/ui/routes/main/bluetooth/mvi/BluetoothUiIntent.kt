@@ -11,5 +11,5 @@ sealed interface BluetoothUiIntent {
     data class DisconnectDevice(val device: BondDevice) : BluetoothUiIntent
     data class ForgetDevice(val device: BondDevice) : BluetoothUiIntent
     data class RequestUuid(val device: BondDevice) : BluetoothUiIntent
-    data class ConnectVendorUuid(val address: String, val deviceUUID: DeviceUUID) : BluetoothUiIntent
+    data class ConnectUuid(val address: String, val deviceUUID: DeviceUUID) : BluetoothUiIntent
 }

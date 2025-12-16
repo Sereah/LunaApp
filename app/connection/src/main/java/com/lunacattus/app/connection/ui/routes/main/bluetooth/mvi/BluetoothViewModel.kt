@@ -1,10 +1,13 @@
 package com.lunacattus.app.connection.ui.routes.main.bluetooth.mvi
 
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothUuid
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lunacattus.app.connection.domain.BluetoothRepository
-import com.lunacattus.app.connection.domain.name
+import com.lunacattus.app.connection.domain.bluetooth.BluetoothRepository
+import com.lunacattus.app.connection.domain.bluetooth.HfpProfileRepository
+import com.lunacattus.app.connection.domain.bluetooth.isVendorUuid
+import com.lunacattus.app.connection.domain.bluetooth.name
 import com.lunacattus.app.connection.ui.ActivityEvent
 import com.lunacattus.app.connection.ui.ActivitySideEffect
 import com.lunacattus.logger.Logger
@@ -20,7 +23,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BluetoothViewModel @Inject constructor(
-    private val repository: BluetoothRepository
+    private val repository: BluetoothRepository,
+    private val hfpProfileRepository: HfpProfileRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(BluetoothUiState())
     val uiState = _uiState.asStateFlow()
@@ -67,7 +71,7 @@ class BluetoothViewModel @Inject constructor(
             is BluetoothUiIntent.ConnectDevice -> connectDevice(intent.device)
             is BluetoothUiIntent.ForgetDevice -> forgetDevice(intent.device)
             is BluetoothUiIntent.RequestUuid -> requestUuid(intent.device)
-            is BluetoothUiIntent.ConnectVendorUuid -> connectVendorUuid(
+            is BluetoothUiIntent.ConnectUuid -> connectUuid(
                 intent.address,
                 intent.deviceUUID
             )
@@ -130,10 +134,17 @@ class BluetoothViewModel @Inject constructor(
         }
     }
 
-    private fun connectVendorUuid(address: String, deviceUUID: DeviceUUID) {
+    private fun connectUuid(address: String, deviceUUID: DeviceUUID) {
         viewModelScope.launch {
-            repository.connectRfcomm(address, deviceUUID.uuid.uuid).collect {
-                Logger.d(TAG, "connect rfcomm result: $it")
+            if (deviceUUID.uuid.isVendorUuid()) {
+                repository.connectRfcomm(address, deviceUUID.uuid.uuid).collect {
+                    Logger.d(TAG, "connect rfcomm result: $it")
+                }
+            }
+            when(deviceUUID.uuid) {
+                BluetoothUuid.HFP -> {
+
+                }
             }
         }
     }

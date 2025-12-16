@@ -1,6 +1,5 @@
 package com.lunacattus.app.connection.ui.routes.main
 
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -12,13 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.lunacattus.app.connection.ui.routes.main.bluetooth.BluetoothGraph
@@ -26,10 +22,6 @@ import com.lunacattus.app.connection.ui.routes.main.bluetooth.bluetoothRouter
 import com.lunacattus.app.connection.ui.routes.main.wifi.WifiGraph
 import com.lunacattus.app.connection.ui.routes.main.wifi.wifiRouter
 import com.lunacattus.app.connection.ui.theme.AppTheme
-import com.lunacattus.app.connection.ui.theme.slideInFromLeft
-import com.lunacattus.app.connection.ui.theme.slideInFromRight
-import com.lunacattus.app.connection.ui.theme.slideOutFromLeft
-import com.lunacattus.app.connection.ui.theme.slideOutFromRight
 import com.lunacattus.ui_design.compose.BottomItem
 import com.lunacattus.ui_design.compose.HazeAppBarBottomScaffold
 

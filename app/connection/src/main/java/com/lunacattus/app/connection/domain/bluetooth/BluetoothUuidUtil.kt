@@ -1,4 +1,4 @@
-package com.lunacattus.app.connection.domain
+package com.lunacattus.app.connection.domain.bluetooth
 
 import android.bluetooth.BluetoothUuid
 import android.os.ParcelUuid
