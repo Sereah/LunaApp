@@ -156,16 +156,31 @@ private fun DeviceControl(
     sendUiIntent: (BluetoothUiIntent) -> Unit,
     onBack: () -> Unit
 ) {
+    val isConnected = selectedDevice.isConnected
+    val isConnecting = selectedDevice.connecting
+    val isDisconnecting = selectedDevice.disconnecting
+
+    val actionIntent = if (isConnected) {
+        BluetoothUiIntent.DisconnectDevice(selectedDevice)
+    } else {
+        BluetoothUiIntent.ConnectDevice(selectedDevice)
+    }
+
+    val actionIcon = if (isConnected) Icons.Rounded.Close else Icons.Rounded.Add
+    val actionText = when {
+        isConnecting -> "连接中"
+        isDisconnecting -> "断开中"
+        isConnected -> "断开"
+        else -> "连接"
+    }
+    val actionColor = if (isConnecting || isDisconnecting) AppTheme.colors.inversePrimary else AppTheme.colors.icon
+
     Row(
         modifier = Modifier
             .height(60.dp)
             .fillMaxWidth()
-            .background(
-                AppTheme.colors.card,
-                RoundedCornerShape(12.dp)
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+            .background(AppTheme.colors.card, RoundedCornerShape(12.dp)),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
             modifier = Modifier
@@ -181,8 +196,7 @@ private fun DeviceControl(
                 imageVector = Icons.Rounded.Delete,
                 contentDescription = null,
                 tint = AppTheme.colors.warning,
-                modifier = Modifier
-                    .size(25.dp)
+                modifier = Modifier.size(25.dp)
             )
             Text("取消保存", fontSize = 14.sp, color = AppTheme.colors.warning)
         }
@@ -195,44 +209,22 @@ private fun DeviceControl(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .clickableWithDebounce(enable = !selectedDevice.connecting) {
-                    if (selectedDevice.isConnected) {
-                        sendUiIntent.invoke(
-                            BluetoothUiIntent.DisconnectDevice(
-                                selectedDevice
-                            )
-                        )
-                    } else {
-                        sendUiIntent.invoke(
-                            BluetoothUiIntent.ConnectDevice(
-                                selectedDevice
-                            )
-                        )
-                    }
+                .clickableWithDebounce(enable = !isConnecting && !isDisconnecting) {
+                    sendUiIntent.invoke(actionIntent)
                 },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector = if (selectedDevice.isConnected) {
-                    Icons.Rounded.Close
-                } else {
-                    Icons.Rounded.Add
-                },
+                imageVector = actionIcon,
                 contentDescription = null,
-                tint = if (selectedDevice.connecting) AppTheme.colors.inversePrimary
-                else AppTheme.colors.icon,
+                tint = actionColor,
                 modifier = Modifier
                     .size(25.dp)
             )
             Text(
-                color = if (selectedDevice.connecting) AppTheme.colors.inversePrimary
-                else AppTheme.colors.icon,
-                text = if (selectedDevice.isConnected) {
-                    "断开"
-                } else {
-                    "连接"
-                }, fontSize = 14.sp
+                color = actionColor,
+                text = actionText, fontSize = 14.sp
             )
         }
     }
