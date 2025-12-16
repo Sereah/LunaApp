@@ -46,6 +46,7 @@ import com.lunacattus.app.connection.ui.theme.AppTheme
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 import com.lunacattus.ui_design.compose.dialog.MessageContent
 import com.lunacattus.ui_design.compose.dialog.MessageDialog
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -89,26 +90,8 @@ fun DeviceDetailScreen(
         item { DeviceControl(selectedDevice, sendUiIntent, onBack) }
         //获取UUID列表
         item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .background(color = AppTheme.colors.card, shape = RoundedCornerShape(12.dp))
-                    .padding(horizontal = 15.dp)
-                    .clickableWithDebounce {
-                        if (deviceUuids == null) {
-                            scope.launch {
-                                ActivitySideEffect.send(ActivityEvent.ShowToast("UUID为空, 已启动SDP服务发现，稍后再试"))
-                            }
-                            sendUiIntent.invoke(BluetoothUiIntent.RequestUuid(selectedDevice))
-                        } else {
-                            showMessageDialog = true
-                        }
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text("获取UUID列表", fontSize = 17.sp)
+            UUIDItem(scope, deviceUuids, sendUiIntent, selectedDevice) {
+                showMessageDialog = true
             }
         }
         //设备地址
@@ -120,6 +103,7 @@ fun DeviceDetailScreen(
             onDismissRequest = {
                 showMessageDialog = false
             },
+            title = "UUID列表",
             message = MessageContent.Lines(deviceUuids)
         )
     }
@@ -251,6 +235,37 @@ private fun DeviceControl(
                 }, fontSize = 14.sp
             )
         }
+    }
+}
+
+@Composable
+private fun UUIDItem(
+    scope: CoroutineScope,
+    deviceUuids: List<String>?,
+    sendUiIntent: (BluetoothUiIntent) -> Unit,
+    selectedDevice: BondDevice,
+    showDialogShow: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .background(color = AppTheme.colors.card, shape = RoundedCornerShape(12.dp))
+            .padding(horizontal = 15.dp)
+            .clickableWithDebounce {
+                if (deviceUuids == null) {
+                    scope.launch {
+                        ActivitySideEffect.send(ActivityEvent.ShowToast("UUID为空, 已启动SDP服务发现，稍后再试"))
+                    }
+                    sendUiIntent.invoke(BluetoothUiIntent.RequestUuid(selectedDevice))
+                } else {
+                    showDialogShow.invoke()
+                }
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Text("获取UUID列表", fontSize = 17.sp)
     }
 }
 

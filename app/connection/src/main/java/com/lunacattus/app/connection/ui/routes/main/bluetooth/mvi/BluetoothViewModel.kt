@@ -58,7 +58,7 @@ class BluetoothViewModel @Inject constructor(
                     reduce {
                         copy(bondedDeviceList = bondedDeviceList.map {
                             if (it.device.address == address) {
-                                it.copy(isConnected = isConnected)
+                                it.copy(isConnected = isConnected, disconnecting = false, connecting = false)
                             } else {
                                 it
                             }
@@ -91,11 +91,25 @@ class BluetoothViewModel @Inject constructor(
 
             is BluetoothUiIntent.DisconnectDevice -> {
                 _selectedDevice.update { it?.copy(connecting = false, disconnecting = true) }
+                reduce {
+                    copy(bondedDeviceList = bondedDeviceList.map {
+                        if (intent.device.device.address == it.device.address) {
+                            it.copy(connecting = false, disconnecting = true)
+                        } else it
+                    })
+                }
                 repository.disconnectDevice(intent.device.device)
             }
 
             is BluetoothUiIntent.ConnectDevice -> {
                 _selectedDevice.update { it?.copy(connecting = true, disconnecting = false) }
+                reduce {
+                    copy(bondedDeviceList = bondedDeviceList.map {
+                        if (intent.device.device.address == it.device.address) {
+                            it.copy(connecting = true, disconnecting = false)
+                        } else it
+                    })
+                }
                 repository.connectDevice(intent.device.device)
             }
 
