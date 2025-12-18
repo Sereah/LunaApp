@@ -14,7 +14,7 @@ class Navigator(
         const val TAG = "Navigator"
     }
 
-    fun navigate(route: NavKey) {
+    fun navigate(route: BaseRoute) {
 
         Logger.d(TAG, "navigate: $route")
 

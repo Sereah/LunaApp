@@ -7,7 +7,10 @@ import com.lunacattus.nav3test.ui.section.wifi.screen.WifiRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object WifiRoute : MainRoute
+data object WifiRoute : MainRoute {
+    override val name: String
+        get() = "Wi-Fi"
+}
 
 fun EntryProviderScope<NavKey>.wifiSection() {
     entry<WifiRoute> {

@@ -3,9 +3,13 @@ package com.lunacattus.nav3test.ui.base
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-interface RootRoute: NavKey //根栈的路由分类
+interface BaseRoute : NavKey {
+    val name: String
+}
 
-interface MainRoute: NavKey //嵌套NavDisplay的路由分类
+interface RootRoute : BaseRoute //根栈的路由分类
+
+interface MainRoute : BaseRoute //嵌套NavDisplay的路由分类
 
 @Serializable
-data object MainGraph : NavKey //代表嵌套NavDisplay的路由放在根栈
+data object MainGraph: NavKey //代表嵌套NavDisplay的路由放在根栈

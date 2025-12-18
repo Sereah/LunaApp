@@ -1,4 +1,4 @@
-package com.lunacattus.nav3test.ui.section.bluetooth
+package com.lunacattus.nav3test.ui.section.bluetooth.discovery
 
 import androidx.lifecycle.ViewModel
 import com.lunacattus.logger.Logger
@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class BluetoothHomeViewModel @Inject constructor(): ViewModel() {
+class BluetoothDiscoveryViewModel @Inject constructor(): ViewModel() {
     init {
         Logger.d(TAG, "init")
     }
@@ -16,6 +16,6 @@ class BluetoothHomeViewModel @Inject constructor(): ViewModel() {
     }
 
     companion object {
-        const val TAG = "BluetoothHomeViewModel"
+        const val TAG = "BluetoothDiscoveryViewModel"
     }
 }

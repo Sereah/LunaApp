@@ -14,4 +14,5 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.gif)
     implementation(libs.haze.android)
+    implementation(libs.haze.material)
 }

@@ -17,7 +17,10 @@ import com.lunacattus.nav3test.ui.base.RootRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object FullScreenDetail : RootRoute
+data object FullScreenDetail : RootRoute {
+    override val name: String
+        get() = "Full Screen Detail"
+}
 
 fun EntryProviderScope<NavKey>.rootSection() {
     entry<FullScreenDetail> {

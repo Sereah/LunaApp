@@ -18,6 +18,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.runtime.serialization.NavKeySerializer
 import androidx.savedstate.compose.serialization.serializers.MutableStateSerializer
+import kotlin.collections.last
 
 /**
  * 创建并记住一个 [NavigationState] 实例。
@@ -29,8 +30,8 @@ import androidx.savedstate.compose.serialization.serializers.MutableStateSeriali
  */
 @Composable
 fun rememberNavigationState(
-    startRoute: NavKey,
-    topLevelRoutesKey: Set<NavKey>
+    startRoute: BaseRoute,
+    topLevelRoutesKey: Set<BaseRoute>
 ): NavigationState {
 
     // 使用 rememberSerializable 来创建和保存当前顶级路由的状态。
@@ -64,18 +65,24 @@ fun rememberNavigationState(
  * @param startRoute 导航图的起始目的地。
  * @param topLevelRouteState 一个可变的 state，持有当前选中的顶级路由（例如，当前活动的标签页）。
  * @param backStacks 一个从顶级路由 [NavKey]到其对应 [NavBackStack] 的映射。这允许多个并行的返回堆栈。
- * @param overlayBackStack 一个用于显示在当前内容之上的目的地（如模态对话框）的返回堆Stack。
  */
 class NavigationState(
-    val startRoute: NavKey,
-    topLevelRouteState: MutableState<NavKey>,
-    val backStacks: Map<NavKey, NavBackStack<NavKey>>
+    val startRoute: BaseRoute,
+    topLevelRouteState: MutableState<BaseRoute>,
+    val backStacks: Map<BaseRoute, NavBackStack<NavKey>>
 ) {
     /**
      * 当前选中的顶级路由。
      * 通过属性代理到 [topLevelRouteState]，使得状态的读写能够被 Compose 框架观察到。
      */
-    var topLevelRoute: NavKey by topLevelRouteState
+    var topLevelRoute: BaseRoute by topLevelRouteState
+
+    val currentRoute: BaseRoute
+        get() {
+            val activeTopRoute = stackInUse.last()
+            return backStacks[activeTopRoute]
+                ?.lastOrNull() as? BaseRoute ?: error("currentRoute is null.")
+        }
 
     /**
      * 计算出当前正在使用的导航堆栈组合。
@@ -83,7 +90,7 @@ class NavigationState(
      * - 如果当前顶级路由就是起始路由，那么只使用起始路由的堆栈。
      * - 否则，将起始路由的堆栈和当前选定顶级路由的堆栈组合起来。这通常用于实现“主页 -> 详情页”然后在不同标签页切换的场景。
      */
-    val stackInUse: List<NavKey>
+    val stackInUse: List<BaseRoute>
         get() = if (topLevelRoute == startRoute) {
             listOf(startRoute)
         } else {
