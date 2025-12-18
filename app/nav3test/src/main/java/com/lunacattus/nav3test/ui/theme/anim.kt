@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.IntOffset
 
 val slideInFromRight = slideIn(
     animationSpec = tween(
-        durationMillis = 800,
+        durationMillis = 500,
         easing = CubicBezierEasing(0.42f, 0.00f, 0.58f, 1.00f)
     ),
     initialOffset = { fullSize ->
@@ -21,7 +21,7 @@ val slideInFromRight = slideIn(
 
 val slideOutFromRight = slideOut(
     animationSpec = tween(
-        durationMillis = 800,
+        durationMillis = 500,
         easing = CubicBezierEasing(0.42f, 0.00f, 0.58f, 1.00f)
     ),
     targetOffset = { fullSize ->
@@ -31,7 +31,7 @@ val slideOutFromRight = slideOut(
 
 val slideInFromLeft = slideIn(
     animationSpec = tween(
-        durationMillis = 800,
+        durationMillis = 500,
         easing = CubicBezierEasing(0.42f, 0.00f, 0.58f, 1.00f)
     ),
     initialOffset = { fullSize ->
@@ -41,7 +41,7 @@ val slideInFromLeft = slideIn(
 
 val slideOutFromLeft = slideOut(
     animationSpec = tween(
-        durationMillis = 800,
+        durationMillis = 500,
         easing = CubicBezierEasing(0.42f, 0.00f, 0.58f, 1.00f)
     ),
     targetOffset = { fullSize ->

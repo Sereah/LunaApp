@@ -29,7 +29,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -57,6 +61,7 @@ import com.lunacattus.nav3test.ui.theme.slideInFromRight
 import com.lunacattus.nav3test.ui.theme.slideOutFromLeft
 import com.lunacattus.nav3test.ui.theme.slideOutFromRight
 import com.lunacattus.ui_design.compose.clickableWithDebounce
+import com.lunacattus.ui_design.compose.dialog.OverlayToast
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
@@ -107,6 +112,7 @@ class MainActivity : ComponentActivity() {
                         onBack = { navigator.goBack() },
                     )
                 }
+                ToastView()
             }
         }
     }
@@ -179,7 +185,7 @@ private fun TopBar(navigator: Navigator, navState: NavigationState, hazeState: H
         modifier = Modifier
             .hazeEffect(
                 state = hazeState,
-                style = HazeMaterials.regular(MaterialTheme.colorScheme.surfaceContainer)
+                style = HazeMaterials.regular(MaterialTheme.colorScheme.surface)
             )
     )
 }
@@ -211,4 +217,28 @@ private fun BottomBar(
             }
         }
     }
+}
+
+@Composable
+fun ToastView() {
+    var toastEvent by remember { mutableStateOf<Pair<String, Long>?>(null) }
+
+    LaunchedEffect(Unit) {
+        ActivitySideEffect.events.collect {
+            toastEvent = when (it) {
+                is ActivityEvent.LogError -> {
+                    it.throwable.toString() to it.id
+                }
+
+                is ActivityEvent.ShowToast -> {
+                    it.message to it.id
+                }
+            }
+        }
+    }
+
+    OverlayToast(
+        modifier = Modifier.fillMaxSize(),
+        toastEvent
+    )
 }

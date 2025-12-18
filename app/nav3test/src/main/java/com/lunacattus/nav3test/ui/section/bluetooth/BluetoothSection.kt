@@ -9,8 +9,6 @@ import com.lunacattus.nav3test.ui.section.bluetooth.discovery.BluetoothDiscovery
 import com.lunacattus.nav3test.ui.section.bluetooth.discovery.BtDiscoveryRoute
 import com.lunacattus.nav3test.ui.section.bluetooth.homepage.BluetoothHomeViewModel
 import com.lunacattus.nav3test.ui.section.bluetooth.homepage.BluetoothRoute
-import com.lunacattus.nav3test.ui.section.root.FullScreenDetail
-import dev.chrisbanes.haze.HazeState
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -20,7 +18,7 @@ data object BluetoothRoute : MainRoute {
 }
 
 @Serializable
-data object BtDiscoveryRoute : MainRoute {
+data class BtDiscoveryRoute(val localDeviceName: String) : MainRoute {
     override val name: String
         get() = "Discovery"
 }
@@ -44,15 +42,15 @@ fun EntryProviderScope<NavKey>.bluetoothSection() {
         BluetoothRoute(
             viewModel = viewmodel,
             navToBtBonded = { navigator.navigate(BtBondedRoute) },
-            navToBtDiscovery = { navigator.navigate(BtDiscoveryRoute) }
+            navToBtDiscovery = {
+                navigator.navigate(BtDiscoveryRoute(it))
+            }
         )
     }
     entry<BtDiscoveryRoute> {
         val navigator = LocalNavigator.current
         val viewmodel = hiltViewModel<BluetoothDiscoveryViewModel>()
-        BtDiscoveryRoute {
-            navigator.navigate(FullScreenDetail)
-        }
+        BtDiscoveryRoute(it.localDeviceName, viewmodel) { navigator.goBack() }
     }
     entry<BtBondedRoute> {
 

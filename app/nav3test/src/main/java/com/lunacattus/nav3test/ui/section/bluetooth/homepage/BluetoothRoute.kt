@@ -41,7 +41,7 @@ import com.lunacattus.ui_design.compose.overScrollVertical
 @Composable
 fun BluetoothRoute(
     viewModel: BluetoothHomeViewModel,
-    navToBtDiscovery: () -> Unit,
+    navToBtDiscovery: (localDeviceName: String) -> Unit,
     navToBtBonded: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -57,13 +57,9 @@ fun BluetoothRoute(
 fun BluetoothScreen(
     uiState: BluetoothHomeUiState,
     sendUiIntent: (BluetoothHomeUiIntent) -> Unit,
-    navToBtDiscovery: () -> Unit = {},
+    navToBtDiscovery: (localDeviceName: String) -> Unit = {},
     navToBtBonded: () -> Unit = {}
 ) {
-
-    LaunchedEffect(Unit) {
-        sendUiIntent.invoke(BluetoothHomeUiIntent.LoadInfo)
-    }
 
     LazyColumn(
         modifier = Modifier
@@ -76,7 +72,7 @@ fun BluetoothScreen(
         items(items = functionList(), key = { it.type }) { function ->
             FunctionItem(function.icon, function.title) {
                 when (function.type) {
-                    Type.ADD_NEW -> navToBtDiscovery()
+                    Type.ADD_NEW -> navToBtDiscovery(uiState.info.name)
                     Type.BONDED -> navToBtBonded()
                 }
             }

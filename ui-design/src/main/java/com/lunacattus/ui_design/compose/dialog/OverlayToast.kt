@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,14 +63,14 @@ fun OverlayToast(
                 modifier = Modifier
                     .padding(horizontal = 30.dp)
                     .background(
-                        Color.Black.copy(alpha = 0.8f),
-                        RoundedCornerShape(16.dp)
+                        MaterialTheme.colorScheme.inverseSurface,
+                        RoundedCornerShape(20.dp)
                     )
                     .padding(horizontal = 16.dp, vertical = 10.dp)
             ) {
                 Text(
                     message,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.inverseOnSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
