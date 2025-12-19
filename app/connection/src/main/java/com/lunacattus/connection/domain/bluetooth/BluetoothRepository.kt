@@ -68,25 +68,6 @@ class BluetoothRepository @Inject constructor(
         }
     }
 
-    fun fetchDeviceUuids(device: BluetoothDevice): Flow<List<ParcelUuid>> = callbackFlow {
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                val d: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                if (d?.address == device.address) {
-                    val uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID)
-                    val uuids = uuidExtra?.filterIsInstance<ParcelUuid>() ?: emptyList()
-                    trySend(uuids)
-                    channel.close()
-                }
-            }
-        }
-
-        context.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_UUID))
-        device.fetchUuidsWithSdp()
-
-        awaitClose { context.unregisterReceiver(receiver) }
-    }
-
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
@@ -197,13 +178,17 @@ class BluetoothRepository @Inject constructor(
         return bondedDevices.toList()
     }
 
-    fun getBluetoothProfile(): String {
+    fun getBluetoothProfile(): List<String> {
         val profiles: List<Int> = adapter.getSupportedProfiles()
         Logger.d(TAG, "profiles: $profiles")
         val list = profiles.map {
             profileIdToString(it)
         }
-        return list.joinToString(separator = "\n")
+        return list
+    }
+
+    fun getLocalUuids(): Array<ParcelUuid> {
+        return adapter.getUuids()
     }
 
     fun getAddress(): String {
@@ -243,6 +228,25 @@ class BluetoothRepository @Inject constructor(
 
     fun getRemoteDevice(address: String): BluetoothDevice {
         return adapter.getRemoteDevice(address)
+    }
+
+    fun fetchDeviceUuids(device: BluetoothDevice): Flow<List<ParcelUuid>> = callbackFlow {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val d: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                if (d?.address == device.address) {
+                    val uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID)
+                    val uuids = uuidExtra?.filterIsInstance<ParcelUuid>() ?: emptyList()
+                    trySend(uuids)
+                    channel.close()
+                }
+            }
+        }
+
+        context.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_UUID))
+        device.fetchUuidsWithSdp()
+
+        awaitClose { context.unregisterReceiver(receiver) }
     }
 
     @Suppress("DEPRECATION")

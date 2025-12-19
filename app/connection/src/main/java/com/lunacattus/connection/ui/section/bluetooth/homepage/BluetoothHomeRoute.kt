@@ -19,6 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.NavigateNext
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.BluetoothConnected
+import androidx.compose.material.icons.rounded.CastConnected
+import androidx.compose.material.icons.rounded.LocalOffer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -35,6 +40,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lunacattus.ui_design.compose.CustomSwitch
 import com.lunacattus.ui_design.compose.SwitchDefaults
 import com.lunacattus.ui_design.compose.clickableWithDebounce
+import com.lunacattus.ui_design.compose.dialog.MessageContent
+import com.lunacattus.ui_design.compose.dialog.MessageDialog
 import com.lunacattus.ui_design.compose.overScrollVertical
 
 @Composable
@@ -60,6 +67,9 @@ fun BluetoothScreen(
     navToBtBonded: () -> Unit = {}
 ) {
 
+    var showProfileDialog by remember { mutableStateOf(false) }
+    var showUuidsDialog by remember { mutableStateOf(false) }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -73,14 +83,34 @@ fun BluetoothScreen(
                 when (function.type) {
                     Type.ADD_NEW -> navToBtDiscovery(uiState.info.name)
                     Type.BONDED -> navToBtBonded()
+                    Type.LOCAL_PROFILE -> showProfileDialog = true
+                    Type.LOCAL_UUIDS -> showUuidsDialog = true
                 }
             }
         }
     }
+
+    if (showProfileDialog) {
+        MessageDialog(
+            onDismissRequest = {
+                showProfileDialog = false
+            },
+            message = MessageContent.Lines(uiState.info.profiles)
+        )
+    }
+
+    if (showUuidsDialog) {
+        MessageDialog(
+            onDismissRequest = {
+                showUuidsDialog = false
+            },
+            message = MessageContent.Lines(uiState.info.uuidList.map { it.toString() })
+        )
+    }
 }
 
 private enum class Type {
-    ADD_NEW, BONDED
+    ADD_NEW, BONDED, LOCAL_PROFILE, LOCAL_UUIDS
 }
 
 private data class BtFunction(
@@ -100,7 +130,17 @@ private fun functionList(): List<BtFunction> {
             type = Type.BONDED,
             title = "保存的设备",
             icon = Icons.Rounded.BluetoothConnected
-        )
+        ),
+        BtFunction(
+            type = Type.LOCAL_PROFILE,
+            title = "本机支持的协议",
+            icon = Icons.Rounded.LocalOffer
+        ),
+        BtFunction(
+            type = Type.LOCAL_UUIDS,
+            title = "本机UUID",
+            icon = Icons.Rounded.CastConnected
+        ),
     )
 }
 

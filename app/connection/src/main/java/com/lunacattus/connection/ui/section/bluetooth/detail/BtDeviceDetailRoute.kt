@@ -1,6 +1,7 @@
 package com.lunacattus.connection.ui.section.bluetooth.detail
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothProfile
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -95,8 +97,11 @@ fun DeviceDetailScreen(
 
     val scope = rememberCoroutineScope()
     var showMessageDialog by remember { mutableStateOf(false) }
-    val showItemUuidList = selectedDevice.uuidList.filter {
-        it.uuid.isCommonUuid() || it.uuid.isVendorUuid()
+    val vendorUuidList = selectedDevice.uuidList.filter {
+        it.uuid.isVendorUuid()
+    }
+    val profileUuidList = selectedDevice.uuidList.filter {
+        it.uuid.isCommonUuid()
     }
 
     LazyColumn(
@@ -116,26 +121,11 @@ fun DeviceDetailScreen(
                 showMessageDialog = true
             }
         }
-        items(items = showItemUuidList, key = { it.uuid }) { uuid ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    .padding(horizontal = 15.dp)
-                    .clickableWithDebounce {
-                        sendUiIntent.invoke(
-                            BtDeviceDetailUiIntent.ConnectUuid(uuid)
-                        )
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text(uuid.name, fontSize = 15.sp)
-            }
+        items(items = profileUuidList, key = { it.uuid }) { uuid ->
+            ProfileItem(uuid, sendUiIntent)
+        }
+        items(items = vendorUuidList, key = { it.uuid }) { uuid ->
+            VendorUuidItem(uuid, sendUiIntent)
         }
         //设备地址
         item { AddressBottom(selectedDevice) }
@@ -285,6 +275,59 @@ private fun UUIDItem(
         horizontalArrangement = Arrangement.Start
     ) {
         Text("查看UUID列表", fontSize = 17.sp)
+    }
+}
+
+@Composable
+private fun ProfileItem(uuid: DeviceUUID, sendUiIntent: (BtDeviceDetailUiIntent) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 15.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        val isChecked = uuid.connectState == BluetoothProfile.STATE_CONNECTED ||
+                uuid.connectState == BluetoothProfile.STATE_CONNECTING
+        val isEnable = uuid.connectState == BluetoothProfile.STATE_CONNECTED ||
+                uuid.connectState == BluetoothProfile.STATE_DISCONNECTED
+        Text(uuid.name, fontSize = 17.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        Switch(
+            checked = isChecked,
+            enabled = isEnable,
+            onCheckedChange = {
+                sendUiIntent(BtDeviceDetailUiIntent.ChangeProfileConnectState(uuid.uuid, !isChecked))
+            }
+        )
+    }
+}
+
+@Composable
+private fun VendorUuidItem(uuid: DeviceUUID, sendUiIntent: (BtDeviceDetailUiIntent) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 15.dp)
+            .clickableWithDebounce {
+                sendUiIntent.invoke(
+                    BtDeviceDetailUiIntent.ConnectUuid(uuid)
+                )
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Text(uuid.name, fontSize = 15.sp)
     }
 }
 

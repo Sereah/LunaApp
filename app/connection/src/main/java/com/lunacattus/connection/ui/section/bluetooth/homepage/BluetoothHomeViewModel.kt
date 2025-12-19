@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.logger.Logger
 import com.lunacattus.connection.domain.bluetooth.BluetoothRepository
+import com.lunacattus.connection.domain.bluetooth.name
 import com.lunacattus.connection.ui.section.bluetooth.BtLocalInfo
+import com.lunacattus.connection.ui.section.bluetooth.DeviceUUID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,6 +52,9 @@ class BluetoothHomeViewModel @Inject constructor(
     private fun loadInfo() {
         try {
             val profiles = repository.getBluetoothProfile()
+            val uuids = repository.getLocalUuids().map { uuid ->
+                DeviceUUID(name = uuid.name(), uuid = uuid)
+            }
             val address = repository.getAddress()
             val name = repository.getName()
             reduce {
@@ -57,7 +62,8 @@ class BluetoothHomeViewModel @Inject constructor(
                     info = info.copy(
                         profiles = profiles,
                         address = address,
-                        name = name
+                        name = name,
+                        uuidList = uuids
                     )
                 )
             }

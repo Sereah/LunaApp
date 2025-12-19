@@ -1,18 +1,17 @@
 package com.lunacattus.connection.ui.section.bluetooth
 
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.lunacattus.connection.ui.base.LocalNavigator
 import com.lunacattus.connection.ui.base.MainRoute
+import com.lunacattus.connection.ui.base.entryWithNavAndVm
 import com.lunacattus.connection.ui.section.bluetooth.bonded.BluetoothBondedRoute
 import com.lunacattus.connection.ui.section.bluetooth.bonded.BluetoothBondedViewModel
 import com.lunacattus.connection.ui.section.bluetooth.detail.BtDeviceDetailRoute
 import com.lunacattus.connection.ui.section.bluetooth.detail.BtDeviceDetailViewModel
-import com.lunacattus.connection.ui.section.bluetooth.discovery.BluetoothDiscoveryViewModel
 import com.lunacattus.connection.ui.section.bluetooth.discovery.BluetoothDiscoveryRoute
-import com.lunacattus.connection.ui.section.bluetooth.homepage.BluetoothHomeViewModel
+import com.lunacattus.connection.ui.section.bluetooth.discovery.BluetoothDiscoveryViewModel
 import com.lunacattus.connection.ui.section.bluetooth.homepage.BluetoothHomeRoute
+import com.lunacattus.connection.ui.section.bluetooth.homepage.BluetoothHomeViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -40,31 +39,23 @@ data class BtDeviceDetailRoute(val address: String) : MainRoute {
 }
 
 fun EntryProviderScope<NavKey>.bluetoothSection() {
-    entry<BluetoothHomeRoute> {
-        val navigator = LocalNavigator.current
-        val viewmodel = hiltViewModel<BluetoothHomeViewModel>()
+    entryWithNavAndVm<BluetoothHomeRoute, BluetoothHomeViewModel> { _, navigator, viewModel ->
         BluetoothHomeRoute(
-            viewModel = viewmodel,
+            viewModel = viewModel,
             navToBtBonded = { navigator.navigate(BluetoothBondedRoute) },
             navToBtDiscovery = {
                 navigator.navigate(BluetoothDiscoveryRoute(it))
             }
         )
     }
-    entry<BluetoothDiscoveryRoute> {
-        val navigator = LocalNavigator.current
-        val viewmodel = hiltViewModel<BluetoothDiscoveryViewModel>()
-        BluetoothDiscoveryRoute(it.localDeviceName, viewmodel) { navigator.goBack() }
+    entryWithNavAndVm<BluetoothDiscoveryRoute, BluetoothDiscoveryViewModel> { it, navigator, viewModel ->
+        BluetoothDiscoveryRoute(it.localDeviceName, viewModel) { navigator.goBack() }
     }
-    entry<BluetoothBondedRoute> {
-        val navigator = LocalNavigator.current
-        val viewmodel = hiltViewModel<BluetoothBondedViewModel>()
-        BluetoothBondedRoute(viewmodel) { navigator.navigate(BtDeviceDetailRoute(it))}
+    entryWithNavAndVm<BluetoothBondedRoute, BluetoothBondedViewModel> { _, navigator, viewModel ->
+        BluetoothBondedRoute(viewModel) { navigator.navigate(BtDeviceDetailRoute(it)) }
     }
-    entry<BtDeviceDetailRoute> {
-        val viewmodel = hiltViewModel<BtDeviceDetailViewModel>()
-        val navigator = LocalNavigator.current
-        BtDeviceDetailRoute(it.address, viewmodel) {
+    entryWithNavAndVm<BtDeviceDetailRoute, BtDeviceDetailViewModel> { it, navigator, viewModel ->
+        BtDeviceDetailRoute(it.address, viewModel) {
             navigator.goBack()
         }
     }
