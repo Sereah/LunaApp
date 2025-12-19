@@ -1,7 +1,7 @@
 ### connection
 
 > 做蓝牙，WiFi相关接口验证
-> compose的MVI架构
+> compose的MVI架构， 使用Navigation3
 
 ### gallery
 
@@ -19,4 +19,4 @@
 ### videoPlayer
 
 > 视频播放器
-> compose，多层NavHost
+> compose，多层NavHost, 使用Navigation2

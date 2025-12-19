@@ -13,7 +13,7 @@ frameworkJar {
 }
 
 android {
-    namespace = "com.lunacattus.app.connection"
+    namespace = "com.lunacattus.connection"
 
     defaultConfig {
         applicationId = "com.lunacattus.app.connection"
@@ -35,4 +35,6 @@ dependencies {
     implementation(project(":ui-design"))
     implementation(project(":common"))
     implementation(project(":logger"))
+    implementation(libs.haze.android)
+    implementation(libs.haze.material)
 }

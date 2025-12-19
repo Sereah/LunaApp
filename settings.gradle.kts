@@ -38,4 +38,3 @@ include(":app:gallery:data")
 include(":service:media")
 
 include(":feature:speech")
-include(":app:nav3test")
