@@ -1,4 +1,4 @@
-package com.lunacattus.connection.domain.bluetooth
+package com.lunacattus.connection.model.bluetooth
 
 import android.bluetooth.BluetoothUuid
 import android.os.ParcelUuid
@@ -177,8 +177,11 @@ private val UUID_META_MAP: Map<ParcelUuid, BluetoothUuidMeta> by lazy {
     )
 }
 
-fun ParcelUuid.name(): String =
+fun ParcelUuid.displayName(): String =
     UUID_META_MAP[this]?.name ?: "UNKNOWN"
+
+fun ParcelUuid.displayNameAndId(): String =
+    "${UUID_META_MAP[this]?.name ?: "UNKNOWN"}: $this"
 
 fun ParcelUuid.category(): BluetoothUuidCategory =
     UUID_META_MAP[this]?.category ?: BluetoothUuidCategory.UNKNOWN

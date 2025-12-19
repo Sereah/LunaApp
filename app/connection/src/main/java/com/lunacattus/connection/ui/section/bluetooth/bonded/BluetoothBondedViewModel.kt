@@ -2,10 +2,10 @@ package com.lunacattus.connection.ui.section.bluetooth.bonded
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lunacattus.logger.Logger
 import com.lunacattus.connection.domain.bluetooth.BluetoothRepository
-import com.lunacattus.connection.ui.section.bluetooth.BondDevice
-import com.lunacattus.connection.ui.section.bluetooth.BondDeviceConnectType
+import com.lunacattus.connection.model.bluetooth.BondDevice
+import com.lunacattus.connection.model.bluetooth.BondDeviceConnectType
+import com.lunacattus.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,7 +1,9 @@
 package com.lunacattus.connection.ui.section.bluetooth
 
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import com.lunacattus.connection.ui.base.LocalNavigator
 import com.lunacattus.connection.ui.base.MainRoute
 import com.lunacattus.connection.ui.base.entryWithNavAndVm
 import com.lunacattus.connection.ui.section.bluetooth.bonded.BluetoothBondedRoute
@@ -54,8 +56,14 @@ fun EntryProviderScope<NavKey>.bluetoothSection() {
     entryWithNavAndVm<BluetoothBondedRoute, BluetoothBondedViewModel> { _, navigator, viewModel ->
         BluetoothBondedRoute(viewModel) { navigator.navigate(BtDeviceDetailRoute(it)) }
     }
-    entryWithNavAndVm<BtDeviceDetailRoute, BtDeviceDetailViewModel> { it, navigator, viewModel ->
-        BtDeviceDetailRoute(it.address, viewModel) {
+    entry<BtDeviceDetailRoute> { key ->
+        val viewModel = hiltViewModel<BtDeviceDetailViewModel, BtDeviceDetailViewModel.Factory>(
+            creationCallback = { factory ->
+                factory.create(key.address)
+            }
+        )
+        val navigator = LocalNavigator.current
+        BtDeviceDetailRoute(viewModel) {
             navigator.goBack()
         }
     }

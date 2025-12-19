@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lunacattus.connection.model.bluetooth.displayNameAndId
 import com.lunacattus.ui_design.compose.CustomSwitch
 import com.lunacattus.ui_design.compose.SwitchDefaults
 import com.lunacattus.ui_design.compose.clickableWithDebounce
@@ -104,7 +105,7 @@ fun BluetoothScreen(
             onDismissRequest = {
                 showUuidsDialog = false
             },
-            message = MessageContent.Lines(uiState.info.uuidList.map { it.toString() })
+            message = MessageContent.Lines(uiState.info.uuidList.map { it.displayNameAndId() })
         )
     }
 }

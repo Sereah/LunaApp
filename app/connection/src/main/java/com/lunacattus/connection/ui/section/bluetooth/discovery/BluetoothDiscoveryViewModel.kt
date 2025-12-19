@@ -3,9 +3,9 @@ package com.lunacattus.connection.ui.section.bluetooth.discovery
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.connection.domain.bluetooth.BluetoothRepository
+import com.lunacattus.connection.model.bluetooth.DiscoveryDevice
 import com.lunacattus.connection.ui.ActivityToastEvent
 import com.lunacattus.connection.ui.ToastEvent
-import com.lunacattus.connection.ui.section.bluetooth.DiscoveryDevice
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.lunacattus.connection.ui.section.bluetooth.DiscoveryDevice
+import com.lunacattus.connection.model.bluetooth.DiscoveryDevice
 import com.lunacattus.connection.ui.theme.immediatelyIn
 import com.lunacattus.connection.ui.theme.immediatelyOut
 import com.lunacattus.ui_design.compose.Spinner

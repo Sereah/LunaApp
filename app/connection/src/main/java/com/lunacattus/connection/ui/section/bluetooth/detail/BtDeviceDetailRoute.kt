@@ -1,7 +1,7 @@
 package com.lunacattus.connection.ui.section.bluetooth.detail
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothProfile
+import android.os.ParcelUuid
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,15 +20,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BluetoothConnected
+import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.DirectionsCarFilled
+import androidx.compose.material.icons.filled.Headset
+import androidx.compose.material.icons.filled.Mouse
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AlignVerticalBottom
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -36,35 +41,28 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.lunacattus.connection.domain.bluetooth.isCommonUuid
-import com.lunacattus.connection.domain.bluetooth.isVendorUuid
-import com.lunacattus.connection.ui.ActivityToastEvent
-import com.lunacattus.connection.ui.ToastEvent
-import com.lunacattus.connection.ui.section.bluetooth.BondDevice
-import com.lunacattus.connection.ui.section.bluetooth.BondDeviceConnectType
-import com.lunacattus.connection.ui.section.bluetooth.DeviceUUID
+import com.lunacattus.connection.model.bluetooth.BluetoothDeviceType
+import com.lunacattus.connection.model.bluetooth.BondDevice
+import com.lunacattus.connection.model.bluetooth.BondDeviceConnectType
+import com.lunacattus.connection.model.bluetooth.displayName
+import com.lunacattus.connection.model.bluetooth.getPreciseType
+import com.lunacattus.connection.model.bluetooth.isCommonUuid
+import com.lunacattus.connection.model.bluetooth.isVendorUuid
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 import com.lunacattus.ui_design.compose.dialog.MessageContent
 import com.lunacattus.ui_design.compose.dialog.MessageDialog
 import com.lunacattus.ui_design.compose.overScrollVertical
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
-fun BtDeviceDetailRoute(address: String, viewModel: BtDeviceDetailViewModel, onBack: () -> Unit) {
+fun BtDeviceDetailRoute(viewModel: BtDeviceDetailViewModel, onBack: () -> Unit) {
     val uiSate by viewModel.uiState.collectAsStateWithLifecycle()
     var showLoading by remember { mutableStateOf(false) }
-
-    LaunchedEffect(address) {
-        viewModel.processUiIntent(BtDeviceDetailUiIntent.GetDevice(address))
-    }
 
     LaunchedEffect(uiSate) {
         showLoading = uiSate.selectDevice == null
@@ -94,14 +92,10 @@ fun DeviceDetailScreen(
     sendUiIntent: (BtDeviceDetailUiIntent) -> Unit,
     onBack: () -> Unit
 ) {
+    var showUuidDetail by remember { mutableStateOf<ParcelUuid?>(null) }
 
-    val scope = rememberCoroutineScope()
-    var showMessageDialog by remember { mutableStateOf(false) }
-    val vendorUuidList = selectedDevice.uuidList.filter {
-        it.uuid.isVendorUuid()
-    }
-    val profileUuidList = selectedDevice.uuidList.filter {
-        it.uuid.isCommonUuid()
+    val uuidList = selectedDevice.uuidList.filter {
+        it.isVendorUuid() || it.isCommonUuid()
     }
 
     LazyColumn(
@@ -115,29 +109,25 @@ fun DeviceDetailScreen(
         item { DeviceIconAndName(selectedDevice) }
         //连接控制
         item { DeviceControl(selectedDevice, sendUiIntent, onBack) }
-        //获取UUID列表
-        item {
-            UUIDItem(scope, selectedDevice.uuidList) {
-                showMessageDialog = true
-            }
-        }
-        items(items = profileUuidList, key = { it.uuid }) { uuid ->
-            ProfileItem(uuid, sendUiIntent)
-        }
-        items(items = vendorUuidList, key = { it.uuid }) { uuid ->
-            VendorUuidItem(uuid, sendUiIntent)
+        item { Text("UUID列表", fontSize = 18.sp, modifier = Modifier.padding(top = 20.dp)) }
+        items(items = uuidList, key = { it }) { uuid ->
+            UuidItem(
+                uuid = uuid,
+                showDetail = { showUuidDetail = uuid },
+                goTo = {})
         }
         //设备地址
         item { AddressBottom(selectedDevice) }
     }
 
-    if (showMessageDialog && selectedDevice.uuidList.isNotEmpty()) {
+    if (showUuidDetail != null) {
         MessageDialog(
             onDismissRequest = {
-                showMessageDialog = false
+                showUuidDetail = null
             },
-            title = "UUID列表",
-            message = MessageContent.Lines(selectedDevice.uuidList.map { it.toString() })
+            message = MessageContent.Text(
+                value = showUuidDetail.toString()
+            )
         )
     }
 }
@@ -145,14 +135,23 @@ fun DeviceDetailScreen(
 @SuppressLint("MissingPermission")
 @Composable
 private fun DeviceIconAndName(selectedDevice: BondDevice) {
+    val icon = when (selectedDevice.device.getPreciseType()) {
+        BluetoothDeviceType.PHONE -> Icons.Filled.PhoneAndroid
+        BluetoothDeviceType.COMPUTER -> Icons.Filled.Computer
+        BluetoothDeviceType.HEADSET -> Icons.Filled.Headset
+        BluetoothDeviceType.CAR -> Icons.Filled.DirectionsCarFilled
+        BluetoothDeviceType.INPUT -> Icons.Filled.Mouse
+        else -> Icons.Filled.BluetoothConnected
+    }
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            imageVector = Icons.Filled.PhoneAndroid,
+            imageVector = icon,
             contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(40.dp)
         )
         Spacer(Modifier.height(10.dp))
@@ -247,69 +246,7 @@ private fun DeviceControl(
 }
 
 @Composable
-private fun UUIDItem(
-    scope: CoroutineScope,
-    deviceUuids: List<DeviceUUID>,
-    showDialogShow: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .padding(vertical = 20.dp)
-            .fillMaxWidth()
-            .height(50.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(horizontal = 15.dp)
-            .clickableWithDebounce {
-                if (deviceUuids.isEmpty()) {
-                    scope.launch {
-                        ActivityToastEvent.send(ToastEvent.ShowToast("UUID为空"))
-                    }
-                } else {
-                    showDialogShow.invoke()
-                }
-            },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Text("查看UUID列表", fontSize = 17.sp)
-    }
-}
-
-@Composable
-private fun ProfileItem(uuid: DeviceUUID, sendUiIntent: (BtDeviceDetailUiIntent) -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(horizontal = 15.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        val isChecked = uuid.connectState == BluetoothProfile.STATE_CONNECTED ||
-                uuid.connectState == BluetoothProfile.STATE_CONNECTING
-        val isEnable = uuid.connectState == BluetoothProfile.STATE_CONNECTED ||
-                uuid.connectState == BluetoothProfile.STATE_DISCONNECTED
-        Text(uuid.name, fontSize = 17.sp)
-        Spacer(modifier = Modifier.weight(1f))
-        Switch(
-            checked = isChecked,
-            enabled = isEnable,
-            onCheckedChange = {
-                sendUiIntent(BtDeviceDetailUiIntent.ChangeProfileConnectState(uuid.uuid, !isChecked))
-            }
-        )
-    }
-}
-
-@Composable
-private fun VendorUuidItem(uuid: DeviceUUID, sendUiIntent: (BtDeviceDetailUiIntent) -> Unit) {
+private fun UuidItem(uuid: ParcelUuid, showDetail: () -> Unit, goTo: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -320,20 +257,27 @@ private fun VendorUuidItem(uuid: DeviceUUID, sendUiIntent: (BtDeviceDetailUiInte
             )
             .padding(horizontal = 15.dp)
             .clickableWithDebounce {
-                sendUiIntent.invoke(
-                    BtDeviceDetailUiIntent.ConnectUuid(uuid)
-                )
+                showDetail()
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
-        Text(uuid.name, fontSize = 15.sp)
+        Text(uuid.displayName(), fontSize = 15.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        Icon(
+            imageVector = Icons.Rounded.Link,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.clickableWithDebounce {
+                goTo()
+            }
+        )
     }
 }
 
 @Composable
 private fun AddressBottom(selectedDevice: BondDevice) {
-    Column {
+    Column(modifier = Modifier.padding(top = 40.dp)) {
         Icon(
             imageVector = Icons.Rounded.AlignVerticalBottom,
             contentDescription = null,

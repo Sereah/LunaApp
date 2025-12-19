@@ -29,8 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.lunacattus.connection.ui.section.bluetooth.BondDevice
-import com.lunacattus.connection.ui.section.bluetooth.BondDeviceConnectType
+import com.lunacattus.connection.model.bluetooth.BondDevice
+import com.lunacattus.connection.model.bluetooth.BondDeviceConnectType
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 import com.lunacattus.ui_design.compose.overScrollVertical
 
@@ -127,6 +127,7 @@ private fun BondedDeviceItem(
         Icon(
             imageVector = Icons.Rounded.Settings,
             contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .size(24.dp)
                 .clickableWithDebounce {

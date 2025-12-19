@@ -178,17 +178,12 @@ class BluetoothRepository @Inject constructor(
         return bondedDevices.toList()
     }
 
-    fun getBluetoothProfile(): List<String> {
-        val profiles: List<Int> = adapter.getSupportedProfiles()
-        Logger.d(TAG, "profiles: $profiles")
-        val list = profiles.map {
-            profileIdToString(it)
-        }
-        return list
+    fun getBluetoothProfile(): List<Int> {
+        return adapter.getSupportedProfiles()
     }
 
-    fun getLocalUuids(): Array<ParcelUuid> {
-        return adapter.getUuids()
+    fun getLocalUuids(): List<ParcelUuid> {
+        return adapter.getUuids().toList()
     }
 
     fun getAddress(): String {
@@ -244,44 +239,13 @@ class BluetoothRepository @Inject constructor(
         }
 
         context.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_UUID))
-        device.fetchUuidsWithSdp()
+        if (device.uuids?.isNotEmpty() == true) {
+            trySend(device.uuids.toList())
+        } else {
+            device.fetchUuidsWithSdp()
+        }
 
         awaitClose { context.unregisterReceiver(receiver) }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun profileIdToString(profileId: Int): String {
-        return when (profileId) {
-            BluetoothProfile.HEADSET -> "HEADSET"
-            BluetoothProfile.A2DP -> "A2DP"
-            BluetoothProfile.HEALTH -> "HEALTH"
-            BluetoothProfile.HID_HOST -> "HID_HOST"
-            BluetoothProfile.PAN -> "PAN"
-            BluetoothProfile.PBAP -> "PBAP"
-            BluetoothProfile.GATT -> "GATT"
-            BluetoothProfile.GATT_SERVER -> "GATT_SERVER"
-            BluetoothProfile.MAP -> "MAP"
-            BluetoothProfile.SAP -> "SAP"
-            BluetoothProfile.A2DP_SINK -> "A2DP_SINK"
-            BluetoothProfile.AVRCP_CONTROLLER -> "AVRCP_CONTROLLER"
-            BluetoothProfile.AVRCP -> "AVRCP"
-            BluetoothProfile.HEADSET_CLIENT -> "HEADSET_CLIENT"
-            BluetoothProfile.PBAP_CLIENT -> "PBAP_CLIENT"
-            BluetoothProfile.MAP_CLIENT -> "MAP_CLIENT"
-            BluetoothProfile.HID_DEVICE -> "HID_DEVICE"
-            BluetoothProfile.OPP -> "OPP"
-            BluetoothProfile.HEARING_AID -> "HEARING_AID"
-            BluetoothProfile.LE_AUDIO -> "LE_AUDIO"
-            BluetoothProfile.VOLUME_CONTROL -> "VOLUME_CONTROL"
-            BluetoothProfile.MCP_SERVER -> "MCP_SERVER"
-            BluetoothProfile.CSIP_SET_COORDINATOR -> "CSIP_SET_COORDINATOR"
-            BluetoothProfile.LE_AUDIO_BROADCAST -> "LE_AUDIO_BROADCAST"
-            BluetoothProfile.LE_CALL_CONTROL -> "LE_CALL_CONTROL"
-            BluetoothProfile.HAP_CLIENT -> "HAP_CLIENT"
-            BluetoothProfile.LE_AUDIO_BROADCAST_ASSISTANT -> "LE_AUDIO_BROADCAST_ASSISTANT"
-            BluetoothProfile.BATTERY -> "BATTERY"
-            else -> "UNKNOWN_PROFILE ($profileId)"
-        }
     }
 
     private fun BluetoothDevice.isBonded(): Boolean {
