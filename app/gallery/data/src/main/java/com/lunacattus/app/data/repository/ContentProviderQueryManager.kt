@@ -65,16 +65,18 @@ class ContentProviderQueryManager<T : Any> @AssistedInject constructor(
     private val contentResolver = context.contentResolver
     private val loadingMutex = Mutex()
 
-    private val observer = MediaContentObserver(Handler(Looper.getMainLooper()))
+    private val observer = MediaContentObserver(Handler(Looper.getMainLooper())) {
+        Logger.d(TAG, "onChange: $it")
+        if (it == null) return@MediaContentObserver
+        scope.launch(Dispatchers.IO) {
+            handleContentChange(it)
+        }
+    }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    private inner class MediaContentObserver(handler: Handler) : ContentObserver(handler) {
+    private class MediaContentObserver(handler: Handler, val change: (Uri?) -> Unit) : ContentObserver(handler) {
         override fun onChange(selfChange: Boolean, changedUri: Uri?) {
-            Logger.d(TAG, "onChange: $changedUri")
-            if (changedUri == null) return
-            scope.launch(Dispatchers.IO) {
-                handleContentChange(changedUri)
-            }
+            change(changedUri)
         }
     }
 

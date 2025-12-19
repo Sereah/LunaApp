@@ -4,6 +4,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 // 1. 定义一个 extension class 来持有版本信息
 open class FrameworkJarExtension {
@@ -36,10 +37,15 @@ class FrameworkJarConventionPlugin : Plugin<Project> {
 
             dependencies {
                 "compileOnly"(files(dependencyFiles))
+                "ksp"(files(dependencyFiles))
             }
             tasks.withType<JavaCompile>().configureEach {
                 val originalClasspath = options.bootstrapClasspath?.files ?: emptySet()
                 options.bootstrapClasspath = files(dependencyFiles, originalClasspath)
+            }
+            tasks.withType<KotlinCompile>().configureEach {
+                val currentLibraries = libraries
+                libraries.setFrom(dependencyFiles, currentLibraries)
             }
         }
     }
