@@ -8,7 +8,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,7 +49,7 @@ import com.lunacattus.nav3test.ui.base.NavigationState
 import com.lunacattus.nav3test.ui.base.Navigator
 import com.lunacattus.nav3test.ui.base.rememberNavigationState
 import com.lunacattus.nav3test.ui.base.toEntries
-import com.lunacattus.nav3test.ui.section.bluetooth.BluetoothRoute
+import com.lunacattus.nav3test.ui.section.bluetooth.BluetoothHomeRoute
 import com.lunacattus.nav3test.ui.section.bluetooth.bluetoothSection
 import com.lunacattus.nav3test.ui.section.root.rootSection
 import com.lunacattus.nav3test.ui.section.wifi.WifiRoute
@@ -84,7 +83,7 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 val rootBackStack = rememberNavBackStack(MainGraph)
                 val innerNavigationState = rememberNavigationState(
-                    startRoute = BluetoothRoute,
+                    startRoute = BluetoothHomeRoute,
                     topLevelRoutesKey = topLevelRoutes.keys
                 )
                 val navigator = remember(rootBackStack, innerNavigationState) {
@@ -158,7 +157,7 @@ private data class NavBarItem(
 )
 
 private val topLevelRoutes = mapOf(
-    BluetoothRoute to NavBarItem(icon = Icons.Rounded.Bluetooth, title = "Bluetooth"),
+    BluetoothHomeRoute to NavBarItem(icon = Icons.Rounded.Bluetooth, title = "Bluetooth"),
     WifiRoute to NavBarItem(icon = Icons.Rounded.Wifi, title = "Wi-Fi")
 )
 
@@ -224,7 +223,7 @@ fun ToastView() {
     var toastEvent by remember { mutableStateOf<Pair<String, Long>?>(null) }
 
     LaunchedEffect(Unit) {
-        ActivitySideEffect.events.collect {
+        ActivityToastEvent.events.collect {
             toastEvent = when (it) {
                 is ActivityEvent.LogError -> {
                     it.throwable.toString() to it.id

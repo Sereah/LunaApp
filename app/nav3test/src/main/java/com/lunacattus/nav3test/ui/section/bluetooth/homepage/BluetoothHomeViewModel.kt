@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.logger.Logger
 import com.lunacattus.nav3test.domain.bluetooth.BluetoothRepository
+import com.lunacattus.nav3test.ui.section.bluetooth.BtLocalInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -90,17 +91,10 @@ class BluetoothHomeViewModel @Inject constructor(
 
 data class BluetoothHomeUiState(
     val btState: Int = BluetoothAdapter.STATE_OFF,
-    val info: BtInfo = BtInfo()
+    val info: BtLocalInfo = BtLocalInfo()
 )
 
 sealed interface BluetoothHomeUiIntent {
     data object LoadInfo : BluetoothHomeUiIntent
     data object SwitchEnable : BluetoothHomeUiIntent
 }
-
-data class BtInfo(
-    val profiles: String = "",
-    val address: String = "",
-    val name: String = "",
-    val uuidList: List<String> = emptyList()
-)

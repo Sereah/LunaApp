@@ -1,12 +1,12 @@
 package com.lunacattus.nav3test.ui.section.bluetooth.discovery
 
-import android.bluetooth.BluetoothDevice
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.logger.Logger
 import com.lunacattus.nav3test.domain.bluetooth.BluetoothRepository
 import com.lunacattus.nav3test.ui.ActivityEvent
-import com.lunacattus.nav3test.ui.ActivitySideEffect
+import com.lunacattus.nav3test.ui.ActivityToastEvent
+import com.lunacattus.nav3test.ui.section.bluetooth.DiscoveryDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -73,7 +73,7 @@ class BluetoothDiscoveryViewModel @Inject constructor(
             }
             val success = repository.pairDevice(device.device)
             if (success) {
-                ActivitySideEffect.send(ActivityEvent.ShowToast("配对成功"))
+                ActivityToastEvent.send(ActivityEvent.ShowToast("配对成功"))
                 reduce { copy(successBonded = true) }
             }
         }
@@ -87,11 +87,6 @@ class BluetoothDiscoveryViewModel @Inject constructor(
         const val TAG = "BluetoothDiscoveryViewModel"
     }
 }
-
-data class DiscoveryDevice(
-    val device: BluetoothDevice,
-    val isBonding: Boolean = false
-)
 
 data class BluetoothDiscoveryUiState(
     val discoveryDeviceList: List<DiscoveryDevice> = emptyList(),

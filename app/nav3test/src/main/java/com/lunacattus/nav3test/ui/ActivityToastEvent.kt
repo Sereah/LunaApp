@@ -3,7 +3,7 @@ package com.lunacattus.nav3test.ui
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
-object ActivitySideEffect {
+object ActivityToastEvent {
     private val _events = MutableSharedFlow<ActivityEvent>()
     val events: SharedFlow<ActivityEvent> = _events
 

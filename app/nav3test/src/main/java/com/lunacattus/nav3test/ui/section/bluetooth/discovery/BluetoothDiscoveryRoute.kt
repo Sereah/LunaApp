@@ -18,9 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBackIosNew
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lunacattus.nav3test.ui.section.bluetooth.DiscoveryDevice
 import com.lunacattus.nav3test.ui.theme.immediatelyIn
 import com.lunacattus.nav3test.ui.theme.immediatelyOut
 import com.lunacattus.ui_design.compose.Spinner
@@ -42,7 +40,7 @@ import com.lunacattus.ui_design.compose.clickableWithDebounce
 import com.lunacattus.ui_design.compose.overScrollVertical
 
 @Composable
-fun BtDiscoveryRoute(
+fun BluetoothDiscoveryRoute(
     localDeviceName: String,
     viewModel: BluetoothDiscoveryViewModel,
     onSuccessBonded: () -> Unit
@@ -101,7 +99,6 @@ private fun DiscoveryTitle(
     sendUiIntent: (BluetoothDiscoveryUiIntent) -> Unit
 ) {
     Column {
-        Text("扫描新设备", fontSize = 24.sp, color = MaterialTheme.colorScheme.onBackground)
         Spacer(Modifier.height(10.dp))
         Text("设备名称", fontSize = 20.sp, color = MaterialTheme.colorScheme.onBackground)
         Text(

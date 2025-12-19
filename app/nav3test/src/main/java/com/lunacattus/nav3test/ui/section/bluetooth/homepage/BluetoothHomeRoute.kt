@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +38,7 @@ import com.lunacattus.ui_design.compose.clickableWithDebounce
 import com.lunacattus.ui_design.compose.overScrollVertical
 
 @Composable
-fun BluetoothRoute(
+fun BluetoothHomeRoute(
     viewModel: BluetoothHomeViewModel,
     navToBtDiscovery: (localDeviceName: String) -> Unit,
     navToBtBonded: () -> Unit
@@ -99,7 +98,7 @@ private fun functionList(): List<BtFunction> {
         ),
         BtFunction(
             type = Type.BONDED,
-            title = "已绑定设备",
+            title = "保存的设备",
             icon = Icons.Rounded.BluetoothConnected
         )
     )

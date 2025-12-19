@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.ParcelUuid
 import androidx.core.content.ContextCompat
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -31,7 +32,7 @@ import kotlin.coroutines.resume
 @Singleton
 @SuppressLint("MissingPermission")
 class BluetoothRepository @Inject constructor(
-    @param:ApplicationContext private val context: Context,
+    @param:ApplicationContext val context: Context,
     private val adapter: BluetoothAdapter
 ) {
     private val _state = MutableStateFlow(STATE_OFF)
@@ -65,6 +66,25 @@ class BluetoothRepository @Inject constructor(
             Logger.d(TAG, "deviceConnectStateChange callback awaitClose")
             adapter.unregisterBluetoothConnectionCallback(callback)
         }
+    }
+
+    fun fetchDeviceUuids(device: BluetoothDevice): Flow<List<ParcelUuid>> = callbackFlow {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val d: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                if (d?.address == device.address) {
+                    val uuidExtra = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID)
+                    val uuids = uuidExtra?.filterIsInstance<ParcelUuid>() ?: emptyList()
+                    trySend(uuids)
+                    channel.close()
+                }
+            }
+        }
+
+        context.registerReceiver(receiver, IntentFilter(BluetoothDevice.ACTION_UUID))
+        device.fetchUuidsWithSdp()
+
+        awaitClose { context.unregisterReceiver(receiver) }
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -171,19 +191,6 @@ class BluetoothRepository @Inject constructor(
         return device.fetchUuidsWithSdp()
     }
 
-    suspend fun asyncDeviceUuids(device: BluetoothDevice): List<String> {
-        return suspendCancellableCoroutine { continuation ->
-            val receiver = createUuidReceiver(device, continuation)
-            context.registerReceiver(
-                receiver,
-                IntentFilter(BluetoothDevice.ACTION_UUID)
-            )
-            if (!device.fetchUuidsWithSdp()) {
-                context.unregisterReceiver(receiver)
-            }
-        }
-    }
-
     fun getBondedDevices(): List<BluetoothDevice> {
         val bondedDevices = adapter.bondedDevices
         Logger.d(TAG, "bondedDevices: $bondedDevices")
@@ -234,6 +241,9 @@ class BluetoothRepository @Inject constructor(
         }
     }
 
+    fun getRemoteDevice(address: String): BluetoothDevice {
+        return adapter.getRemoteDevice(address)
+    }
 
     @Suppress("DEPRECATION")
     private fun profileIdToString(profileId: Int): String {
@@ -290,27 +300,6 @@ class BluetoothRepository @Inject constructor(
                 continuation,
                 this
             )
-        }
-    }
-
-    private fun createUuidReceiver(
-        target: BluetoothDevice,
-        continuation: CancellableContinuation<List<String>>
-    ): BroadcastReceiver = object : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-            val uuids = intent.getParcelableArrayExtra(
-                BluetoothDevice.EXTRA_UUID,
-                Array<UUID>::class.java
-            )?.map { it.toString() } ?: emptyList()
-            val device = intent.getParcelableExtra(
-                BluetoothDevice.EXTRA_DEVICE,
-                BluetoothDevice::class.java
-            )
-            if (uuids.isNotEmpty() && target.address == device?.address && continuation.isActive) {
-                continuation.resume(uuids)
-                context.unregisterReceiver(this)
-            }
         }
     }
 
