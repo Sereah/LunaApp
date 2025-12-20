@@ -7,6 +7,7 @@ import com.lunacattus.connection.domain.bluetooth.BluetoothRepository
 import com.lunacattus.connection.domain.bluetooth.HfpProfileRepository
 import com.lunacattus.connection.model.bluetooth.BondDevice
 import com.lunacattus.connection.model.bluetooth.BondDeviceConnectType
+import com.lunacattus.connection.ui.section.bluetooth.bonded.BluetoothBondedViewModel
 import com.lunacattus.logger.Logger
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -14,11 +15,13 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.collections.map
 
 @HiltViewModel(assistedFactory = BtDeviceDetailViewModel.Factory::class)
 @SuppressLint("MissingPermission")
@@ -40,7 +43,8 @@ class BtDeviceDetailViewModel @AssistedInject constructor(
         Logger.d(TAG, "init, address: $address")
         loadDevice(address)
         viewModelScope.launch {
-            loadProfileList()
+            launch { loadProfileList() }
+            launch { processDeviceConnectStateChange() }
         }
     }
 
@@ -104,6 +108,25 @@ class BtDeviceDetailViewModel @AssistedInject constructor(
                     selectDevice = selectDevice?.copy(
                         uuidList = it
                     )
+                )
+            }
+        }
+    }
+
+    private suspend fun processDeviceConnectStateChange() {
+        repository.deviceConnectStateChange.collectLatest { (address, isConnected) ->
+            Logger.d(
+                TAG,
+                "collect deviceConnectStateChange: $address, isConnected: $isConnected"
+            )
+            val connectType = if (isConnected) {
+                BondDeviceConnectType.Connected
+            } else {
+                BondDeviceConnectType.Disconnected
+            }
+            reduce {
+                copy(
+                    selectDevice = selectDevice?.copy(connectType = connectType)
                 )
             }
         }
