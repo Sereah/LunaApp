@@ -9,15 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BluetoothConnected
@@ -31,6 +28,7 @@ import androidx.compose.material.icons.rounded.AlignVerticalBottom
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Link
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -55,8 +53,10 @@ import com.lunacattus.connection.model.bluetooth.getPreciseType
 import com.lunacattus.connection.model.bluetooth.isCommonUuid
 import com.lunacattus.connection.model.bluetooth.isVendorUuid
 import com.lunacattus.ui_design.compose.clickableWithDebounce
+import com.lunacattus.ui_design.compose.dialog.DialogActions
 import com.lunacattus.ui_design.compose.dialog.MessageContent
 import com.lunacattus.ui_design.compose.dialog.MessageDialog
+import com.lunacattus.ui_design.compose.dialog.MessageDialogDefaults
 import com.lunacattus.ui_design.compose.overScrollVertical
 
 @Composable
@@ -93,6 +93,7 @@ fun DeviceDetailScreen(
     onBack: () -> Unit
 ) {
     var showUuidDetail by remember { mutableStateOf<ParcelUuid?>(null) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
 
     val uuidList = selectedDevice.uuidList.filter {
         it.isVendorUuid() || it.isCommonUuid()
@@ -108,13 +109,31 @@ fun DeviceDetailScreen(
         //设备图标和名字
         item { DeviceIconAndName(selectedDevice) }
         //连接控制
-        item { DeviceControl(selectedDevice, sendUiIntent, onBack) }
+        item {
+            DeviceControl(selectedDevice, sendUiIntent) {
+                showDeleteConfirm = true
+            }
+        }
         item { Text("UUID列表", fontSize = 18.sp, modifier = Modifier.padding(top = 20.dp)) }
-        items(items = uuidList, key = { it }) { uuid ->
-            UuidItem(
-                uuid = uuid,
-                showDetail = { showUuidDetail = uuid },
-                goTo = {})
+        item {
+            Column(
+                modifier = Modifier
+                    .background(
+                        MaterialTheme.colorScheme.surfaceContainerHighest,
+                        RoundedCornerShape(12.dp)
+                    )
+                    .padding(horizontal = 15.dp)
+            ) {
+                uuidList.forEach { uuid ->
+                    UuidItem(
+                        uuid = uuid,
+                        showDetail = { showUuidDetail = uuid },
+                        goTo = {})
+                    if (uuid != uuidList.last()) {
+                        HorizontalDivider()
+                    }
+                }
+            }
         }
         //设备地址
         item { AddressBottom(selectedDevice) }
@@ -127,6 +146,23 @@ fun DeviceDetailScreen(
             },
             message = MessageContent.Text(
                 value = showUuidDetail.toString()
+            )
+        )
+    }
+
+    if(showDeleteConfirm) {
+        MessageDialog(
+            onDismissRequest = {
+                showDeleteConfirm = false
+            },
+            message = MessageContent.Text(value = "确认删除 ${selectedDevice.device.name} ？"),
+            actions = DialogActions(
+                confirmButtonText = "确认",
+                cancelButtonText = "取消",
+                onConfirm = {
+                    sendUiIntent.invoke(BtDeviceDetailUiIntent.ForgetDevice)
+                    onBack()
+                }
             )
         )
     }
@@ -166,7 +202,7 @@ private fun DeviceIconAndName(selectedDevice: BondDevice) {
 private fun DeviceControl(
     selectedDevice: BondDevice,
     sendUiIntent: (BtDeviceDetailUiIntent) -> Unit,
-    onBack: () -> Unit,
+    onDeleteDevice: (BondDevice) -> Unit,
 ) {
     val connectState = selectedDevice.connectType
     val isConnected = connectState == BondDeviceConnectType.Connected
@@ -187,22 +223,21 @@ private fun DeviceControl(
         BondDeviceConnectType.Disconnected -> "连接"
     }
     val actionColor =
-        if (isConnected || isDisconnected) MaterialTheme.colorScheme.primary
+        if (isConnected || isDisconnected) MaterialTheme.colorScheme.tertiary
         else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
 
     Row(
         modifier = Modifier
-            .height(60.dp)
             .fillMaxWidth()
+            .height(80.dp)
             .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp)),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
                 .clickableWithDebounce {
-                    sendUiIntent.invoke(BtDeviceDetailUiIntent.ForgetDevice)
-                    onBack()
+                    onDeleteDevice(selectedDevice)
                 },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -211,15 +246,13 @@ private fun DeviceControl(
                 imageVector = Icons.Rounded.Delete,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(25.dp)
+                modifier = Modifier.size(30.dp)
             )
-            Text("取消保存", fontSize = 14.sp, color = MaterialTheme.colorScheme.error)
+            Spacer(modifier = Modifier.height(5.dp))
+            Text("取消保存", fontSize = 16.sp, color = MaterialTheme.colorScheme.error)
         }
         VerticalDivider(
             modifier = Modifier
-                .width(0.5.dp)
-                .fillMaxHeight()
-                .background(MaterialTheme.colorScheme.outlineVariant)
         )
         Column(
             modifier = Modifier
@@ -235,11 +268,12 @@ private fun DeviceControl(
                 contentDescription = null,
                 tint = actionColor,
                 modifier = Modifier
-                    .size(25.dp)
+                    .size(30.dp)
             )
+            Spacer(modifier = Modifier.height(5.dp))
             Text(
                 color = actionColor,
-                text = actionText, fontSize = 14.sp
+                text = actionText, fontSize = 16.sp
             )
         }
     }
@@ -250,12 +284,7 @@ private fun UuidItem(uuid: ParcelUuid, showDetail: () -> Unit, goTo: () -> Unit)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(horizontal = 15.dp)
+            .height(50.dp)
             .clickableWithDebounce {
                 showDetail()
             },
@@ -267,7 +296,7 @@ private fun UuidItem(uuid: ParcelUuid, showDetail: () -> Unit, goTo: () -> Unit)
         Icon(
             imageVector = Icons.Rounded.Link,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.secondary,
             modifier = Modifier.clickableWithDebounce {
                 goTo()
             }

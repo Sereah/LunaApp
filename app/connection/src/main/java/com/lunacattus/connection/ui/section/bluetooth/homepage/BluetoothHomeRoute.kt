@@ -3,6 +3,7 @@ package com.lunacattus.connection.ui.section.bluetooth.homepage
 import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.NavigateNext
@@ -21,7 +21,9 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.BluetoothConnected
 import androidx.compose.material.icons.rounded.CastConnected
 import androidx.compose.material.icons.rounded.LocalOffer
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -79,13 +81,27 @@ fun BluetoothScreen(
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         item { BtSwitchItem(uiState.btState, sendUiIntent) }
-        items(items = functionList(), key = { it.type }) { function ->
-            FunctionItem(function.icon, function.title) {
-                when (function.type) {
-                    Type.ADD_NEW -> navToBtDiscovery(uiState.info.name)
-                    Type.BONDED -> navToBtBonded()
-                    Type.LOCAL_PROFILE -> showProfileDialog = true
-                    Type.LOCAL_UUIDS -> showUuidsDialog = true
+        item {
+            Column(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .padding(10.dp)
+            ) {
+                functionList().forEach { function ->
+                    FunctionItem(function.icon, function.title) {
+                        when (function.type) {
+                            Type.ADD_NEW -> navToBtDiscovery(uiState.info.name)
+                            Type.BONDED -> navToBtBonded()
+                            Type.LOCAL_PROFILE -> showProfileDialog = true
+                            Type.LOCAL_UUIDS -> showUuidsDialog = true
+                        }
+                    }
+                    if (function != functionList().last()) {
+                        HorizontalDivider()
+                    }
                 }
             }
         }
@@ -155,10 +171,6 @@ private fun FunctionItem(
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
-            .background(
-                MaterialTheme.colorScheme.surfaceVariant,
-                RoundedCornerShape(10.dp)
-            )
             .padding(10.dp)
             .clickableWithDebounce {
                 onClick.invoke()
@@ -166,7 +178,7 @@ private fun FunctionItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         CompositionLocalProvider(
-            LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant
+            LocalContentColor provides MaterialTheme.colorScheme.onSurface
         ) {
             Icon(
                 imageVector = icon,
@@ -182,9 +194,8 @@ private fun FunctionItem(
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.NavigateNext,
                 contentDescription = null,
-                modifier = Modifier.size(25.dp)
+                modifier = Modifier.size(30.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 }
@@ -203,7 +214,7 @@ private fun BtSwitchItem(btState: Int, sendUiIntent: (BluetoothHomeUiIntent) -> 
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Text("蓝牙开关", fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("蓝牙开关", fontSize = 20.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.weight(1f))
         CustomSwitch(
             colors = SwitchDefaults.colors()

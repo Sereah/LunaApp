@@ -150,7 +150,7 @@ private fun DiscoveryDeviceItem(
             .fillMaxWidth()
             .height(40.dp)
             .background(
-                MaterialTheme.colorScheme.surfaceVariant,
+                MaterialTheme.colorScheme.surfaceContainerLow,
                 RoundedCornerShape(10.dp)
             )
             .padding(horizontal = 10.dp)
@@ -163,7 +163,7 @@ private fun DiscoveryDeviceItem(
         Text(
             device.device.name ?: device.device.address,
             fontSize = 15.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(Modifier.weight(1f))
         AnimatedVisibility(
