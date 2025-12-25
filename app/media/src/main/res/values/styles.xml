@@ -18,11 +18,22 @@
         <item name="android:windowExitAnimation">@anim/slide_out_right</item>
     </style>
 
-
     <!-- 从底部滑入，滑出到底部 -->
     <style name="AnimationBottom">
         <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
+    </style>
+
+    <!-- 放大缩小 -->
+    <style name="AnimationScale">
+        <item name="android:windowEnterAnimation">@anim/scale_in</item>
+        <item name="android:windowExitAnimation">@anim/scale_out</item>
+    </style>
+
+    <!-- 放大缩小并淡入淡出 -->
+    <style name="AnimationScaleFade">
+        <item name="android:windowEnterAnimation">@anim/scale_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/scale_fade_out</item>
     </style>
 
 

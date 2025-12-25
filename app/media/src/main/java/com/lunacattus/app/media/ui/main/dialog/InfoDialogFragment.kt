@@ -40,7 +40,7 @@ class InfoDialogFragment : BaseDialogFragment<
             marginX = 40,
             gravity = Gravity.CENTER,
             hasCustomBackground = true,
-            windowAnimations = R.style.AnimationFade
+            windowAnimations = R.style.AnimationScaleFade
         )
     }
 }
