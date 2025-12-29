@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":ui-design"))
     implementation(project(":common"))
     implementation(project(":logger"))
+    implementation(project(":feature:speech"))
     implementation(libs.haze.android)
     implementation(libs.haze.material)
 }

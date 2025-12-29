@@ -82,7 +82,7 @@ fun Main(navState: NavigationState, navigator: Navigator) {
 @Composable
 private fun TopBar(navigator: Navigator, navState: NavigationState, hazeState: HazeState) {
     CenterAlignedTopAppBar(
-        title = { Text(navState.currentRoute.name) },
+        title = { Text(topLevelRoutes[navState.currentRoute]?.title ?: "") },
         colors = TopAppBarDefaults.topAppBarColors().copy(
             containerColor = Color.Transparent,
             scrolledContainerColor = Color.Transparent,

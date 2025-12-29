@@ -73,6 +73,7 @@ data class MessageDialogStyle(
 
 @Immutable
 data class DialogActions(
+    val dismissOnClickOutside: Boolean = true,
     val confirmButtonText: String? = null,
     val onConfirm: (() -> Unit)? = null,
     val cancelButtonText: String? = null,
@@ -111,6 +112,7 @@ object MessageDialogDefaults {
 
     @Composable
     fun actions(
+        dismissOnClickOutside: Boolean = true,
         confirmButtonText: String? = null,
         onConfirm: (() -> Unit)? = null,
         cancelButtonText: String? = null,
@@ -119,7 +121,8 @@ object MessageDialogDefaults {
         confirmButtonText = confirmButtonText,
         onConfirm = onConfirm,
         cancelButtonText = cancelButtonText,
-        onCancel = onCancel
+        onCancel = onCancel,
+        dismissOnClickOutside = dismissOnClickOutside
     )
 
     @Composable
@@ -180,7 +183,7 @@ fun MessageDialog(
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
             dismissOnBackPress = true,
-            dismissOnClickOutside = true
+            dismissOnClickOutside = actions.dismissOnClickOutside
         )
     ) {
         (LocalView.current.parent as? DialogWindowProvider)?.window?.setDimAmount(style.dimAmount)

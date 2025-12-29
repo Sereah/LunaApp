@@ -1,5 +1,6 @@
 package com.lunacattus.conflux.ui
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -34,6 +35,7 @@ import com.lunacattus.conflux.ui.sections.home.HomeRoute
 import com.lunacattus.conflux.ui.sections.media.MediaRoute
 import com.lunacattus.conflux.ui.theme.LunaAppTheme
 import com.lunacattus.ui_design.compose.dialog.OverlayToast
+import com.lunacattus.conflux.permission.PermissionHost
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -47,37 +49,46 @@ class MainActivity : ComponentActivity() {
             )
         )
         setContent {
-            LunaAppTheme {
-                val rootBackStack = rememberNavBackStack(MainGraph)
-                val innerNavigationState = rememberNavigationState(
-                    startRoute = HomeRoute,
-                    topLevelRoutesKey = topLevelRoutes.keys
-                )
-                val navigator = remember(rootBackStack, innerNavigationState) {
-                    Navigator(
-                        innerState = innerNavigationState,
-                        rootBackStack = rootBackStack
-                    )
+            PermissionHost(
+                permissions = listOf(
+                    Manifest.permission.RECORD_AUDIO,
+                ),
+                onPermissionDenied = {
+                    finish()
                 }
-                CompositionLocalProvider(LocalNavigator provides navigator) {
-                    NavDisplay(
-                        entries = rememberDecoratedNavEntries(
-                            backStack = rootBackStack,
-                            entryDecorators = listOf(
-                                rememberSaveableStateHolderNavEntryDecorator(),
-                                rememberViewModelStoreNavEntryDecorator()
-                            ),
-                            entryProvider = entryProvider {
-                                entry<MainGraph> {
-                                    Main(innerNavigationState, navigator)
+            ) {
+                LunaAppTheme {
+                    val rootBackStack = rememberNavBackStack(MainGraph)
+                    val innerNavigationState = rememberNavigationState(
+                        startRoute = HomeRoute,
+                        topLevelRoutesKey = topLevelRoutes.keys
+                    )
+                    val navigator = remember(rootBackStack, innerNavigationState) {
+                        Navigator(
+                            innerState = innerNavigationState,
+                            rootBackStack = rootBackStack
+                        )
+                    }
+                    CompositionLocalProvider(LocalNavigator provides navigator) {
+                        NavDisplay(
+                            entries = rememberDecoratedNavEntries(
+                                backStack = rootBackStack,
+                                entryDecorators = listOf(
+                                    rememberSaveableStateHolderNavEntryDecorator(),
+                                    rememberViewModelStoreNavEntryDecorator()
+                                ),
+                                entryProvider = entryProvider {
+                                    entry<MainGraph> {
+                                        Main(innerNavigationState, navigator)
+                                    }
                                 }
-                            }
-                        ),
-                        onBack = { navigator.goBack() },
-                    )
+                            ),
+                            onBack = { navigator.goBack() },
+                        )
+                    }
                 }
-                ToastView()
             }
+            ToastView()
         }
     }
 }
