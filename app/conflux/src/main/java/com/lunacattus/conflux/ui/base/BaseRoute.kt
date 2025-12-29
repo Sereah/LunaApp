@@ -1,4 +1,4 @@
-package com.lunacattus.connection.ui.base
+package com.lunacattus.conflux.ui.base
 
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,7 +16,7 @@ interface RootRoute : BaseRoute //根栈的路由分类
 interface MainRoute : BaseRoute //嵌套NavDisplay的路由分类
 
 @Serializable
-data object MainGraph: NavKey //代表嵌套NavDisplay的路由放在根栈
+data object MainGraph : NavKey //代表嵌套NavDisplay的路由放在根栈
 
 inline fun <reified R : NavKey, reified VM : ViewModel>
         EntryProviderScope<NavKey>.entryWithVm(
@@ -35,7 +35,6 @@ inline fun <reified R : NavKey>
         content(it, LocalNavigator.current)
     }
 }
-
 
 inline fun <reified R : NavKey, reified VM : ViewModel>
         EntryProviderScope<NavKey>.entryWithNavAndVm(
