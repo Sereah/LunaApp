@@ -3,9 +3,11 @@ package com.lunacattus.conflux.ui.sections.media
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.lunacattus.conflux.ui.base.BaseRoute
-import com.lunacattus.conflux.ui.base.entryWithNavAndVm
+import com.lunacattus.conflux.ui.base.entryWithNav
+import com.lunacattus.conflux.ui.base.entryWithVm
 import com.lunacattus.conflux.ui.sections.media.homepage.MediaRoute
-import com.lunacattus.conflux.ui.sections.media.homepage.MediaViewModel
+import com.lunacattus.conflux.ui.sections.media.speech.asr.AsrRoute
+import com.lunacattus.conflux.ui.sections.media.speech.asr.AsrViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,8 +16,20 @@ data object MediaRoute : BaseRoute {
         get() = "多媒体"
 }
 
+@Serializable
+data object AsrRoute : BaseRoute {
+    override val name: String
+        get() = "ASR识别"
+}
+
 fun EntryProviderScope<NavKey>.mediaSection() {
-    entryWithNavAndVm<MediaRoute, MediaViewModel> { _, navigator, model ->
-        MediaRoute(model)
+    entryWithNav<MediaRoute> { _, navigator ->
+        MediaRoute(
+            navToAsrScreen = { navigator.navigate(AsrRoute) },
+            navToTTSScreen = {}
+        )
+    }
+    entryWithVm<AsrRoute, AsrViewModel> { _, viewmodel ->
+        AsrRoute(viewmodel)
     }
 }

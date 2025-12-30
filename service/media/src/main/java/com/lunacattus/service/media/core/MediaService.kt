@@ -32,14 +32,7 @@ class MediaService : Service() {
     override fun onCreate() {
         super.onCreate()
         Logger.d(TAG, "onCreate.")
-        speech.init(
-            SpeechAuthConfig(
-                apiKey = "734458de88dd734458de88dd68c0e6e7",
-                productId = "279632188",
-                productKey = "7b8fdd95562c767257979f5dd87d3318",
-                productSecret = "8f3ec6dafa59135d6e34e341bcc3a96b"
-            )
-        )
+        speech.init()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
