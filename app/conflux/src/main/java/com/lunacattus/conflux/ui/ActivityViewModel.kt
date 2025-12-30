@@ -13,8 +13,14 @@ class ActivityViewModel @Inject constructor() : ViewModel() {
     var dynamicColor by mutableStateOf(true)
         private set
 
+    var nightMode by mutableStateOf(false)
+        private set
+
     fun changeDynamicColor(enable: Boolean) {
         dynamicColor = enable
     }
 
+    fun changeNightMode(enable: Boolean) {
+        nightMode = enable
+    }
 }

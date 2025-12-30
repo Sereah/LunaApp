@@ -7,6 +7,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
@@ -22,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberDecoratedNavEntries
@@ -56,6 +56,7 @@ class MainActivity : ComponentActivity() {
             )
         )
         setContent {
+            viewModel.changeNightMode(isSystemInDarkTheme())
             PermissionHost(
                 permissions = listOf(
                     Manifest.permission.RECORD_AUDIO,
@@ -64,7 +65,10 @@ class MainActivity : ComponentActivity() {
                     finish()
                 }
             ) {
-                LunaAppTheme(dynamicColor = viewModel.dynamicColor) {
+                LunaAppTheme(
+                    dynamicColor = viewModel.dynamicColor,
+                    darkTheme = viewModel.nightMode
+                ) {
                     val rootBackStack = rememberNavBackStack(MainGraph)
                     val innerNavigationState = rememberNavigationState(
                         startRoute = HomeRoute,
