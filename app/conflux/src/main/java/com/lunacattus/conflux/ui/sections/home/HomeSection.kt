@@ -15,7 +15,7 @@ data object HomeRoute : BaseRoute {
 }
 
 fun EntryProviderScope<NavKey>.homeSection() {
-    entryWithNavAndVm<HomeRoute, HomeViewModel> { _, navigator, viewModel ->
+    entryWithNavAndVm<HomeRoute, HomeViewModel>(animated = false) { _, navigator, viewModel ->
         HomeRoute(viewModel)
     }
 }

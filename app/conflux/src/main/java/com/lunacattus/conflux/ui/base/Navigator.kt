@@ -16,7 +16,7 @@ class Navigator(
 
     fun navigate(route: BaseRoute) {
 
-        Logger.d(TAG, "navigate: $route")
+        Logger.d(TAG, "navigate: $route, innerBackStack: ${innerState.backStacks[innerState.topLevelRoute]?.toList()}")
 
         if (route in innerState.backStacks.keys) {
             innerState.topLevelRoute = route

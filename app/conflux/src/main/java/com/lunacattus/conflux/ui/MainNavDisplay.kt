@@ -72,9 +72,19 @@ fun Main(navState: NavigationState, navigator: Navigator) {
                 ),
                 onBack = { navigator.goBack() },
                 transitionSpec = {
-                    slideInFromRight togetherWith slideOutFromLeft
+                    //根据bottom的左右顺序来做切换动画的进出方向
+                    val topLevels: List<String> =
+                        topLevelRoutes.keys.map { it.toString() }
+                    val fromKey = initialState.key as String
+                    val targetKey = targetState.key as String
+                    if (isMoveToRight(fromKey, targetKey, topLevels)) {
+                        slideInFromRight togetherWith slideOutFromLeft
+                    } else {
+                        slideInFromLeft togetherWith slideOutFromRight
+                    }
                 },
                 popTransitionSpec = {
+                    //每个bottom栈的首页返回都是到home，都是从右退出，home首页从左进
                     slideInFromLeft togetherWith slideOutFromRight
                 },
                 modifier = Modifier
@@ -144,4 +154,14 @@ private fun BottomBar(
 
 val LocalInnerPadding = staticCompositionLocalOf<PaddingValues> {
     error("PaddingValues not provided")
+}
+
+fun isMoveToRight(
+    fromRoute: String,
+    toRoute: String,
+    topLevelRoutes: List<String>
+): Boolean {
+    val fromIndex = topLevelRoutes.indexOf(fromRoute)
+    val toIndex = topLevelRoutes.indexOf(toRoute)
+    return toIndex > fromIndex
 }
