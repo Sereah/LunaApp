@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -18,8 +18,11 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -31,6 +34,7 @@ import com.lunacattus.conflux.ui.base.toEntries
 import com.lunacattus.conflux.ui.sections.connection.connectSection
 import com.lunacattus.conflux.ui.sections.home.homeSection
 import com.lunacattus.conflux.ui.sections.media.mediaSection
+import com.lunacattus.conflux.ui.sections.setting.settingSection
 import com.lunacattus.conflux.ui.theme.slideInFromLeft
 import com.lunacattus.conflux.ui.theme.slideInFromRight
 import com.lunacattus.conflux.ui.theme.slideOutFromLeft
@@ -55,33 +59,36 @@ fun Main(navState: NavigationState, navigator: Navigator) {
         bottomBar = {
             BottomBar(navigator, navState, hazeState)
         }
-    ) { _ ->
-        NavDisplay(
-            entries = navState.toEntries(
-                entryProvider {
-                    homeSection()
-                    connectSection()
-                    mediaSection()
-                }
-            ),
-            onBack = { navigator.goBack() },
-            transitionSpec = {
-                slideInFromRight togetherWith slideOutFromLeft
-            },
-            popTransitionSpec = {
-                slideInFromLeft togetherWith slideOutFromRight
-            },
-            modifier = Modifier
-                .fillMaxSize()
-                .hazeSource(hazeState)
-        )
+    ) { padding ->
+        CompositionLocalProvider(LocalInnerPadding provides padding) {
+            NavDisplay(
+                entries = navState.toEntries(
+                    entryProvider {
+                        homeSection()
+                        connectSection()
+                        mediaSection()
+                        settingSection()
+                    }
+                ),
+                onBack = { navigator.goBack() },
+                transitionSpec = {
+                    slideInFromRight togetherWith slideOutFromLeft
+                },
+                popTransitionSpec = {
+                    slideInFromLeft togetherWith slideOutFromRight
+                },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .hazeSource(hazeState)
+            )
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
 @Composable
 private fun TopBar(navigator: Navigator, navState: NavigationState, hazeState: HazeState) {
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = { Text(topLevelRoutes[navState.currentRoute]?.title ?: "") },
         colors = TopAppBarDefaults.topAppBarColors().copy(
             containerColor = Color.Transparent,
@@ -120,7 +127,7 @@ private fun BottomBar(
                 .height(0.5.dp)
         )
         NavigationBar(
-            windowInsets = WindowInsets(),
+            windowInsets = WindowInsets(bottom = 10.dp),
             modifier = Modifier.hazeEffect(state = hazeState, style = HazeMaterials.ultraThick())
         ) {
             topLevelRoutes.forEach { (key, value) ->
@@ -133,4 +140,8 @@ private fun BottomBar(
             }
         }
     }
+}
+
+val LocalInnerPadding = staticCompositionLocalOf<PaddingValues> {
+    error("PaddingValues not provided")
 }
