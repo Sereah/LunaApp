@@ -10,7 +10,6 @@ import com.lunacattus.logger.Logger
 import com.lunacattus.service.media.R
 import com.lunacattus.service.media.speech.AsrHandler
 import com.lunacattus.speech.Speech
-import com.lunacattus.speech.SpeechAuthConfig
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +31,6 @@ class MediaService : Service() {
     override fun onCreate() {
         super.onCreate()
         Logger.d(TAG, "onCreate.")
-        speech.init()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -44,7 +42,6 @@ class MediaService : Service() {
 
     override fun onDestroy() {
         Logger.d(TAG, "onDestroy.")
-        speech.destroy()
         scope.cancel()
         super.onDestroy()
     }
@@ -72,9 +69,6 @@ class MediaService : Service() {
 
     private fun collectFlow() {
         scope.launch {
-            speech.asrResult.collect {
-                asrHandler.handler(it)
-            }
         }
     }
 
