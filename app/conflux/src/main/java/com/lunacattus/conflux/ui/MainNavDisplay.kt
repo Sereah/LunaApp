@@ -1,6 +1,7 @@
 package com.lunacattus.conflux.ui
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -26,8 +27,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.lunacattus.conflux.ui.base.BaseRoute
 import com.lunacattus.conflux.ui.base.NavigationState
 import com.lunacattus.conflux.ui.base.Navigator
 import com.lunacattus.conflux.ui.base.toEntries
@@ -72,16 +76,36 @@ fun Main(navState: NavigationState, navigator: Navigator) {
                 ),
                 onBack = { navigator.goBack() },
                 transitionSpec = {
-                    //根据bottom的左右顺序来做切换动画的进出方向
-                    val topLevels: List<String> =
-                        topLevelRoutes.keys.map { it.toString() }
-                    val fromKey = initialState.key as String
-                    val targetKey = targetState.key as String
-                    if (isMoveToRight(fromKey, targetKey, topLevels)) {
-                        slideInFromRight togetherWith slideOutFromLeft
-                    } else {
-                        slideInFromLeft togetherWith slideOutFromRight
+
+                    val topLevels = topLevelRoutes.keys.map { it.toString() }
+                    val lastRoute = navState.lastRoute
+                    val currentRoute = navState.currentRoute
+
+                    val transform: ContentTransform = when {
+                        // 顶级 ↔ 顶级
+                        isTopLevelToTopLevel(lastRoute, currentRoute, topLevels) -> {
+                            topLevelTransform(lastRoute, currentRoute, topLevels)
+                        }
+
+                        // 子路由：同一顶级栈
+                        isSameTopLevelStack(lastRoute, currentRoute, navState.backStacks) -> {
+                            slideInFromRight togetherWith slideOutFromLeft
+                        }
+
+                        // 子路由：跨顶级栈
+                        else -> {
+                            val lastTop = lastRoute?.let {
+                                findTopLevelOfRoute(it, navState.backStacks)
+                            }
+                            val currentTop = findTopLevelOfRoute(
+                                currentRoute,
+                                navState.backStacks
+                            )
+                            topLevelTransform(lastTop, currentTop, topLevels)
+                        }
                     }
+
+                    transform
                 },
                 popTransitionSpec = {
                     //每个bottom栈的首页返回都是到home，都是从右退出，home首页从左进
@@ -99,7 +123,7 @@ fun Main(navState: NavigationState, navigator: Navigator) {
 @Composable
 private fun TopBar(navigator: Navigator, navState: NavigationState, hazeState: HazeState) {
     TopAppBar(
-        title = { Text(topLevelRoutes[navState.currentRoute]?.title ?: "") },
+        title = { Text(navState.currentRoute.name) },
         colors = TopAppBarDefaults.topAppBarColors().copy(
             containerColor = Color.Transparent,
             scrolledContainerColor = Color.Transparent,
@@ -156,7 +180,42 @@ val LocalInnerPadding = staticCompositionLocalOf<PaddingValues> {
     error("PaddingValues not provided")
 }
 
-fun isMoveToRight(
+private fun topLevelTransform(
+    from: BaseRoute?,
+    to: BaseRoute?,
+    topLevels: List<String>
+): ContentTransform {
+    return if (isMoveToRight(from.toString(), to.toString(), topLevels)) {
+        slideInFromRight togetherWith slideOutFromLeft
+    } else {
+        slideInFromLeft togetherWith slideOutFromRight
+    }
+}
+
+private fun isSameTopLevelStack(
+    lastRoute: BaseRoute?,
+    currentRoute: BaseRoute,
+    backStacks: Map<BaseRoute, NavBackStack<NavKey>>
+): Boolean {
+    if (lastRoute == null) return false
+
+    val lastTop = findTopLevelOfRoute(lastRoute, backStacks)
+    val currentTop = findTopLevelOfRoute(currentRoute, backStacks)
+
+    return lastTop != null && lastTop == currentTop
+}
+
+private fun isTopLevelToTopLevel(
+    lastRoute: BaseRoute?,
+    currentRoute: BaseRoute,
+    topLevels: List<String>
+): Boolean {
+    return lastRoute != null &&
+            lastRoute.toString() in topLevels &&
+            currentRoute.toString() in topLevels
+}
+
+private fun isMoveToRight(
     fromRoute: String,
     toRoute: String,
     topLevelRoutes: List<String>
@@ -164,4 +223,13 @@ fun isMoveToRight(
     val fromIndex = topLevelRoutes.indexOf(fromRoute)
     val toIndex = topLevelRoutes.indexOf(toRoute)
     return toIndex > fromIndex
+}
+
+private fun findTopLevelOfRoute(
+    route: BaseRoute,
+    backStacks: Map<BaseRoute, NavBackStack<NavKey>>
+): BaseRoute? {
+    return backStacks.entries
+        .firstOrNull { (_, stack) -> stack.contains(route) }
+        ?.key
 }

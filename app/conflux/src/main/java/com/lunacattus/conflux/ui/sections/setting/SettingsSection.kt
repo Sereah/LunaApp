@@ -15,7 +15,7 @@ data object SettingRoute : BaseRoute {
 }
 
 fun EntryProviderScope<NavKey>.settingSection() {
-    entryWithNavAndVm<SettingRoute, SettingViewModel>(animated = false) { _, navigator, model ->
+    entryWithNavAndVm<SettingRoute, SettingViewModel> { _, navigator, model ->
         SettingRoute(model)
     }
 }

@@ -23,7 +23,7 @@ data object AsrRoute : BaseRoute {
 }
 
 fun EntryProviderScope<NavKey>.mediaSection() {
-    entryWithNav<MediaRoute>(animated = false) { _, navigator ->
+    entryWithNav<MediaRoute> { _, navigator ->
         MediaRoute(
             navToAsrScreen = { navigator.navigate(AsrRoute) },
             navToTTSScreen = {}

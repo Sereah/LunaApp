@@ -15,7 +15,7 @@ data object ConnectionRoute : BaseRoute {
 }
 
 fun EntryProviderScope<NavKey>.connectSection() {
-    entryWithNavAndVm<ConnectionRoute, ConnectionViewModel>(animated = false) { _, navigator, model ->
+    entryWithNavAndVm<ConnectionRoute, ConnectionViewModel> { _, navigator, model ->
         ConnectionRoute(model)
     }
 }
