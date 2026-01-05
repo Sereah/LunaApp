@@ -39,3 +39,4 @@ include(":service:media")
 
 include(":feature:speech")
 include(":app:conflux")
+include(":app:mutilscreen")

@@ -8,7 +8,6 @@ import android.content.Intent
 import android.os.IBinder
 import com.lunacattus.logger.Logger
 import com.lunacattus.service.media.R
-import com.lunacattus.service.media.speech.AsrHandler
 import com.lunacattus.speech.Speech
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -23,8 +22,6 @@ class MediaService : Service() {
 
     @Inject
     lateinit var speech: Speech
-
-    @Inject lateinit var asrHandler: AsrHandler
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
