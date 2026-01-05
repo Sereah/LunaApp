@@ -21,6 +21,12 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 }
 
                 signingConfigs {
+                    create("app") {
+                        storeFile = file("$rootDir/keystore/app.jks")
+                        storePassword = "123456"
+                        keyAlias = "app"
+                        keyPassword = "123456"
+                    }
                     create("system") {
                         storeFile = file("$rootDir/keystore/system.jks")
                         storePassword = "123456"
@@ -54,7 +60,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 productFlavors {
                     create("app") {
                         dimension = "platform"
-                        signingConfig = signingConfigs.getByName("debug")
+                        signingConfig = signingConfigs.getByName("app")
                     }
                     create("system") {
                         dimension = "platform"

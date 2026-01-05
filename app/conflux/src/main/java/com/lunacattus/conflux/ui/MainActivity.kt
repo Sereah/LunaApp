@@ -102,9 +102,9 @@ class MainActivity : ComponentActivity() {
                             onBack = { navigator.goBack() },
                         )
                     }
+                    ToastView()
                 }
             }
-            ToastView()
         }
     }
 }
