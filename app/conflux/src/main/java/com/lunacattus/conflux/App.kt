@@ -2,12 +2,12 @@ package com.lunacattus.conflux
 
 import android.app.Application
 import android.content.Context
+import com.lunacattus.common.util.ReceiverSafeContext
 import com.lunacattus.logger.Logger
-import com.lunacattus.speech.util.ReceiverSafeContext
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class App: Application() {
+class App : Application() {
     override fun onCreate() {
         super.onCreate()
         Logger.initBaseTag("Conflux", true)
