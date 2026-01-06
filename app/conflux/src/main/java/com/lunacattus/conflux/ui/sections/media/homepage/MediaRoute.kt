@@ -41,7 +41,7 @@ fun MediaScreen(
 ) {
 
     val voiceBasicItems = listOf(
-        NavigationItem(title = "ASR识别", icon = Icons.Rounded.SpatialAudioOff, onClick = navToAsrScreen),
+        NavigationItem(title = "在线ASR识别", icon = Icons.Rounded.SpatialAudioOff, onClick = navToAsrScreen),
         NavigationItem(title = "TTS合成", icon = Icons.Rounded.SettingsVoice, onClick = navToTTSScreen),
     )
     var voiceBasicCardLockState by remember { mutableStateOf(CardLockState.Lock) }
