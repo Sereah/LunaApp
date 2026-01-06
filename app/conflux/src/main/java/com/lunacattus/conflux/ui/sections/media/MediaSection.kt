@@ -3,9 +3,10 @@ package com.lunacattus.conflux.ui.sections.media
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.lunacattus.conflux.ui.base.BaseRoute
-import com.lunacattus.conflux.ui.base.entryWithNav
+import com.lunacattus.conflux.ui.base.entryWithNavAndVm
 import com.lunacattus.conflux.ui.base.entryWithVm
 import com.lunacattus.conflux.ui.sections.media.homepage.MediaRoute
+import com.lunacattus.conflux.ui.sections.media.homepage.MediaViewModel
 import com.lunacattus.conflux.ui.sections.media.speech.asr.AsrRoute
 import com.lunacattus.conflux.ui.sections.media.speech.asr.AsrViewModel
 import kotlinx.serialization.Serializable
@@ -23,8 +24,9 @@ data object AsrRoute : BaseRoute {
 }
 
 fun EntryProviderScope<NavKey>.mediaSection() {
-    entryWithNav<MediaRoute> { _, navigator ->
+    entryWithNavAndVm<MediaRoute, MediaViewModel> { _, navigator, viewModel ->
         MediaRoute(
+            viewModel = viewModel,
             navToAsrScreen = { navigator.navigate(AsrRoute) },
             navToTTSScreen = {}
         )

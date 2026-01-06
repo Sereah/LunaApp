@@ -1,9 +1,12 @@
 package com.lunacattus.conflux.ui.base
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -11,7 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -26,6 +31,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lunacattus.ui_design.compose.clickableWithDebounce
+import com.lunacattus.ui_design.compose.debouncedOnClick
 
 sealed interface Item {
     val title: String
@@ -132,29 +138,81 @@ fun ItemRow(
 }
 
 @Composable
-fun ItemCard(items: List<Item>, categoryText: String = "") {
-    Column(
+fun ItemCard(
+    items: List<Item>,
+    categoryText: String = "",
+    lockState: CardLockState = CardLockState.UnLock,
+    onLockButtonClick: (CardLockState) -> Unit = {}
+) {
+    Box(
         modifier = Modifier
             .padding(horizontal = 20.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(15.dp)
-            )
+            .fillMaxWidth()
     ) {
-        if (categoryText.isNotEmpty()) {
-            Text(text = categoryText, fontSize = 14.sp, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(8.dp))
-            HorizontalDivider(modifier = Modifier.fillMaxWidth())
-        }
-        items.forEachIndexed { index, item ->
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                ItemRow(item)
-            }
-            if (index != items.lastIndex) {
-                HorizontalDivider(
-                    modifier = Modifier
-                        .padding(start = 58.dp, end = 12.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = RoundedCornerShape(15.dp)
                 )
+        ) {
+            if (categoryText.isNotEmpty()) {
+                Text(
+                    text = categoryText,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(8.dp)
+                )
+                HorizontalDivider(modifier = Modifier.fillMaxWidth())
+            }
+
+            items.forEachIndexed { index, item ->
+                CompositionLocalProvider(
+                    LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant
+                ) {
+                    ItemRow(item)
+                }
+
+                if (index != items.lastIndex) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(start = 58.dp, end = 12.dp)
+                    )
+                }
+            }
+        }
+
+        AnimatedVisibility(
+            visible = lockState != CardLockState.UnLock,
+            modifier = Modifier.matchParentSize()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(15.dp)
+                    )
+                    .clickableWithDebounce { },
+                contentAlignment = Alignment.Center
+            ) {
+                Button(enabled = lockState == CardLockState.Lock, onClick = debouncedOnClick {
+                    onLockButtonClick(lockState)
+                }) {
+                    Icon(Icons.Default.LockOpen, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        when (lockState) {
+                            CardLockState.Lock -> "解锁"
+                            else -> "解锁中"
+                        }
+                    )
+                }
             }
         }
     }
+}
+
+enum class CardLockState {
+    Lock, UnLock, UnLocking
 }

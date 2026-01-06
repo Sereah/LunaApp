@@ -1,12 +1,26 @@
 package com.lunacattus.conflux.ui.sections.media.homepage
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.lunacattus.conflux.ui.ActivityToastEvent
+import com.lunacattus.conflux.ui.ToastEvent
 import com.lunacattus.logger.Logger
+import com.lunacattus.voice.AuthInfo
+import com.lunacattus.voice.Voice
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MediaViewModel @Inject constructor(): ViewModel() {
+class MediaViewModel @Inject constructor(
+    private val voice: Voice
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(MediaHomeUiState())
+    val uiState = _uiState.asStateFlow()
 
     init {
         Logger.d(TAG, "init.")
@@ -17,7 +31,62 @@ class MediaViewModel @Inject constructor(): ViewModel() {
         Logger.d(TAG, "onCleared.")
     }
 
+    fun handleUiIntent(intent: MediaHomeUiIntent) {
+        Logger.d(TAG, "handleUiIntent: $intent")
+        when (intent) {
+            MediaHomeUiIntent.InitVoiceBasic -> initVoiceBasic()
+        }
+    }
+
+    private fun initVoiceBasic() {
+        viewModelScope.launch {
+            reduce { copy(voiceBasicInitState = VoiceBasicState.Authing) }
+            voice.init(authInfo).collect { authResult ->
+                reduce {
+                    copy(
+                        voiceBasicInitState = if (authResult.success) {
+                            VoiceBasicState.Authed
+                        } else {
+                            VoiceBasicState.UnAuth
+                        }
+                    )
+                }
+                ActivityToastEvent.send(
+                    ToastEvent.ShowToast(
+                        if (authResult.success) {
+                            "语音初始化成功"
+                        } else {
+                            "语音初始化失败: ${authResult.msg}"
+                        }
+                    )
+                )
+            }
+        }
+    }
+
+    private fun reduce(reducer: MediaHomeUiState.() -> MediaHomeUiState) {
+        _uiState.update(reducer)
+    }
+
     companion object {
         const val TAG = "MediaViewModel"
+        private val authInfo = AuthInfo(
+            apiKey = "540c772fd3d3540c772fd3d3695bcbc4",
+            productId = "279633473",
+            productKey = "11060f9232830d0de1f7225c33cf93df",
+            productSecret = "a42fad2312eba7d1e41379ec6a6d337f"
+        )
     }
+}
+
+data class MediaHomeUiState(
+    val voiceBasicInitState: VoiceBasicState = VoiceBasicState.UnAuth
+)
+
+sealed interface MediaHomeUiIntent {
+    data object InitVoiceBasic : MediaHomeUiIntent
+}
+
+enum class VoiceBasicState {
+    UnAuth, Authing, Authed
 }
