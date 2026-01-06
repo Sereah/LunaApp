@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.KeyboardVoice
 import androidx.compose.material.icons.rounded.SettingsVoice
 import androidx.compose.material.icons.rounded.SpatialAudioOff
 import androidx.compose.runtime.Composable
@@ -19,6 +20,8 @@ import com.lunacattus.conflux.ui.LocalInnerPadding
 import com.lunacattus.conflux.ui.base.CardLockState
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.NavigationItem
+import com.lunacattus.conflux.ui.base.SwitchItem
+import com.lunacattus.conflux.ui.base.ValueNavigationItem
 import com.lunacattus.ui_design.compose.overScrollVertical
 
 @Composable
@@ -29,15 +32,22 @@ fun MediaRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sendUiIntent = viewModel::handleUiIntent
-    MediaScreen(uiState, sendUiIntent, navToAsrScreen, navToTTSScreen)
+    MediaScreen(
+        uiState, navToAsrScreen, navToTTSScreen,
+        unLockVoiceBasicFeature = { sendUiIntent(MediaHomeUiIntent.InitVoiceBasic) },
+        switchRecord = { sendUiIntent(MediaHomeUiIntent.SwitchRecord(it)) },
+        openRecordingFile = {sendUiIntent(MediaHomeUiIntent.OpenRecordingFile)}
+    )
 }
 
 @Composable
 fun MediaScreen(
     uiState: MediaHomeUiState,
-    sendUiIntent: (intent: MediaHomeUiIntent) -> Unit,
     navToAsrScreen: () -> Unit,
     navToTTSScreen: () -> Unit,
+    unLockVoiceBasicFeature: () -> Unit,
+    switchRecord: (isRecord: Boolean) -> Unit,
+    openRecordingFile: () -> Unit
 ) {
 
     val voiceBasicItems = listOf(
@@ -53,6 +63,22 @@ fun MediaScreen(
         }
     }
 
+    val mediaUtilItems = listOf(
+        SwitchItem(
+            title = "录制音频",
+            summary = if (uiState.isRecord) "录制中" else null,
+            icon = Icons.Rounded.KeyboardVoice,
+            checked = uiState.isRecord,
+            onCheckedChange = switchRecord
+        ),
+        ValueNavigationItem(
+            title = "打开录音文件",
+            icon = Icons.Rounded.KeyboardVoice,
+            valueText = "60",
+            onClick = openRecordingFile
+        )
+    )
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -63,8 +89,12 @@ fun MediaScreen(
 
         item {
             ItemCard(voiceBasicItems, "语音基础功能", lockState = voiceBasicCardLockState) {
-                sendUiIntent(MediaHomeUiIntent.InitVoiceBasic)
+                unLockVoiceBasicFeature()
             }
+        }
+
+        item {
+            ItemCard(mediaUtilItems, "多媒体工具")
         }
     }
 }

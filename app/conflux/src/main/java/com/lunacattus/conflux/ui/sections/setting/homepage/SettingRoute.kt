@@ -1,5 +1,6 @@
 package com.lunacattus.conflux.ui.sections.setting.homepage
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -8,7 +9,6 @@ import androidx.compose.material.icons.rounded.Nightlight
 import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lunacattus.conflux.ui.ActivityViewModel
 import com.lunacattus.conflux.ui.LocalInnerPadding
@@ -20,7 +20,7 @@ import com.lunacattus.ui_design.compose.overScrollVertical
 
 @Composable
 fun SettingRoute(viewModel: SettingViewModel) {
-    val activity = LocalContext.current as MainActivity
+    val activity = LocalActivity.current as MainActivity
     val activityViewModel: ActivityViewModel = hiltViewModel(activity)
     SettingScreen(
         enableDynamicColor = activityViewModel.dynamicColor,

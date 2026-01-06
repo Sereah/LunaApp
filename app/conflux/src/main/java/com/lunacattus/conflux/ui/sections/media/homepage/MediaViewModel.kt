@@ -7,6 +7,7 @@ import com.lunacattus.conflux.ui.ToastEvent
 import com.lunacattus.logger.Logger
 import com.lunacattus.voice.AuthInfo
 import com.lunacattus.voice.Voice
+import com.lunacattus.voice.record.AudioRecordManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MediaViewModel @Inject constructor(
-    private val voice: Voice
+    private val voice: Voice,
+    private val audioRecordManager: AudioRecordManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MediaHomeUiState())
@@ -35,6 +37,8 @@ class MediaViewModel @Inject constructor(
         Logger.d(TAG, "handleUiIntent: $intent")
         when (intent) {
             MediaHomeUiIntent.InitVoiceBasic -> initVoiceBasic()
+            is MediaHomeUiIntent.SwitchRecord -> switchRecord(intent.isRecord)
+            MediaHomeUiIntent.OpenRecordingFile -> openRecordingFile()
         }
     }
 
@@ -64,6 +68,23 @@ class MediaViewModel @Inject constructor(
         }
     }
 
+    private fun switchRecord(isRecord: Boolean) {
+        if (isRecord) {
+            audioRecordManager.start(true)
+        } else {
+            audioRecordManager.stop()
+        }
+        viewModelScope.launch {
+            audioRecordManager.isRecording.collect {
+                reduce { copy(isRecord = it) }
+            }
+        }
+    }
+
+    private fun openRecordingFile() {
+        audioRecordManager.openSystemAudioPicker()
+    }
+
     private fun reduce(reducer: MediaHomeUiState.() -> MediaHomeUiState) {
         _uiState.update(reducer)
     }
@@ -80,11 +101,14 @@ class MediaViewModel @Inject constructor(
 }
 
 data class MediaHomeUiState(
-    val voiceBasicInitState: VoiceBasicState = VoiceBasicState.UnAuth
+    val voiceBasicInitState: VoiceBasicState = VoiceBasicState.UnAuth,
+    val isRecord: Boolean = false
 )
 
 sealed interface MediaHomeUiIntent {
     data object InitVoiceBasic : MediaHomeUiIntent
+    data class SwitchRecord(val isRecord: Boolean) : MediaHomeUiIntent
+    data object OpenRecordingFile: MediaHomeUiIntent
 }
 
 enum class VoiceBasicState {
