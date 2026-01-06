@@ -15,4 +15,5 @@ dependencies {
     implementation(libs.coil.gif)
     implementation(libs.haze.android)
     implementation(libs.haze.material)
+    implementation(libs.lottie)
 }
