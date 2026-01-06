@@ -82,7 +82,7 @@ class MediaViewModel @Inject constructor(
     }
 
     private fun openRecordingFile() {
-        audioRecordManager.openSystemAudioPicker()
+        audioRecordManager.openRecodingFiles()
     }
 
     private fun reduce(reducer: MediaHomeUiState.() -> MediaHomeUiState) {
