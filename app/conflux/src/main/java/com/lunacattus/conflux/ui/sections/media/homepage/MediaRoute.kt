@@ -21,7 +21,6 @@ import com.lunacattus.conflux.ui.base.CardLockState
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.NavigationItem
 import com.lunacattus.conflux.ui.base.SwitchItem
-import com.lunacattus.conflux.ui.base.ValueNavigationItem
 import com.lunacattus.ui_design.compose.overScrollVertical
 
 @Composable
@@ -29,6 +28,7 @@ fun MediaRoute(
     viewModel: MediaViewModel,
     navToAsrScreen: () -> Unit,
     navToTTSScreen: () -> Unit,
+    navToMediaFilesScreen: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sendUiIntent = viewModel::handleUiIntent
@@ -36,7 +36,7 @@ fun MediaRoute(
         uiState, navToAsrScreen, navToTTSScreen,
         unLockVoiceBasicFeature = { sendUiIntent(MediaHomeUiIntent.InitVoiceBasic) },
         switchRecord = { sendUiIntent(MediaHomeUiIntent.SwitchRecord(it)) },
-        openRecordingFile = {sendUiIntent(MediaHomeUiIntent.OpenRecordingFile)}
+        openRecordingFile = navToMediaFilesScreen
     )
 }
 
@@ -71,10 +71,9 @@ fun MediaScreen(
             checked = uiState.isRecord,
             onCheckedChange = switchRecord
         ),
-        ValueNavigationItem(
+        NavigationItem(
             title = "打开录音文件",
             icon = Icons.Rounded.KeyboardVoice,
-            valueText = "60",
             onClick = openRecordingFile
         )
     )
@@ -94,7 +93,7 @@ fun MediaScreen(
         }
 
         item {
-            ItemCard(mediaUtilItems, "多媒体工具")
+            ItemCard(mediaUtilItems, "录音能力")
         }
     }
 }

@@ -33,6 +33,7 @@ class MediaViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         Logger.d(TAG, "onCleared.")
+        audioRecordManager.stop()
     }
 
     fun handleUiIntent(intent: MediaHomeUiIntent) {
@@ -40,7 +41,6 @@ class MediaViewModel @Inject constructor(
         when (intent) {
             MediaHomeUiIntent.InitVoiceBasic -> initVoiceBasic()
             is MediaHomeUiIntent.SwitchRecord -> switchRecord(intent.isRecord)
-            MediaHomeUiIntent.OpenRecordingFile -> openRecordingFile()
         }
     }
 
@@ -83,14 +83,6 @@ class MediaViewModel @Inject constructor(
         }
     }
 
-    private fun openRecordingFile() {
-        recordFileResp.getWavFiles().let {
-            if (it.isNotEmpty()) {
-                recordFileResp.playWithSystemPlayer(it[0])
-            }
-        }
-    }
-
     private fun reduce(reducer: MediaHomeUiState.() -> MediaHomeUiState) {
         _uiState.update(reducer)
     }
@@ -114,7 +106,6 @@ data class MediaHomeUiState(
 sealed interface MediaHomeUiIntent {
     data object InitVoiceBasic : MediaHomeUiIntent
     data class SwitchRecord(val isRecord: Boolean) : MediaHomeUiIntent
-    data object OpenRecordingFile: MediaHomeUiIntent
 }
 
 enum class VoiceBasicState {

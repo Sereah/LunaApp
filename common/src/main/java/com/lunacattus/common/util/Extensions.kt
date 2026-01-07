@@ -25,6 +25,29 @@ fun Long.toDateTimeString(
     return sdf.format(Date(millis))
 }
 
+fun Long.toDuration(): String {
+    val ms = this % 1000
+    val totalSeconds = this / 1000
+    val s = totalSeconds % 60
+    val totalMinutes = totalSeconds / 60
+    val m = totalMinutes % 60
+    val h = totalMinutes / 60
+
+    return "%02d:%02d:%02d.%03d".format(h, m, s, ms)
+}
+
+fun Long.toDurationStringShort(): String {
+    return when {
+        this < 1_000 -> "${this}ms"
+        this < 60_000 -> "%.2fs".format(this / 1000f)
+        else -> {
+            val minutes = this / 60_000
+            val seconds = (this % 60_000) / 1000
+            "${minutes}m ${seconds}s"
+        }
+    }
+}
+
 fun Float.dpToPx(context: Context): Float {
     return TypedValue.applyDimension(
         TypedValue.COMPLEX_UNIT_DIP,
