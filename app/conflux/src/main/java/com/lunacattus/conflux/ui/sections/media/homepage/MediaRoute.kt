@@ -12,16 +12,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lunacattus.conflux.ui.ActivityToastEvent
 import com.lunacattus.conflux.ui.LocalInnerPadding
+import com.lunacattus.conflux.ui.ToastEvent
 import com.lunacattus.conflux.ui.base.CardLockState
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.NavigationItem
 import com.lunacattus.conflux.ui.base.SwitchItem
 import com.lunacattus.ui_design.compose.overScrollVertical
+import kotlinx.coroutines.launch
 
 @Composable
 fun MediaRoute(
@@ -50,6 +54,8 @@ fun MediaScreen(
     openRecordingFile: () -> Unit
 ) {
 
+    val scope = rememberCoroutineScope()
+
     val voiceBasicItems = listOf(
         NavigationItem(title = "ASR识别", icon = Icons.Rounded.SpatialAudioOff, onClick = navToAsrScreen),
         NavigationItem(title = "TTS合成", icon = Icons.Rounded.SettingsVoice, onClick = navToTTSScreen),
@@ -74,7 +80,13 @@ fun MediaScreen(
         NavigationItem(
             title = "打开录音文件",
             icon = Icons.Rounded.KeyboardVoice,
-            onClick = openRecordingFile
+            onClick = {
+                if (uiState.isRecord) {
+                    scope.launch { ActivityToastEvent.send(ToastEvent.ShowToast("请先停止录制")) }
+                } else {
+                    openRecordingFile()
+                }
+            }
         )
     )
 
