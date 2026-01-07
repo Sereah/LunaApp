@@ -8,6 +8,7 @@ import com.lunacattus.logger.Logger
 import com.lunacattus.voice.AuthInfo
 import com.lunacattus.voice.Voice
 import com.lunacattus.voice.record.AudioRecordManager
+import com.lunacattus.voice.record.RecordingFileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MediaViewModel @Inject constructor(
     private val voice: Voice,
-    private val audioRecordManager: AudioRecordManager
+    private val audioRecordManager: AudioRecordManager,
+    private val recordFileResp: RecordingFileRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MediaHomeUiState())
@@ -82,7 +84,11 @@ class MediaViewModel @Inject constructor(
     }
 
     private fun openRecordingFile() {
-        audioRecordManager.openRecodingFiles()
+        recordFileResp.getWavFiles().let {
+            if (it.isNotEmpty()) {
+                recordFileResp.playWithSystemPlayer(it[0])
+            }
+        }
     }
 
     private fun reduce(reducer: MediaHomeUiState.() -> MediaHomeUiState) {
