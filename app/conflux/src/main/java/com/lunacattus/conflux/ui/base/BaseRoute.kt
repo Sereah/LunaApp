@@ -7,9 +7,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-interface BaseRoute : NavKey {
-    val name: String
-}
+interface BaseRoute : NavKey
 
 interface RootRoute : BaseRoute //根栈的路由分类
 

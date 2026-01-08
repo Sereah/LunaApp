@@ -9,10 +9,7 @@ import com.lunacattus.conflux.ui.sections.home.homepage.HomeViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object HomeRoute : BaseRoute {
-    override val name: String
-        get() = "首页"
-}
+data object HomeRoute : BaseRoute
 
 fun EntryProviderScope<NavKey>.homeSection() {
     entryWithNavAndVm<HomeRoute, HomeViewModel> { _, navigator, viewModel ->

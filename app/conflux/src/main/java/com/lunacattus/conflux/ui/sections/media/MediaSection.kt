@@ -16,22 +16,13 @@ import com.lunacattus.conflux.ui.sections.media.speech.asr.AsrViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object MediaRoute : BaseRoute {
-    override val name: String
-        get() = "多媒体"
-}
+data object MediaRoute : BaseRoute
 
 @Serializable
-data object AsrRoute : BaseRoute {
-    override val name: String
-        get() = "ASR识别"
-}
+data object AsrRoute : BaseRoute
 
 @Serializable
-data class MediaFilesRoute(val path: String) : BaseRoute {
-    override val name: String
-        get() = "多媒体文件"
-}
+data class MediaFilesRoute(val path: String) : BaseRoute
 
 fun EntryProviderScope<NavKey>.mediaSection() {
     entryWithNavAndVm<MediaRoute, MediaViewModel> { _, navigator, viewModel ->
@@ -53,6 +44,6 @@ fun EntryProviderScope<NavKey>.mediaSection() {
                 factory.create(it.path)
             }
         )
-        MediaFilesRoute(viewModel)
+        MediaFilesRoute(viewModel, it.path)
     }
 }

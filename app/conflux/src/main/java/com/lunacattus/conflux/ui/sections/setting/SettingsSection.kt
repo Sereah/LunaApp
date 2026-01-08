@@ -9,10 +9,7 @@ import com.lunacattus.conflux.ui.sections.setting.homepage.SettingViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object SettingRoute : BaseRoute {
-    override val name: String
-        get() = "设置"
-}
+data object SettingRoute : BaseRoute
 
 fun EntryProviderScope<NavKey>.settingSection() {
     entryWithNavAndVm<SettingRoute, SettingViewModel> { _, navigator, model ->

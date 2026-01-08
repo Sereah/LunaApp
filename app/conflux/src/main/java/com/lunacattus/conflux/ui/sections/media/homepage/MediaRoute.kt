@@ -18,8 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lunacattus.conflux.ui.ActivityToastEvent
+import com.lunacattus.conflux.ui.LocalActivityViewModel
 import com.lunacattus.conflux.ui.LocalInnerPadding
+import com.lunacattus.conflux.ui.LocalSetTopBarTitle
 import com.lunacattus.conflux.ui.ToastEvent
+import com.lunacattus.conflux.ui.TopBarTitle
 import com.lunacattus.conflux.ui.base.CardLockState
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.NavigationItem
@@ -34,6 +37,7 @@ fun MediaRoute(
     navToTTSScreen: () -> Unit,
     navToMediaFilesScreen: () -> Unit
 ) {
+    LocalSetTopBarTitle.current.invoke(TopBarTitle(title = "多媒体"))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sendUiIntent = viewModel::handleUiIntent
     MediaScreen(
@@ -57,8 +61,16 @@ fun MediaScreen(
     val scope = rememberCoroutineScope()
 
     val voiceBasicItems = listOf(
-        NavigationItem(title = "ASR识别", icon = Icons.Rounded.SpatialAudioOff, onClick = navToAsrScreen),
-        NavigationItem(title = "TTS合成", icon = Icons.Rounded.SettingsVoice, onClick = navToTTSScreen),
+        NavigationItem(
+            title = "ASR识别",
+            icon = Icons.Rounded.SpatialAudioOff,
+            onClick = navToAsrScreen
+        ),
+        NavigationItem(
+            title = "TTS合成",
+            icon = Icons.Rounded.SettingsVoice,
+            onClick = navToTTSScreen
+        ),
     )
     var voiceBasicCardLockState by remember { mutableStateOf(CardLockState.Lock) }
     LaunchedEffect(uiState.voiceBasicInitState) {

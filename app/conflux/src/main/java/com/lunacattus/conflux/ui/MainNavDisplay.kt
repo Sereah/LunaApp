@@ -23,14 +23,21 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.base.BaseRoute
 import com.lunacattus.conflux.ui.base.NavigationState
 import com.lunacattus.conflux.ui.base.Navigator
@@ -56,15 +63,29 @@ import dev.chrisbanes.haze.rememberHazeState
 @Composable
 fun Main(navState: NavigationState, navigator: Navigator) {
     val hazeState = rememberHazeState()
+    val context = LocalContext.current
+    var topBarTitle by remember {
+        mutableStateOf(
+            TopBarTitle(
+                title = context.getString(R.string.app_name),
+                showBackIcon = false
+            )
+        )
+    }
     Scaffold(
         topBar = {
-            TopBar(navigator, navState, hazeState)
+            TopBar(navigator, hazeState, topBarTitle)
         },
         bottomBar = {
             BottomBar(navigator, navState, hazeState)
         }
     ) { padding ->
-        CompositionLocalProvider(LocalInnerPadding provides padding) {
+        CompositionLocalProvider(
+            LocalInnerPadding provides padding,
+            LocalSetTopBarTitle provides { title ->
+                topBarTitle = title
+            }
+        ) {
             NavDisplay(
                 entries = navState.toEntries(
                     entryProvider {
@@ -121,15 +142,19 @@ fun Main(navState: NavigationState, navigator: Navigator) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
 @Composable
-private fun TopBar(navigator: Navigator, navState: NavigationState, hazeState: HazeState) {
+private fun TopBar(
+    navigator: Navigator,
+    hazeState: HazeState,
+    topBarTitle: TopBarTitle
+) {
     TopAppBar(
-        title = { Text(navState.currentRoute.name) },
+        title = { Text(topBarTitle.title) },
         colors = TopAppBarDefaults.topAppBarColors().copy(
             containerColor = Color.Transparent,
             scrolledContainerColor = Color.Transparent,
         ),
         navigationIcon = {
-            if (navState.currentRoute != navState.topLevelRoute) {
+            if (topBarTitle.showBackIcon) {
                 Icon(
                     imageVector = Icons.Rounded.ArrowBackIosNew,
                     contentDescription = "",
@@ -179,6 +204,15 @@ private fun BottomBar(
 val LocalInnerPadding = staticCompositionLocalOf<PaddingValues> {
     error("PaddingValues not provided")
 }
+
+val LocalSetTopBarTitle = compositionLocalOf<(TopBarTitle) -> Unit> {
+    error("LocalSetTopBarTitle not provided")
+}
+
+data class TopBarTitle(
+    val title: String,
+    val showBackIcon: Boolean = false,
+)
 
 private fun topLevelTransform(
     from: BaseRoute?,

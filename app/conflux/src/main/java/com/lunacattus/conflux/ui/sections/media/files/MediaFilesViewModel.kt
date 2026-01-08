@@ -1,5 +1,6 @@
 package com.lunacattus.conflux.ui.sections.media.files
 
+import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.logger.Logger
@@ -52,7 +53,7 @@ class MediaFilesViewModel @AssistedInject constructor(
             val success = recordingFileRepository.deleteRecursivelySafely(mediaFile.file)
             if (success) {
                 reduce {
-                    copy(recordFiles = recordFiles.filterNot { it.file == mediaFile.file })
+                    copy(mediaFiles = mediaFiles.filterNot { it.file == mediaFile.file })
                 }
             }
         }
@@ -69,7 +70,7 @@ class MediaFilesViewModel @AssistedInject constructor(
             val timerDeferred = async { delay(500) }
             val list = dataDeferred.await()
             timerDeferred.await()
-            reduce { copy(recordFiles = list, isLoading = false, hasLoaded = true) }
+            reduce { copy(mediaFiles = list, isLoading = false, hasLoaded = true) }
         }
     }
 
@@ -89,7 +90,7 @@ data class MediaFile(
 
 data class MediaFilesUiState(
     val isLoading: Boolean = false,
-    val recordFiles: List<MediaFile> = emptyList(),
+    val mediaFiles: List<MediaFile> = emptyList(),
     val hasLoaded: Boolean = false
 )
 

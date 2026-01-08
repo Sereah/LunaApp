@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
@@ -85,7 +86,10 @@ class MainActivity : ComponentActivity() {
                             rootBackStack = rootBackStack
                         )
                     }
-                    CompositionLocalProvider(LocalNavigator provides navigator) {
+                    CompositionLocalProvider(
+                        LocalNavigator provides navigator,
+                        LocalActivityViewModel provides viewModel
+                    ) {
                         NavDisplay(
                             entries = rememberDecoratedNavEntries(
                                 backStack = rootBackStack,
@@ -139,6 +143,10 @@ fun ToastView() {
         modifier = Modifier.fillMaxSize(),
         toastEvent
     )
+}
+
+val LocalActivityViewModel = staticCompositionLocalOf<ActivityViewModel> {
+    error("ActivityViewModel not provided")
 }
 
 val topLevelRoutes = mapOf(

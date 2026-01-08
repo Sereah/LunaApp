@@ -9,10 +9,7 @@ import com.lunacattus.conflux.ui.sections.connection.homepage.ConnectionViewMode
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object ConnectionRoute : BaseRoute {
-    override val name: String
-        get() = "连接"
-}
+data object ConnectionRoute : BaseRoute
 
 fun EntryProviderScope<NavKey>.connectSection() {
     entryWithNavAndVm<ConnectionRoute, ConnectionViewModel> { _, navigator, model ->

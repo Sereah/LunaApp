@@ -1,18 +1,19 @@
 package com.lunacattus.conflux.ui.sections.setting.homepage
 
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ColorLens
 import androidx.compose.material.icons.rounded.Nightlight
 import androidx.compose.material.icons.rounded.Restore
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.lunacattus.conflux.ui.ActivityViewModel
+import com.lunacattus.conflux.ui.LocalActivityViewModel
 import com.lunacattus.conflux.ui.LocalInnerPadding
-import com.lunacattus.conflux.ui.MainActivity
+import com.lunacattus.conflux.ui.LocalSetTopBarTitle
+import com.lunacattus.conflux.ui.TopBarTitle
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.SwitchItem
 import com.lunacattus.conflux.ui.base.ValueNavigationItem
@@ -20,8 +21,8 @@ import com.lunacattus.ui_design.compose.overScrollVertical
 
 @Composable
 fun SettingRoute(viewModel: SettingViewModel) {
-    val activity = LocalActivity.current as MainActivity
-    val activityViewModel: ActivityViewModel = hiltViewModel(activity)
+    LocalSetTopBarTitle.current.invoke(TopBarTitle(title = "设置"))
+    val activityViewModel = LocalActivityViewModel.current
     SettingScreen(
         enableDynamicColor = activityViewModel.dynamicColor,
         changeDynamicColor = { activityViewModel.changeDynamicColor(it) },
@@ -39,7 +40,12 @@ private fun SettingScreen(
 ) {
 
     val firstItems = listOf(
-        ValueNavigationItem(title = "测试", icon = Icons.Rounded.Restore, summary = "这是一个测试item", valueText = "打开", onClick = {}),
+        ValueNavigationItem(
+            title = "测试",
+            icon = Icons.Rounded.Restore,
+            summary = "这是一个测试item",
+            valueText = "打开",
+            onClick = {}),
         SwitchItem(
             title = "自适应主题颜色",
             icon = Icons.Rounded.ColorLens,

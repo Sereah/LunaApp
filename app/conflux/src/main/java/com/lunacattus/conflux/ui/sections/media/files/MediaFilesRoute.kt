@@ -1,5 +1,6 @@
 package com.lunacattus.conflux.ui.sections.media.files
 
+import android.os.Environment
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -36,13 +37,22 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lunacattus.common.util.toDurationStringShort
 import com.lunacattus.conflux.ui.LocalInnerPadding
+import com.lunacattus.conflux.ui.LocalSetTopBarTitle
+import com.lunacattus.conflux.ui.TopBarTitle
 import com.lunacattus.ui_design.compose.SwipeToRevealItem
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 
 @Composable
 fun MediaFilesRoute(
-    viewModel: MediaFilesViewModel
+    viewModel: MediaFilesViewModel,
+    path: String
 ) {
+    val title = when (path) {
+        Environment.DIRECTORY_RECORDINGS -> "录音文件"
+        Environment.DIRECTORY_MUSIC -> "音乐文件"
+        else -> ""
+    }
+    LocalSetTopBarTitle.current.invoke(TopBarTitle(title, true))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     MediaFilesScreen(
         uiState,
@@ -66,7 +76,7 @@ fun MediaFilesScreen(
             contentPadding = LocalInnerPadding.current,
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
-            items(items = uiState.recordFiles, key = { it.file.name }) { mediaFile ->
+            items(items = uiState.mediaFiles, key = { it.file.name }) { mediaFile ->
                 SwipeToRevealItem(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -118,13 +128,13 @@ fun MediaFilesScreen(
         }
     }
     AnimatedVisibility(
-        visible = uiState.isLoading || (uiState.hasLoaded && uiState.recordFiles.isEmpty()),
+        visible = uiState.isLoading || (uiState.hasLoaded && uiState.mediaFiles.isEmpty()),
         enter = fadeIn(),
         exit = fadeOut()
     ) {
         val text = when {
             uiState.isLoading -> "加载中..."
-            uiState.hasLoaded && uiState.recordFiles.isEmpty() -> "空空如也"
+            uiState.hasLoaded && uiState.mediaFiles.isEmpty() -> "空空如也"
             else -> ""
         }
         Box(contentAlignment = Alignment.Center) {
