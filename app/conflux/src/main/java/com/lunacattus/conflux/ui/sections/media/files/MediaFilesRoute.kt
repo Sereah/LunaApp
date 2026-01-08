@@ -80,13 +80,13 @@ fun MediaFilesScreen(
                                 dampingRatio = Spring.DampingRatioLowBouncy
                             )
                         ),
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
                     containerShape = RoundedCornerShape(20.dp),
                     foregroundColor = MaterialTheme.colorScheme.secondaryContainer,
                     revealContent = {
                         Icon(
                             Icons.Rounded.Delete, contentDescription = "",
-                            tint = MaterialTheme.colorScheme.onErrorContainer,
+                            tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier
                                 .size(32.dp)
                                 .clickableWithDebounce {
