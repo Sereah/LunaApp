@@ -77,24 +77,11 @@ class NavigationState(
      */
     var topLevelRoute: BaseRoute by topLevelRouteState
 
-    /** 上一次的 route（不参与 Compose 状态系统） */
     var lastRoute: BaseRoute? = null
-        private set
-
-    /** 用于判断 route 是否真的发生变化 */
-    private var cachedCurrentRoute: BaseRoute? = null
+        internal set
 
     val currentRoute: BaseRoute
-        get() {
-            val newRoute = computeCurrentRoute()
-
-            if (cachedCurrentRoute != newRoute) {
-                lastRoute = cachedCurrentRoute
-                cachedCurrentRoute = newRoute
-            }
-
-            return newRoute
-        }
+        get() = computeCurrentRoute()
 
     /**
      * 计算出当前正在使用的导航堆栈组合。

@@ -17,7 +17,7 @@ class Navigator(
     fun navigate(route: BaseRoute) {
 
         Logger.d(TAG, "navigate: $route, innerBackStack: ${innerState.backStacks[innerState.topLevelRoute]?.toList()}")
-
+        innerState.lastRoute = innerState.currentRoute
         if (route in innerState.backStacks.keys) {
             innerState.topLevelRoute = route
             return
@@ -34,7 +34,7 @@ class Navigator(
     fun goBack() {
         Logger.d(TAG, "Start goBack, rootBackStack: ${rootBackStack.toList()}, " +
                 "currentStack: ${innerState.backStacks[innerState.topLevelRoute]?.toList()}")
-
+        innerState.lastRoute = innerState.currentRoute
         if (rootBackStack.size > 1) {
             rootBackStack.removeLastOrNull()
             return

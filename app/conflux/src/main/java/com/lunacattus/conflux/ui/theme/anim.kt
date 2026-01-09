@@ -49,6 +49,46 @@ val slideOutFromLeft = slideOut(
     }
 )
 
+val slideInFromBottom = slideIn(
+    animationSpec = tween(
+        durationMillis = 400,
+        easing = CubicBezierEasing(0.42f, 0.00f, 0.58f, 1.00f)
+    ),
+    initialOffset = { fullSize ->
+        IntOffset(0, fullSize.height)
+    }
+)
+
+val slideOutFromBottom = slideOut(
+    animationSpec = tween(
+        durationMillis = 400,
+        easing = CubicBezierEasing(0.42f, 0.00f, 0.58f, 1.00f)
+    ),
+    targetOffset = { fullSize ->
+        IntOffset(0, fullSize.height)
+    }
+)
+
+val slideInFromTop = slideIn(
+    animationSpec = tween(
+        durationMillis = 400,
+        easing = CubicBezierEasing(0.42f, 0.00f, 0.58f, 1.00f)
+    ),
+    initialOffset = { fullSize ->
+        IntOffset(0, -fullSize.height)
+    }
+)
+
+val slideOutFromTop = slideOut(
+    animationSpec = tween(
+        durationMillis = 400,
+        easing = CubicBezierEasing(0.42f, 0.00f, 0.58f, 1.00f)
+    ),
+    targetOffset = { fullSize ->
+        IntOffset(0, -fullSize.height)
+    }
+)
+
 val stayStillIn = slideIn(
     animationSpec = tween(durationMillis = 1000, easing = LinearEasing),
     initialOffset = { _ ->
