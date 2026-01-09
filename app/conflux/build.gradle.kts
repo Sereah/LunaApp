@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":logger"))
     implementation(project(":feature:voice"))
+    debugImplementation(libs.leakcanary.android)
     implementation(libs.haze.android)
     implementation(libs.haze.material)
 }
