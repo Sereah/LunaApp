@@ -35,6 +35,7 @@ class Navigator(
         Logger.d(TAG, "Start goBack, rootBackStack: ${rootBackStack.toList()}, " +
                 "currentStack: ${innerState.backStacks[innerState.topLevelRoute]?.toList()}")
         innerState.lastRoute = innerState.currentRoute
+        innerState.lastBackStackList = innerState.backStacks[innerState.topLevelRoute]?.toList() ?: emptyList()
         if (rootBackStack.size > 1) {
             rootBackStack.removeLastOrNull()
             return

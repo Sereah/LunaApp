@@ -18,7 +18,6 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.runtime.serialization.NavKeySerializer
 import androidx.savedstate.compose.serialization.serializers.MutableStateSerializer
-import kotlin.collections.last
 
 /**
  * 创建并记住一个 [NavigationState] 实例。
@@ -78,6 +77,9 @@ class NavigationState(
     var topLevelRoute: BaseRoute by topLevelRouteState
 
     var lastRoute: BaseRoute? = null
+        internal set
+
+    var lastBackStackList: List<NavKey> = emptyList() //todo 空了整理一下路由的变化和返回栈的变化
         internal set
 
     val currentRoute: BaseRoute

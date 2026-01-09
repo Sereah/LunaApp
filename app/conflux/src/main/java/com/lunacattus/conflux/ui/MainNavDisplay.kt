@@ -154,7 +154,8 @@ fun Main(navState: NavigationState, navigator: Navigator) {
                         val currentRoute = navState.currentRoute
 
                         val useHorizontal =
-                            isBottomBar || isSameTopLevelStack(lastRoute, currentRoute, navState.backStacks)
+                            isBottomBar || (navState.lastBackStackList.contains(lastRoute as NavKey) &&
+                                    navState.lastBackStackList.contains(currentRoute))
 
                         if (useHorizontal) {
                             slideInFromLeft togetherWith slideOutFromRight
