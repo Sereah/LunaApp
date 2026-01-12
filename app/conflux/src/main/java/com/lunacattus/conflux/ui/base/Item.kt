@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lunacattus.ui_design.compose.clickableWithDebounce
-import com.lunacattus.ui_design.compose.debouncedOnClick
+import com.lunacattus.ui_design.compose.onClickWithDebounced
 
 sealed interface Item {
     val title: String
@@ -196,7 +196,7 @@ fun ItemCard(
                     .clickableWithDebounce { },
                 contentAlignment = Alignment.Center
             ) {
-                Button(enabled = lockState == CardLockState.Lock, onClick = debouncedOnClick {
+                Button(enabled = lockState == CardLockState.Lock, onClick = onClickWithDebounced {
                     onLockButtonClick(lockState)
                 }) {
                     Icon(Icons.Default.LockOpen, contentDescription = null)

@@ -48,7 +48,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import com.lunacattus.ui_design.compose.clickableWithDebounce
-import com.lunacattus.ui_design.compose.debouncedOnClick
+import com.lunacattus.ui_design.compose.onClickWithDebounced
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -268,7 +268,7 @@ fun MessageDialog(
                             ) {
                                 if (actions.cancelButtonText != null) {
                                     TextButton(
-                                        onClick = debouncedOnClick {
+                                        onClick = onClickWithDebounced {
                                             dismissWithAnimation()
                                             actions.onCancel?.let { it() }
                                         }
@@ -282,7 +282,7 @@ fun MessageDialog(
                                 if (actions.confirmButtonText != null) {
                                     Spacer(Modifier.width(8.dp)) // Spacer between buttons
                                     TextButton(
-                                        onClick = debouncedOnClick {
+                                        onClick = onClickWithDebounced {
                                             dismissWithAnimation()
                                             actions.onConfirm?.let { it() }
                                         }

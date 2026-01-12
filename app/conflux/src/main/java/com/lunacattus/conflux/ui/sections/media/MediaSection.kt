@@ -13,6 +13,8 @@ import com.lunacattus.conflux.ui.sections.media.homepage.MediaRoute
 import com.lunacattus.conflux.ui.sections.media.homepage.MediaViewModel
 import com.lunacattus.conflux.ui.sections.media.speech.asr.AsrRoute
 import com.lunacattus.conflux.ui.sections.media.speech.asr.AsrViewModel
+import com.lunacattus.conflux.ui.sections.media.speech.tts.TtsRoute
+import com.lunacattus.conflux.ui.sections.media.speech.tts.TtsViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -22,6 +24,9 @@ data object MediaRoute : BaseRoute
 data object AsrRoute : BaseRoute
 
 @Serializable
+data object TtsRoute : BaseRoute
+
+@Serializable
 data class MediaFilesRoute(val path: String) : BaseRoute
 
 fun EntryProviderScope<NavKey>.mediaSection() {
@@ -29,7 +34,7 @@ fun EntryProviderScope<NavKey>.mediaSection() {
         MediaRoute(
             viewModel = viewModel,
             navToAsrScreen = { navigator.navigate(AsrRoute) },
-            navToTTSScreen = {},
+            navToTTSScreen = { navigator.navigate(TtsRoute) },
             navToMediaFilesScreen = {
                 navigator.navigate(MediaFilesRoute(Environment.DIRECTORY_RECORDINGS))
             }
@@ -37,6 +42,9 @@ fun EntryProviderScope<NavKey>.mediaSection() {
     }
     entryWithVm<AsrRoute, AsrViewModel> { _, viewmodel ->
         AsrRoute(viewmodel)
+    }
+    entryWithVm<TtsRoute, TtsViewModel> { _, viewmodel ->
+        TtsRoute(viewmodel)
     }
     entry<MediaFilesRoute> {
         val viewModel = hiltViewModel<MediaFilesViewModel, MediaFilesViewModel.Factory>(

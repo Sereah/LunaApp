@@ -42,7 +42,7 @@ import com.lunacattus.connection.model.bluetooth.BondDevice
 import com.lunacattus.connection.model.bluetooth.BondDeviceConnectType
 import com.lunacattus.connection.model.bluetooth.getPreciseType
 import com.lunacattus.ui_design.compose.clickableWithDebounce
-import com.lunacattus.ui_design.compose.debouncedOnClick
+import com.lunacattus.ui_design.compose.onClickWithDebounced
 import com.lunacattus.ui_design.compose.overScrollVertical
 
 @Composable
@@ -152,7 +152,7 @@ private fun BondedDeviceItem(
                 .padding(horizontal = 10.dp, vertical = 15.dp)
                 .width(0.5.dp)
         )
-        IconButton(onClick = debouncedOnClick { navToDeviceDetail(device.device.address) }) {
+        IconButton(onClick = onClickWithDebounced { navToDeviceDetail(device.device.address) }) {
             Icon(
                 imageVector = Icons.Rounded.Settings,
                 contentDescription = null,

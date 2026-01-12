@@ -34,7 +34,7 @@ fun Modifier.clickableWithDebounce(
 }
 
 @Composable
-fun debouncedOnClick(
+fun onClickWithDebounced(
     debounceTime: Long = 500L,
     onClick: () -> Unit
 ): () -> Unit {
