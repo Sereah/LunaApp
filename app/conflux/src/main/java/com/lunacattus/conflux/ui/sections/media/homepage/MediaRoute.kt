@@ -18,11 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lunacattus.conflux.ui.ActivityToastEvent
-import com.lunacattus.conflux.ui.LocalActivityViewModel
 import com.lunacattus.conflux.ui.LocalInnerPadding
-import com.lunacattus.conflux.ui.LocalSetTopBarTitle
 import com.lunacattus.conflux.ui.ToastEvent
-import com.lunacattus.conflux.ui.TopBarTitle
 import com.lunacattus.conflux.ui.base.CardLockState
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.NavigationItem
@@ -37,7 +34,6 @@ fun MediaRoute(
     navToTTSScreen: () -> Unit,
     navToMediaFilesScreen: () -> Unit
 ) {
-    LocalSetTopBarTitle.current.invoke(TopBarTitle(title = "多媒体"))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sendUiIntent = viewModel::handleUiIntent
     MediaScreen(

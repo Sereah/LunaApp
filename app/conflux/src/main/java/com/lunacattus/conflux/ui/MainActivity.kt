@@ -27,6 +27,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
@@ -34,9 +35,10 @@ import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.lunacattus.conflux.R
 import com.lunacattus.conflux.permission.PermissionHost
 import com.lunacattus.conflux.ui.base.LocalNavigator
-import com.lunacattus.conflux.ui.base.MainRoute
+import com.lunacattus.conflux.ui.base.Main
 import com.lunacattus.conflux.ui.base.Navigator
 import com.lunacattus.conflux.ui.base.rememberNavigationState
 import com.lunacattus.conflux.ui.sections.connection.ConnectionRoute
@@ -45,6 +47,8 @@ import com.lunacattus.conflux.ui.sections.media.MediaRoute
 import com.lunacattus.conflux.ui.sections.root.rootSection
 import com.lunacattus.conflux.ui.sections.setting.SettingRoute
 import com.lunacattus.conflux.ui.theme.LunaAppTheme
+import com.lunacattus.conflux.ui.theme.enterAndExit
+import com.lunacattus.conflux.ui.theme.popEnterAndExit
 import com.lunacattus.ui_design.compose.dialog.OverlayToast
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -76,14 +80,14 @@ class MainActivity : ComponentActivity() {
                     darkTheme = viewModel.nightMode
                 ) {
                     SystemBarAppearance(viewModel.nightMode)
-                    val rootBackStack = rememberNavBackStack(MainRoute)
-                    val innerNavigationState = rememberNavigationState(
+                    val rootBackStack = rememberNavBackStack(Main)
+                    val mainNavigationState = rememberNavigationState(
                         startRoute = HomeRoute,
-                        topLevelRoutesKey = topLevelRoutes.keys
+                        topLevelRoutesKey = topLevelRoutes().keys
                     )
-                    val navigator = remember(rootBackStack, innerNavigationState) {
+                    val navigator = remember(rootBackStack, mainNavigationState) {
                         Navigator(
-                            mainNavState = innerNavigationState,
+                            mainNavState = mainNavigationState,
                             rootBackStack = rootBackStack
                         )
                     }
@@ -99,13 +103,22 @@ class MainActivity : ComponentActivity() {
                                     rememberViewModelStoreNavEntryDecorator()
                                 ),
                                 entryProvider = entryProvider {
-                                    entry<MainRoute> {
-                                        Main(innerNavigationState, navigator)
+                                    entry<Main> {
+                                        Main(mainNavigationState, navigator)
                                     }
                                     rootSection()
                                 }
                             ),
                             onBack = { navigator.goBack() },
+                            transitionSpec = {
+                                enterAndExit
+                            },
+                            popTransitionSpec = {
+                                popEnterAndExit
+                            },
+                            predictivePopTransitionSpec = {
+                                popEnterAndExit
+                            }
                         )
                     }
                     ToastView()
@@ -151,11 +164,12 @@ val LocalActivityViewModel = staticCompositionLocalOf<ActivityViewModel> {
     error("ActivityViewModel not provided")
 }
 
-val topLevelRoutes = mapOf(
-    HomeRoute to NavBarItem(icon = Icons.Rounded.Home, title = "首页"),
-    ConnectionRoute to NavBarItem(icon = Icons.Rounded.Link, title = "连接"),
-    MediaRoute to NavBarItem(icon = Icons.Rounded.MusicVideo, title = "多媒体"),
-    SettingRoute to NavBarItem(icon = Icons.Rounded.Settings, title = "设置"),
+@Composable
+fun topLevelRoutes() = mapOf(
+    HomeRoute to NavBarItem(icon = Icons.Rounded.Home, title = stringResource(R.string.home_title)),
+    ConnectionRoute to NavBarItem(icon = Icons.Rounded.Link, title = stringResource(R.string.connection_title)),
+    MediaRoute to NavBarItem(icon = Icons.Rounded.MusicVideo, title = stringResource(R.string.media_title)),
+    SettingRoute to NavBarItem(icon = Icons.Rounded.Settings, title = stringResource(R.string.setting_title)),
 )
 
 data class NavBarItem(

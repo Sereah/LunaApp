@@ -1,6 +1,5 @@
 package com.lunacattus.conflux.ui.sections.media.files
 
-import android.os.Environment
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -37,8 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lunacattus.common.util.toDurationStringShort
 import com.lunacattus.conflux.ui.LocalInnerPadding
-import com.lunacattus.conflux.ui.LocalSetTopBarTitle
-import com.lunacattus.conflux.ui.TopBarTitle
 import com.lunacattus.ui_design.compose.SwipeToRevealItem
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 
@@ -47,12 +44,6 @@ fun MediaFilesRoute(
     viewModel: MediaFilesViewModel,
     path: String
 ) {
-    val title = when (path) {
-        Environment.DIRECTORY_RECORDINGS -> "录音文件"
-        Environment.DIRECTORY_MUSIC -> "音乐文件"
-        else -> ""
-    }
-    LocalSetTopBarTitle.current.invoke(TopBarTitle(title, true))
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     MediaFilesScreen(
         uiState,

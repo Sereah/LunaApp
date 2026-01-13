@@ -21,11 +21,6 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +30,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.lunacattus.conflux.R
+import com.lunacattus.conflux.ui.base.MainRoute
 import com.lunacattus.conflux.ui.base.NavigationState
 import com.lunacattus.conflux.ui.base.Navigator
 import com.lunacattus.conflux.ui.base.toEntries
@@ -62,19 +58,11 @@ import dev.chrisbanes.haze.rememberHazeState
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Main(navState: NavigationState, navigator: Navigator) {
-    val defaultTitle = stringResource(R.string.app_name)
-    var topBarTitle by remember {
-        mutableStateOf(
-            TopBarTitle(
-                title = defaultTitle,
-                showBackIcon = false
-            )
-        )
-    }
     val hazeState = rememberHazeState()
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val layoutType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
     val isBottomBar = layoutType == NavigationSuiteType.NavigationBar
+    val topLevelRoutes = topLevelRoutes()
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -97,14 +85,11 @@ fun Main(navState: NavigationState, navigator: Navigator) {
     ) {
         Scaffold(
             topBar = {
-                TopBar(navigator, hazeState, topBarTitle)
+                TopBar(navigator, hazeState, navState)
             },
         ) { padding ->
             CompositionLocalProvider(
                 LocalInnerPadding provides padding,
-                LocalSetTopBarTitle provides { title ->
-                    topBarTitle = title
-                }
             ) {
                 NavDisplay(
                     entries = navState.toEntries(
@@ -138,15 +123,21 @@ fun Main(navState: NavigationState, navigator: Navigator) {
                     },
                     popTransitionSpec = {
                         val lastRoute = navState.lastRoute
-
                         val useHorizontal = isBottomBar || !navState.backStacks.keys.contains(lastRoute)
-
                         if (useHorizontal) {
                             slideInFromLeft togetherWith slideOutFromRight
                         } else {
                             slideInFromTop togetherWith slideOutFromBottom
                         }
-
+                    },
+                    predictivePopTransitionSpec = {
+                        val lastRoute = navState.lastRoute
+                        val useHorizontal = isBottomBar || !navState.backStacks.keys.contains(lastRoute)
+                        if (useHorizontal) {
+                            slideInFromLeft togetherWith slideOutFromRight
+                        } else {
+                            slideInFromTop togetherWith slideOutFromBottom
+                        }
                     },
                     modifier = Modifier
                         .fillMaxSize()
@@ -162,16 +153,18 @@ fun Main(navState: NavigationState, navigator: Navigator) {
 private fun TopBar(
     navigator: Navigator,
     hazeState: HazeState,
-    topBarTitle: TopBarTitle
+    navState: NavigationState
 ) {
+    val currentRoute = navState.currentRoute as? MainRoute
+    val title = currentRoute?.titleResId?.let { stringResource(it) } ?: stringResource(R.string.app_name)
     TopAppBar(
-        title = { Text(topBarTitle.title) },
+        title = { Text(text = title) },
         colors = TopAppBarDefaults.topAppBarColors().copy(
             containerColor = Color.Transparent,
             scrolledContainerColor = Color.Transparent,
         ),
         navigationIcon = {
-            if (topBarTitle.showBackIcon) {
+            if (!navState.backStacks.keys.contains(navState.currentRoute)) {
                 Icon(
                     imageVector = Icons.Rounded.ArrowBackIosNew,
                     contentDescription = "",
@@ -192,15 +185,6 @@ private fun TopBar(
 val LocalInnerPadding = staticCompositionLocalOf<PaddingValues> {
     error("PaddingValues not provided")
 }
-
-val LocalSetTopBarTitle = compositionLocalOf<(TopBarTitle) -> Unit> {
-    error("LocalSetTopBarTitle not provided")
-}
-
-data class TopBarTitle(
-    val title: String,
-    val showBackIcon: Boolean = false,
-)
 
 private fun topLevelTransform(
     isBottomBar: Boolean,

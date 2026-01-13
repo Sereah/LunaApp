@@ -6,13 +6,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.lunacattus.conflux.ui.LocalSetTopBarTitle
-import com.lunacattus.conflux.ui.TopBarTitle
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 
 @Composable
 fun HomeRoute(viewModel: HomeViewModel, navToRoot: () -> Unit) {
-    LocalSetTopBarTitle.current.invoke(TopBarTitle("首页"))
     HomeScreen(navToRoot)
 }
 

@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Conflux</string>
+    <string name="media_title">Media</string>
+    <string name="connection_title">Connection</string>
+    <string name="setting_title">Setting</string>
+    <string name="home_title">Home</string>
+    <string name="asr_title">ASR</string>
+    <string name="tts_title">TTS</string>
+    <string name="files_title">Files</string>
+    <string name="music_title">MusicFiles</string>
+    <string name="record_title">RecordFiles</string>
 </resources>

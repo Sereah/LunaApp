@@ -6,14 +6,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ColorLens
 import androidx.compose.material.icons.rounded.Nightlight
 import androidx.compose.material.icons.rounded.Restore
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.lunacattus.conflux.ui.LocalActivityViewModel
 import com.lunacattus.conflux.ui.LocalInnerPadding
-import com.lunacattus.conflux.ui.LocalSetTopBarTitle
-import com.lunacattus.conflux.ui.TopBarTitle
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.SwitchItem
 import com.lunacattus.conflux.ui.base.ValueNavigationItem
@@ -21,7 +17,6 @@ import com.lunacattus.ui_design.compose.overScrollVertical
 
 @Composable
 fun SettingRoute(viewModel: SettingViewModel) {
-    LocalSetTopBarTitle.current.invoke(TopBarTitle(title = "设置"))
     val activityViewModel = LocalActivityViewModel.current
     SettingScreen(
         enableDynamicColor = activityViewModel.dynamicColor,
