@@ -114,15 +114,9 @@ val enterAndExit = scaleIn(
     initialScale = 0.8f,
     animationSpec = tween(durationMillis = 700)
 ) + fadeIn(animationSpec = tween(durationMillis = 700)) togetherWith
-        scaleOut(
-            targetScale = 1.1f, // 退出时稍微放大，模拟被推向后台的深度感
-            animationSpec = tween(durationMillis = 700)
-        ) + fadeOut(animationSpec = tween(durationMillis = 700))
+        stayStillOut
 
-val popEnterAndExit = scaleIn(
-    initialScale = 1.1f, // 返回时从大变小回到原位
-    animationSpec = tween(durationMillis = 700)
-) + fadeIn(animationSpec = tween(durationMillis = 700)) togetherWith
+val popEnterAndExit = stayStillIn togetherWith
         scaleOut(
             targetScale = 0.8f, // 当前页向中心缩小消失
             animationSpec = tween(durationMillis = 700)
