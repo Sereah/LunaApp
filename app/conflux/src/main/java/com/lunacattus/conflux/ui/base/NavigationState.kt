@@ -2,6 +2,7 @@ package com.lunacattus.conflux.ui.base
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,8 +30,8 @@ import androidx.savedstate.compose.serialization.serializers.MutableStateSeriali
  */
 @Composable
 fun rememberNavigationState(
-    startRoute: BaseRoute,
-    topLevelRoutesKey: Set<BaseRoute>
+    startRoute: NavKey,
+    topLevelRoutesKey: Set<NavKey>
 ): NavigationState {
 
     // 使用 rememberSerializable 来创建和保存当前顶级路由的状态。
@@ -66,43 +67,43 @@ fun rememberNavigationState(
  * @param backStacks 一个从顶级路由 [NavKey]到其对应 [NavBackStack] 的映射。这允许多个并行的返回堆栈。
  */
 class NavigationState(
-    val startRoute: BaseRoute,
-    topLevelRouteState: MutableState<BaseRoute>,
-    val backStacks: Map<BaseRoute, NavBackStack<NavKey>>
+    val startRoute: NavKey,
+    topLevelRouteState: MutableState<NavKey>,
+    val backStacks: Map<NavKey, NavBackStack<NavKey>>
 ) {
-    /**
-     * 当前选中的顶级路由。
-     * 通过属性代理到 [topLevelRouteState]，使得状态的读写能够被 Compose 框架观察到。
-     */
-    var topLevelRoute: BaseRoute by topLevelRouteState
 
-    var lastRoute: BaseRoute? = null
-        internal set
+    /** 当前选中的顶级路由。 */
+    var topLevelRoute: NavKey by topLevelRouteState
 
-    var lastBackStackList: List<NavKey> = emptyList() //todo 空了整理一下路由的变化和返回栈的变化
-        internal set
-
-    val currentRoute: BaseRoute
-        get() = computeCurrentRoute()
-
-    /**
-     * 计算出当前正在使用的导航堆栈组合。
-     * 这个列表决定了哪些返回堆栈的内容应该被显示出来。
-     * - 如果当前顶级路由就是起始路由，那么只使用起始路由的堆栈。
-     * - 否则，将起始路由的堆栈和当前选定顶级路由的堆栈组合起来。这通常用于实现“主页 -> 详情页”然后在不同标签页切换的场景。
-     */
-    val stackInUse: List<BaseRoute>
+    /** 计算正在使用的返回堆栈。 */
+    val stackInUse: List<NavKey>
         get() = if (topLevelRoute == startRoute) {
             listOf(startRoute)
         } else {
             listOf(startRoute, topLevelRoute)
         }
 
-    private fun computeCurrentRoute(): BaseRoute {
+    /** 导航开始时的路由（旧路由） */
+    var lastRoute by mutableStateOf<NavKey?>(null)
+
+    /** 导航开始时的返回栈 */
+    var lastBackStack by mutableStateOf<NavBackStack<NavKey>?>(null)
+
+    /** 当前使用的路由 */
+    val currentRoute: NavKey by derivedStateOf {
         val activeTopRoute = stackInUse.last()
-        return backStacks[activeTopRoute]
-            ?.lastOrNull() as? BaseRoute
-            ?: error("currentRoute is null.")
+        backStacks[activeTopRoute]?.lastOrNull() ?: error("CurrentRoute is null!")
+    }
+
+    /** 当前使用的返回栈 */
+    val currentBackStack: NavBackStack<NavKey> by derivedStateOf {
+        backStacks[topLevelRoute] ?: error("CurrentBackStack is null!")
+    }
+
+    fun performNavigation(action: () -> Unit) {
+        lastRoute = currentRoute
+        lastBackStack = currentBackStack
+        action()
     }
 }
 
@@ -125,7 +126,7 @@ fun NavigationState.toEntries(
     )
 
     // 为每个顶级路由的返回堆栈中的 NavKey 创建和装饰 NavEntry。
-    val entries = backStacks.mapValues { (_, stack) ->
+    val topRouteToEntries = backStacks.mapValues { (_, stack) ->
         rememberDecoratedNavEntries(
             backStack = stack,
             entryDecorators = decorators,
@@ -137,6 +138,8 @@ fun NavigationState.toEntries(
     // .flatMap { entries[it] ?: emptyList() } 从映射中安全地获取当前活动堆栈的条目。
     // 最后，将合并后的列表转换为 SnapshotStateList，以便Compose可以观察其变化。
     return stackInUse
-        .flatMap { entries[it] ?: emptyList() }
+        .flatMap { topRoute ->
+            topRouteToEntries[topRoute] ?: emptyList()
+        }
         .toMutableStateList()
 }

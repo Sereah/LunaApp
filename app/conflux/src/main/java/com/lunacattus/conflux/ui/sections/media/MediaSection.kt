@@ -4,7 +4,6 @@ import android.os.Environment
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.lunacattus.conflux.ui.base.BaseRoute
 import com.lunacattus.conflux.ui.base.entryWithNavAndVm
 import com.lunacattus.conflux.ui.base.entryWithVm
 import com.lunacattus.conflux.ui.sections.media.files.MediaFilesRoute
@@ -18,16 +17,16 @@ import com.lunacattus.conflux.ui.sections.media.speech.tts.TtsViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object MediaRoute : BaseRoute
+data object MediaRoute : NavKey
 
 @Serializable
-data object AsrRoute : BaseRoute
+data object AsrRoute : NavKey
 
 @Serializable
-data object TtsRoute : BaseRoute
+data object TtsRoute : NavKey
 
 @Serializable
-data class MediaFilesRoute(val path: String) : BaseRoute
+data class MediaFilesRoute(val path: String) : NavKey
 
 fun EntryProviderScope<NavKey>.mediaSection() {
     entryWithNavAndVm<MediaRoute, MediaViewModel> { _, navigator, viewModel ->

@@ -7,14 +7,10 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-interface BaseRoute : NavKey
-
-interface RootRoute : BaseRoute //根栈的路由分类
-
-interface MainRoute : BaseRoute //嵌套NavDisplay的路由分类
+interface RootRoute : NavKey //根栈的路由分类
 
 @Serializable
-data object MainGraph : NavKey //代表嵌套NavDisplay的路由放在根栈
+data object MainRoute : NavKey //代表嵌套NavDisplay的路由放在根栈
 
 inline fun <reified R : NavKey, reified VM : ViewModel>
         EntryProviderScope<NavKey>.entryWithVm(

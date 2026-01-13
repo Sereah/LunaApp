@@ -36,12 +36,13 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.lunacattus.conflux.permission.PermissionHost
 import com.lunacattus.conflux.ui.base.LocalNavigator
-import com.lunacattus.conflux.ui.base.MainGraph
+import com.lunacattus.conflux.ui.base.MainRoute
 import com.lunacattus.conflux.ui.base.Navigator
 import com.lunacattus.conflux.ui.base.rememberNavigationState
 import com.lunacattus.conflux.ui.sections.connection.ConnectionRoute
 import com.lunacattus.conflux.ui.sections.home.HomeRoute
 import com.lunacattus.conflux.ui.sections.media.MediaRoute
+import com.lunacattus.conflux.ui.sections.root.rootSection
 import com.lunacattus.conflux.ui.sections.setting.SettingRoute
 import com.lunacattus.conflux.ui.theme.LunaAppTheme
 import com.lunacattus.ui_design.compose.dialog.OverlayToast
@@ -75,14 +76,14 @@ class MainActivity : ComponentActivity() {
                     darkTheme = viewModel.nightMode
                 ) {
                     SystemBarAppearance(viewModel.nightMode)
-                    val rootBackStack = rememberNavBackStack(MainGraph)
+                    val rootBackStack = rememberNavBackStack(MainRoute)
                     val innerNavigationState = rememberNavigationState(
                         startRoute = HomeRoute,
                         topLevelRoutesKey = topLevelRoutes.keys
                     )
                     val navigator = remember(rootBackStack, innerNavigationState) {
                         Navigator(
-                            innerState = innerNavigationState,
+                            mainNavState = innerNavigationState,
                             rootBackStack = rootBackStack
                         )
                     }
@@ -98,9 +99,10 @@ class MainActivity : ComponentActivity() {
                                     rememberViewModelStoreNavEntryDecorator()
                                 ),
                                 entryProvider = entryProvider {
-                                    entry<MainGraph> {
+                                    entry<MainRoute> {
                                         Main(innerNavigationState, navigator)
                                     }
+                                    rootSection()
                                 }
                             ),
                             onBack = { navigator.goBack() },

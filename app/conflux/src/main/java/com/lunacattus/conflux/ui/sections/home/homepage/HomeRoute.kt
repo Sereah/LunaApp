@@ -8,19 +8,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.lunacattus.conflux.ui.LocalSetTopBarTitle
 import com.lunacattus.conflux.ui.TopBarTitle
+import com.lunacattus.ui_design.compose.clickableWithDebounce
 
 @Composable
-fun HomeRoute(viewModel: HomeViewModel) {
+fun HomeRoute(viewModel: HomeViewModel, navToRoot: () -> Unit) {
     LocalSetTopBarTitle.current.invoke(TopBarTitle("首页"))
-    HomeScreen()
+    HomeScreen(navToRoot)
 }
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navToRoot: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text("首页")
+        Text("首页", modifier = Modifier.clickableWithDebounce {
+            navToRoot.invoke()
+        })
     }
 }
