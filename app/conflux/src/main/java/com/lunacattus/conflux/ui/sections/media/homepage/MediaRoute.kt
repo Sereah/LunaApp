@@ -76,15 +76,19 @@ fun MediaScreen(
         stringResource(id= R.string.speech_init_fail, uiState.initMsg)
     }
     var voiceBasicCardLockState by remember { mutableStateOf(CardLockState.Lock) }
+    var lastVoiceState by remember { mutableStateOf(uiState.voiceBasicInitState) }
     LaunchedEffect(uiState.voiceBasicInitState) {
         voiceBasicCardLockState = when (uiState.voiceBasicInitState) {
             VoiceBasicState.UnAuth -> CardLockState.Lock
             VoiceBasicState.Authing -> CardLockState.UnLocking
             VoiceBasicState.Authed -> CardLockState.UnLock
         }
-        ActivityToastEvent.send(
-            ToastEvent.ShowToast(toastText)
-        )
+        if (lastVoiceState == VoiceBasicState.Authing && uiState.voiceBasicInitState != VoiceBasicState.Authing) {
+            ActivityToastEvent.send(
+                ToastEvent.ShowToast(toastText)
+            )
+        }
+        lastVoiceState = uiState.voiceBasicInitState
     }
 
     val mediaUtilItems = listOf(
