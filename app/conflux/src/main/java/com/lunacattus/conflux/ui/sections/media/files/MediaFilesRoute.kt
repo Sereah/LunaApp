@@ -31,10 +31,12 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lunacattus.common.util.toDurationStringShort
+import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.LocalInnerPadding
 import com.lunacattus.ui_design.compose.SwipeToRevealItem
 import com.lunacattus.ui_design.compose.clickableWithDebounce
@@ -124,8 +126,8 @@ fun MediaFilesScreen(
         exit = fadeOut()
     ) {
         val text = when {
-            uiState.isLoading -> "加载中..."
-            uiState.hasLoaded && uiState.mediaFiles.isEmpty() -> "空空如也"
+            uiState.isLoading -> stringResource(R.string.loading)
+            uiState.hasLoaded && uiState.mediaFiles.isEmpty() -> stringResource(R.string.empty)
             else -> ""
         }
         Box(contentAlignment = Alignment.Center) {

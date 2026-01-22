@@ -15,8 +15,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.ActivityToastEvent
 import com.lunacattus.conflux.ui.LocalInnerPadding
 import com.lunacattus.conflux.ui.ToastEvent
@@ -58,16 +60,21 @@ fun MediaScreen(
 
     val voiceBasicItems = listOf(
         NavigationItem(
-            title = "ASR识别",
+            title = stringResource(R.string.asr),
             icon = Icons.Rounded.SpatialAudioOff,
             onClick = navToAsrScreen
         ),
         NavigationItem(
-            title = "TTS合成",
+            title = stringResource(R.string.tts),
             icon = Icons.Rounded.SettingsVoice,
             onClick = navToTTSScreen
         ),
     )
+    val toastText = if (uiState.voiceBasicInitState == VoiceBasicState.Authed) {
+        stringResource(R.string.speech_init_success)
+    } else {
+        stringResource(id= R.string.speech_init_fail, uiState.initMsg)
+    }
     var voiceBasicCardLockState by remember { mutableStateOf(CardLockState.Lock) }
     LaunchedEffect(uiState.voiceBasicInitState) {
         voiceBasicCardLockState = when (uiState.voiceBasicInitState) {
@@ -75,18 +82,21 @@ fun MediaScreen(
             VoiceBasicState.Authing -> CardLockState.UnLocking
             VoiceBasicState.Authed -> CardLockState.UnLock
         }
+        ActivityToastEvent.send(
+            ToastEvent.ShowToast(toastText)
+        )
     }
 
     val mediaUtilItems = listOf(
         SwitchItem(
-            title = "录制音频",
-            summary = if (uiState.isRecord) "录制中" else null,
+            title = stringResource(R.string.record),
+            summary = if (uiState.isRecord) stringResource(R.string.recording) else null,
             icon = Icons.Rounded.KeyboardVoice,
             checked = uiState.isRecord,
             onCheckedChange = switchRecord
         ),
         NavigationItem(
-            title = "打开录音文件",
+            title = stringResource(R.string.open_record_file),
             icon = Icons.Rounded.KeyboardVoice,
             onClick = {
                 if (uiState.isRecord) {
@@ -107,13 +117,13 @@ fun MediaScreen(
     ) {
 
         item {
-            ItemCard(voiceBasicItems, "语音基础功能", lockState = voiceBasicCardLockState) {
+            ItemCard(voiceBasicItems, stringResource(R.string.speech_basic_skill), lockState = voiceBasicCardLockState) {
                 unLockVoiceBasicFeature()
             }
         }
 
         item {
-            ItemCard(mediaUtilItems, "录音能力")
+            ItemCard(mediaUtilItems, stringResource(R.string.record_skill))
         }
     }
 }

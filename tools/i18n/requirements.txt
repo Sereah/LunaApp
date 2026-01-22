@@ -1,0 +1,4 @@
+lxml
+tqdm
+requests
+httpx

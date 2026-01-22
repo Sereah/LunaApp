@@ -54,18 +54,10 @@ class MediaViewModel @Inject constructor(
                             VoiceBasicState.Authed
                         } else {
                             VoiceBasicState.UnAuth
-                        }
+                        },
+                        initMsg = if (authResult.success) "" else authResult.msg
                     )
                 }
-                ActivityToastEvent.send(
-                    ToastEvent.ShowToast(
-                        if (authResult.success) {
-                            "语音初始化成功"
-                        } else {
-                            "语音初始化失败: ${authResult.msg}"
-                        }
-                    )
-                )
             }
         }
     }
@@ -100,6 +92,7 @@ class MediaViewModel @Inject constructor(
 
 data class MediaHomeUiState(
     val voiceBasicInitState: VoiceBasicState = VoiceBasicState.UnAuth,
+    val initMsg: String = "",
     val isRecord: Boolean = false
 )
 

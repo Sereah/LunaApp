@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="androidAuto">AndroidAuto</string>
+  <string name="app_name">Conflux</string>
+  <string name="asr">自動語音辨識</string>
+  <string name="asr_setting">ASR 設定</string>
+  <string name="asr_title">語音辨識</string>
+  <string name="click_to_start">點擊開始</string>
+  <string name="connection_title">連線</string>
+  <string name="dynamic_color">動態色彩</string>
+  <string name="empty">空白</string>
+  <string name="files_title">檔案</string>
+  <string name="home_title">首頁</string>
+  <string name="homepage">首頁</string>
+  <string name="leak_canary_display_activity_label">ConfluxLeak</string>
+  <string name="listening">正在聆聽…</string>
+  <string name="loading">載入中…</string>
+  <string name="media_title">媒體</string>
+  <string name="music_title">音樂檔案</string>
+  <string name="night_mode">夜間模式</string>
+  <string name="night_mode_summary">預設跟隨系統</string>
+  <string name="offline_asr">離線語音辨識</string>
+  <string name="offline_tts">離線文字轉語音</string>
+  <string name="online_asr">線上語音辨識</string>
+  <string name="online_tts">線上文字轉語音</string>
+  <string name="open_record_file">開啟錄音檔案</string>
+  <string name="record">錄製</string>
+  <string name="record_skill">記錄技能</string>
+  <string name="record_title">錄音檔案</string>
+  <string name="recording">錄音中</string>
+  <string name="setting_title">設定</string>
+  <string name="speech_basic_skill">語音基礎技能</string>
+  <string name="start_recognition">開始辨識</string>
+  <string name="stop_recognition">停止辨識</string>
+  <string name="tts">文字轉語音</string>
+  <string name="tts_title">文字轉語音</string>
+  <string name="unknow_error">糟糕！未知錯誤。</string>
+</resources>

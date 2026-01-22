@@ -57,9 +57,7 @@ fun EntryProviderScope<NavKey>.mediaSection() {
             }
         )
     }
-    entryWithVm<AsrRoute, AsrViewModel>(
-        metadata = mapOf("title" to "ASR识别")
-    ) { _, viewmodel ->
+    entryWithVm<AsrRoute, AsrViewModel> { _, viewmodel ->
         AsrRoute(viewmodel)
     }
     entryWithVm<TtsRoute, TtsViewModel> { _, viewmodel ->

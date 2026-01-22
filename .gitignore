@@ -16,3 +16,4 @@ local.properties
 /.idea
 .idea
 .kotlin
+/tools/i18n/venv

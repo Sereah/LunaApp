@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="androidAuto">Android Auto</string>
+  <string name="app_name">Conflux</string>
+  <string name="asr">Reconnaissance vocale automatique</string>
+  <string name="asr_setting">Paramètre ASR</string>
+  <string name="asr_title">ASR</string>
+  <string name="click_to_start">Cliquez pour démarrer</string>
+  <string name="connection_title">Connexion</string>
+  <string name="dynamic_color">Couleur dynamique</string>
+  <string name="empty">Vide</string>
+  <string name="files_title">Fichiers</string>
+  <string name="home_title">Accueil</string>
+  <string name="homepage">Page d\'accueil</string>
+  <string name="leak_canary_display_activity_label">ConfluxLeak</string>
+  <string name="listening">Écoute en cours…</string>
+  <string name="loading">Chargement…</string>
+  <string name="media_title">Média</string>
+  <string name="music_title">FichiersMusicaux</string>
+  <string name="night_mode">Mode Nuit</string>
+  <string name="night_mode_summary">Suivre le système par défaut</string>
+  <string name="offline_asr">Reconnaissance vocale hors ligne</string>
+  <string name="offline_tts">TTS hors ligne</string>
+  <string name="online_asr">Reconnaissance vocale en ligne</string>
+  <string name="online_tts">TTS en ligne</string>
+  <string name="open_record_file">Ouvrir le fichier d\'enregistrement</string>
+  <string name="record">Enregistrer</string>
+  <string name="record_skill">Enregistrer la compétence</string>
+  <string name="record_title">Fichiers d\'enregistrement</string>
+  <string name="recording">Enregistrement</string>
+  <string name="setting_title">Paramètres</string>
+  <string name="speech_basic_skill">Compétence de base en parole</string>
+  <string name="start_recognition">Démarrer la reconnaissance</string>
+  <string name="stop_recognition">Arrêter la reconnaissance</string>
+  <string name="tts">Synthèse vocale</string>
+  <string name="tts_title">TTS</string>
+  <string name="unknow_error">Merde ! Erreur inconnue.</string>
+</resources>

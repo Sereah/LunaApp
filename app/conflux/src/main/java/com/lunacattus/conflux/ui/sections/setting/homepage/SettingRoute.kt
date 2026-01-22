@@ -5,14 +5,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ColorLens
 import androidx.compose.material.icons.rounded.Nightlight
-import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.LocalActivityViewModel
 import com.lunacattus.conflux.ui.LocalInnerPadding
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.SwitchItem
-import com.lunacattus.conflux.ui.base.ValueNavigationItem
 import com.lunacattus.ui_design.compose.overScrollVertical
 
 @Composable
@@ -35,21 +35,15 @@ private fun SettingScreen(
 ) {
 
     val firstItems = listOf(
-        ValueNavigationItem(
-            title = "测试",
-            icon = Icons.Rounded.Restore,
-            summary = "这是一个测试item",
-            valueText = "打开",
-            onClick = {}),
         SwitchItem(
-            title = "自适应主题颜色",
+            title = stringResource(R.string.dynamic_color),
             icon = Icons.Rounded.ColorLens,
             checked = enableDynamicColor,
             onCheckedChange = changeDynamicColor
         ),
         SwitchItem(
-            title = "黑夜主题",
-            summary = "默认跟随系统",
+            title = stringResource(R.string.night_mode),
+            summary = stringResource(R.string.night_mode_summary),
             icon = Icons.Rounded.Nightlight,
             checked = enableNightMode,
             onCheckedChange = changeNightMode

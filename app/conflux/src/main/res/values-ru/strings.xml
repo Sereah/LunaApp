@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="androidAuto">Android Auto</string>
+  <string name="app_name">Conflux</string>
+  <string name="asr">Автоматическое распознавание речи</string>
+  <string name="asr_setting">Настройка ASR</string>
+  <string name="asr_title">ASR</string>
+  <string name="click_to_start">Нажмите, чтобы начать</string>
+  <string name="connection_title">Подключение</string>
+  <string name="dynamic_color">Динамический цвет</string>
+  <string name="empty">Пусто</string>
+  <string name="files_title">Файлы</string>
+  <string name="home_title">Главная</string>
+  <string name="homepage">Главная страница</string>
+  <string name="leak_canary_display_activity_label">ConfluxLeak</string>
+  <string name="listening">Слушаю…</string>
+  <string name="loading">Загрузка…</string>
+  <string name="media_title">Медиа</string>
+  <string name="music_title">Музыкальные файлы</string>
+  <string name="night_mode">Ночной режим</string>
+  <string name="night_mode_summary">По умолчанию следовать системе</string>
+  <string name="offline_asr">Офлайн ASR</string>
+  <string name="offline_tts">Офлайн TTS</string>
+  <string name="online_asr">Онлайн ASR</string>
+  <string name="online_tts">Онлайн TTS</string>
+  <string name="open_record_file">Открыть файл записи</string>
+  <string name="record">Запись</string>
+  <string name="record_skill">Записать навык</string>
+  <string name="record_title">Файлы записей</string>
+  <string name="recording">Запись</string>
+  <string name="setting_title">Настройки</string>
+  <string name="speech_basic_skill">Речевой базовый навык</string>
+  <string name="start_recognition">Начать распознавание</string>
+  <string name="stop_recognition">Остановить распознавание</string>
+  <string name="tts">Текст в речь</string>
+  <string name="tts_title">TTS</string>
+  <string name="unknow_error">Чёрт! Неизвестная ошибка.</string>
+</resources>
