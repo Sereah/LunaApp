@@ -36,4 +36,6 @@
     <string name="speech_init_success">Speech init success!</string>
     <string name="speech_init_fail">Speech init fail: %s</string>
     <string name="leak_canary_display_activity_label">ConfluxLeak</string>
+    <string name="unlock">Unlock</string>
+    <string name="unlocking">Unlocking</string>
 </resources>

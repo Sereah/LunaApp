@@ -28,8 +28,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.lunacattus.conflux.R
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 import com.lunacattus.ui_design.compose.onClickWithDebounced
 
@@ -203,8 +205,8 @@ fun ItemCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         when (lockState) {
-                            CardLockState.Lock -> "解锁"
-                            else -> "解锁中"
+                            CardLockState.Lock -> stringResource(R.string.unlock)
+                            else -> stringResource(R.string.unlocking)
                         }
                     )
                 }
