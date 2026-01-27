@@ -38,18 +38,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lunacattus.common.util.toDurationStringShort
 import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.LocalInnerPadding
+import com.lunacattus.conflux.ui.sections.media.MediaSourceType
 import com.lunacattus.ui_design.compose.SwipeToRevealItem
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 
 @Composable
 fun MediaFilesRoute(
     viewModel: MediaFilesViewModel,
-    path: String
+    type: MediaSourceType,
+    navToMediaPlayerScreen: (MediaFile) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     MediaFilesScreen(
         uiState,
-        selectFile = { viewModel.handleUiIntent(MediaFilesUiIntent.PlayMedia(it)) },
+        selectFile = navToMediaPlayerScreen,
         deleteFile = { viewModel.handleUiIntent(MediaFilesUiIntent.DeleteMedia(it)) })
 }
 

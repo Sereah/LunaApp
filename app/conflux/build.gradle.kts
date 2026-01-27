@@ -22,4 +22,7 @@ dependencies {
     debugImplementation(libs.leakcanary.android)
     implementation(libs.haze.android)
     implementation(libs.haze.material)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.session)
+    implementation(libs.androidx.media3.ui)
 }

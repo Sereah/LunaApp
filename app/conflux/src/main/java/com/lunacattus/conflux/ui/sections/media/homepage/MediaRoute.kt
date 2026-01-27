@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardVoice
+import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.SettingsVoice
 import androidx.compose.material.icons.rounded.SpatialAudioOff
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ import com.lunacattus.conflux.ui.base.CardLockState
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.NavigationItem
 import com.lunacattus.conflux.ui.base.SwitchItem
+import com.lunacattus.conflux.ui.sections.media.MediaSourceType
 import com.lunacattus.ui_design.compose.overScrollVertical
 import kotlinx.coroutines.launch
 
@@ -34,7 +36,7 @@ fun MediaRoute(
     viewModel: MediaViewModel,
     navToAsrScreen: () -> Unit,
     navToTTSScreen: () -> Unit,
-    navToMediaFilesScreen: () -> Unit
+    navToMediaFilesScreen: (type: MediaSourceType) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sendUiIntent = viewModel::handleUiIntent
@@ -42,7 +44,7 @@ fun MediaRoute(
         uiState, navToAsrScreen, navToTTSScreen,
         unLockVoiceBasicFeature = { sendUiIntent(MediaHomeUiIntent.InitVoiceBasic) },
         switchRecord = { sendUiIntent(MediaHomeUiIntent.SwitchRecord(it)) },
-        openRecordingFile = navToMediaFilesScreen
+        navToMediaFilesScreen = navToMediaFilesScreen
     )
 }
 
@@ -53,7 +55,7 @@ fun MediaScreen(
     navToTTSScreen: () -> Unit,
     unLockVoiceBasicFeature: () -> Unit,
     switchRecord: (isRecord: Boolean) -> Unit,
-    openRecordingFile: () -> Unit
+    navToMediaFilesScreen: (type: MediaSourceType) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
@@ -106,8 +108,18 @@ fun MediaScreen(
                 if (uiState.isRecord) {
                     scope.launch { ActivityToastEvent.send(ToastEvent.ShowToast("请先停止录制")) }
                 } else {
-                    openRecordingFile()
+                    navToMediaFilesScreen(MediaSourceType.AppRecording)
                 }
+            }
+        )
+    )
+
+    val mediaFilesItems = listOf(
+        NavigationItem(
+            title = stringResource(R.string.open_music_file),
+            icon = Icons.Rounded.MusicNote,
+            onClick = {
+                navToMediaFilesScreen(MediaSourceType.SystemMusic)
             }
         )
     )
@@ -128,6 +140,10 @@ fun MediaScreen(
 
         item {
             ItemCard(mediaUtilItems, stringResource(R.string.record_skill))
+        }
+
+        item {
+            ItemCard(mediaFilesItems, stringResource(R.string.media_file))
         }
     }
 }

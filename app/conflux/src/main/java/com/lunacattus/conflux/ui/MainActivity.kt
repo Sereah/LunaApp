@@ -2,6 +2,7 @@ package com.lunacattus.conflux.ui
 
 import android.Manifest
 import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -68,9 +69,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             viewModel.changeNightMode(isSystemInDarkTheme())
             PermissionHost(
-                permissions = listOf(
-                    Manifest.permission.RECORD_AUDIO,
-                ),
+                permissions = buildPermissionList(),
                 onPermissionDenied = {
                     finish()
                 }
@@ -176,3 +175,27 @@ data class NavBarItem(
     val icon: ImageVector,
     val title: String
 )
+
+private fun buildPermissionList(): List<String> {
+    return buildList {
+        add(Manifest.permission.RECORD_AUDIO)
+        add(Manifest.permission.POST_NOTIFICATIONS)
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                add(Manifest.permission.READ_MEDIA_AUDIO)
+                add(Manifest.permission.READ_MEDIA_VIDEO)
+                add(Manifest.permission.READ_MEDIA_IMAGES)
+                add(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+            }
+
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+
+            else -> {
+                add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
+    }
+}
+

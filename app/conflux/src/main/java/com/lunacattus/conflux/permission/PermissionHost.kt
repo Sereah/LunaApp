@@ -64,26 +64,66 @@ fun PermissionHost(
     val context = LocalContext.current
     val activity = context as Activity
 
+    // 1. 将 check 逻辑移到 state 初始化之前或定义为独立函数
+    fun checkDeniedPermissions(): List<String> {
+        val isPartialGranted = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            false
+        }
+
+        return permissions.filter { permission ->
+            val isGranted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+
+            val isMediaPermission = permission == android.Manifest.permission.READ_MEDIA_IMAGES ||
+                    permission == android.Manifest.permission.READ_MEDIA_VIDEO
+
+            if (isMediaPermission && isPartialGranted) {
+                false
+            } else {
+                !isGranted
+            }
+        }
+    }
+
+    // 2. 修改 uiState 的初始化逻辑
     var uiState by remember {
-        mutableStateOf<PermissionUiState>(
-            PermissionUiState.RequestPermission(permissions)
+        val initialDenied = checkDeniedPermissions()
+        mutableStateOf(
+            if (initialDenied.isEmpty()) {
+                PermissionUiState.Granted
+            } else {
+                PermissionUiState.RequestPermission(initialDenied)
+            }
         )
     }
 
-    fun deniedPermissions(): List<String> =
-        permissions.filter {
-            ContextCompat.checkSelfPermission(
-                context,
-                it
-            ) != PackageManager.PERMISSION_GRANTED
-        }
+    fun deniedPermissions() = checkDeniedPermissions()
 
     val permissionLauncher =
         rememberLauncherForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { result ->
 
-            val denied = result.filterValues { !it }.keys.toList()
+            // 判断是否获得了部分授权 (Android 14+)
+            val hasPartialAccess = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                result[android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED] == true
+            } else {
+                false
+            }
+
+            val denied = result.filter { (permission, isGranted) ->
+                if (isGranted) return@filter false
+
+                // 如果获得了部分授权，忽略媒体权限的失败
+                val isMediaPermission = permission == android.Manifest.permission.READ_MEDIA_IMAGES ||
+                        permission == android.Manifest.permission.READ_MEDIA_VIDEO
+
+                !(isMediaPermission && hasPartialAccess)
+            }.keys.toList()
 
             if (denied.isEmpty()) {
                 uiState = PermissionUiState.Granted

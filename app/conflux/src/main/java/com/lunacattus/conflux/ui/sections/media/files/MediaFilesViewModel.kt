@@ -1,8 +1,9 @@
 package com.lunacattus.conflux.ui.sections.media.files
 
-import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lunacattus.conflux.domain.media.MediaRepository
+import com.lunacattus.conflux.ui.sections.media.MediaSourceType
 import com.lunacattus.logger.Logger
 import com.lunacattus.voice.record.RecordingFileRepository
 import dagger.assisted.Assisted
@@ -19,20 +20,21 @@ import java.io.File
 
 @HiltViewModel(assistedFactory = MediaFilesViewModel.Factory::class)
 class MediaFilesViewModel @AssistedInject constructor(
-    @Assisted val path: String,
-    private val recordingFileRepository: RecordingFileRepository
+    @Assisted val type: MediaSourceType,
+    private val recordingFileRepository: RecordingFileRepository,
+    private val mediaRepository: MediaRepository
 ) : ViewModel() {
 
     @AssistedFactory
     interface Factory {
-        fun create(path: String): MediaFilesViewModel
+        fun create(type: MediaSourceType): MediaFilesViewModel
     }
 
     private val _uiState = MutableStateFlow(MediaFilesUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
-        Logger.d(TAG, "init, path: $path")
+        Logger.d(TAG, "init, type: $type")
         updateFiles()
     }
 
@@ -63,8 +65,16 @@ class MediaFilesViewModel @AssistedInject constructor(
         reduce { copy(isLoading = true) }
         viewModelScope.launch {
             val dataDeferred = async(Dispatchers.IO) {
-                recordingFileRepository.getWavFiles(path).map { file ->
-                    MediaFile(file, recordingFileRepository.getWavDuration(file))
+                when (type) {
+                    MediaSourceType.AppRecording -> {
+                        recordingFileRepository.getWavFiles().map { file ->
+                            MediaFile(file, recordingFileRepository.getWavDuration(file))
+                        }
+                    }
+
+                    MediaSourceType.SystemMusic -> {
+                        mediaRepository.getAllMusic()
+                    }
                 }
             }
             val timerDeferred = async { delay(500) }

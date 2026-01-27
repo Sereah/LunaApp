@@ -1,17 +1,18 @@
 package com.lunacattus.conflux.ui.sections.media
 
-import android.os.Environment
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.base.MainRoute
+import com.lunacattus.conflux.ui.base.RootRoute
 import com.lunacattus.conflux.ui.base.entryWithNavAndVm
 import com.lunacattus.conflux.ui.base.entryWithVm
 import com.lunacattus.conflux.ui.sections.media.files.MediaFilesRoute
 import com.lunacattus.conflux.ui.sections.media.files.MediaFilesViewModel
 import com.lunacattus.conflux.ui.sections.media.homepage.MediaRoute
 import com.lunacattus.conflux.ui.sections.media.homepage.MediaViewModel
+import com.lunacattus.conflux.ui.sections.media.player.MediaPlayerRoute
 import com.lunacattus.conflux.ui.sections.media.speech.asr.AsrRoute
 import com.lunacattus.conflux.ui.sections.media.speech.asr.AsrViewModel
 import com.lunacattus.conflux.ui.sections.media.speech.tts.TtsRoute
@@ -37,14 +38,16 @@ data object TtsRoute : MainRoute {
 }
 
 @Serializable
-data class MediaFilesRoute(val path: String) : MainRoute {
+data class MediaFilesRoute(val type: MediaSourceType) : MainRoute {
     override val titleResId: Int
-        get() = when (path) {
-            Environment.DIRECTORY_RECORDINGS -> R.string.record_title
-            Environment.DIRECTORY_MUSIC -> R.string.music_title
-            else -> R.string.files_title
+        get() = when (type) {
+            MediaSourceType.AppRecording -> R.string.record_title
+            MediaSourceType.SystemMusic -> R.string.music_title
         }
 }
+
+@Serializable
+data class MediaPlayerRoute(val path: String) : RootRoute
 
 fun EntryProviderScope<NavKey>.mediaSection() {
     entryWithNavAndVm<MediaRoute, MediaViewModel> { _, navigator, viewModel ->
@@ -53,7 +56,7 @@ fun EntryProviderScope<NavKey>.mediaSection() {
             navToAsrScreen = { navigator.navigate(AsrRoute) },
             navToTTSScreen = { navigator.navigate(TtsRoute) },
             navToMediaFilesScreen = {
-                navigator.navigate(MediaFilesRoute(Environment.DIRECTORY_RECORDINGS))
+                navigator.navigate(MediaFilesRoute(it))
             }
         )
     }
@@ -63,12 +66,35 @@ fun EntryProviderScope<NavKey>.mediaSection() {
     entryWithVm<TtsRoute, TtsViewModel> { _, viewmodel ->
         TtsRoute(viewmodel)
     }
-    entry<MediaFilesRoute> {
-        val viewModel = hiltViewModel<MediaFilesViewModel, MediaFilesViewModel.Factory>(
-            creationCallback = { factory ->
-                factory.create(it.path)
-            }
-        )
-        MediaFilesRoute(viewModel, it.path)
+    entryWithNavAndVm<MediaFilesRoute, MediaFilesViewModel>(
+        viewModelProvider = { route ->
+            hiltViewModel<MediaFilesViewModel, MediaFilesViewModel.Factory>(
+                creationCallback = {
+                    it.create(route.type)
+                }
+            )
+        }
+    ) { route, navigator, viewModel ->
+        MediaFilesRoute(
+            viewModel, route.type,
+            navToMediaPlayerScreen = {
+                navigator.navigate(MediaPlayerRoute(path = it.file.absolutePath))
+            })
     }
+}
+
+fun EntryProviderScope<NavKey>.mediaRootSection() {
+    entry<MediaPlayerRoute> {
+        MediaPlayerRoute(filePath = it.path)
+    }
+}
+
+@Serializable
+sealed class MediaSourceType {
+
+    @Serializable
+    data object AppRecording : MediaSourceType()
+
+    @Serializable
+    data object SystemMusic : MediaSourceType()
 }
