@@ -7,6 +7,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.lunacattus.conflux.ui.sections.media.files.MediaFileItem
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -89,6 +90,19 @@ class MediaRepository @Inject constructor(
             }
         }
         return list
+    }
+
+    fun deleteFileSafely(file: File?): Boolean {
+        if (file == null || !file.exists()) return true
+
+        return runCatching {
+            if (file.isDirectory) {
+                file.listFiles()?.forEach { child ->
+                    deleteFileSafely(child)
+                }
+            }
+            file.delete()
+        }.getOrDefault(false)
     }
 
     companion object {

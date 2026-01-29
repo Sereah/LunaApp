@@ -8,6 +8,7 @@ import androidx.compose.material.icons.rounded.KeyboardVoice
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.SettingsVoice
 import androidx.compose.material.icons.rounded.SpatialAudioOff
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,6 +26,7 @@ import com.lunacattus.conflux.ui.ActivityToastEvent
 import com.lunacattus.conflux.ui.LocalInnerPadding
 import com.lunacattus.conflux.ui.ToastEvent
 import com.lunacattus.conflux.ui.base.CardLockState
+import com.lunacattus.conflux.ui.base.IconSource
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.NavigationItem
 import com.lunacattus.conflux.ui.base.SwitchItem
@@ -63,12 +66,14 @@ fun MediaScreen(
     val voiceBasicItems = listOf(
         NavigationItem(
             title = stringResource(R.string.asr),
-            icon = Icons.Rounded.SpatialAudioOff,
+            icon = IconSource.Vector(Icons.Rounded.SpatialAudioOff),
+            iconTint = LocalContentColor.current,
             onClick = navToAsrScreen
         ),
         NavigationItem(
             title = stringResource(R.string.tts),
-            icon = Icons.Rounded.SettingsVoice,
+            icon = IconSource.Vector(Icons.Rounded.SettingsVoice),
+            iconTint = LocalContentColor.current,
             onClick = navToTTSScreen
         ),
     )
@@ -97,13 +102,15 @@ fun MediaScreen(
         SwitchItem(
             title = stringResource(R.string.record),
             summary = if (uiState.isRecord) stringResource(R.string.recording) else null,
-            icon = Icons.Rounded.KeyboardVoice,
+            icon = IconSource.Vector(Icons.Rounded.KeyboardVoice),
+            iconTint = if (uiState.isRecord) Color.Green else LocalContentColor.current,
             checked = uiState.isRecord,
             onCheckedChange = switchRecord
         ),
         NavigationItem(
             title = stringResource(R.string.open_record_file),
-            icon = Icons.Rounded.KeyboardVoice,
+            icon = IconSource.Resource(R.drawable.ic_record_file),
+            iconTint = LocalContentColor.current,
             onClick = {
                 if (uiState.isRecord) {
                     scope.launch { ActivityToastEvent.send(ToastEvent.ShowToast("请先停止录制")) }
@@ -117,7 +124,8 @@ fun MediaScreen(
     val mediaFilesItems = listOf(
         NavigationItem(
             title = stringResource(R.string.open_music_file),
-            icon = Icons.Rounded.MusicNote,
+            icon = IconSource.Vector(Icons.Rounded.MusicNote),
+            iconTint = LocalContentColor.current,
             onClick = {
                 navToMediaFilesScreen(MediaSourceType.SystemMusic)
             }

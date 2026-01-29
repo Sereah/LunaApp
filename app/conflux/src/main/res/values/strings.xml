@@ -40,4 +40,9 @@
     <string name="unlocking">Unlocking</string>
     <string name="open_music_file">Open Music Files</string>
     <string name="media_file">Media Files</string>
+    <string name="delete">Delete</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="day_before_yesterday">2 days ago</string>
+    <string name="play">Play</string>
 </resources>

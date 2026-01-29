@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.TypedValue
 import android.view.View
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -23,6 +24,65 @@ fun Long.toDateTimeString(
     val sdf = SimpleDateFormat(pattern, locale)
     sdf.timeZone = timeZone
     return sdf.format(Date(millis))
+}
+
+/**
+ * 将文件大小（字节）转换为易读的字符串格式
+ */
+fun Long.toFileSizeString(): String {
+    val kb = 1024.0
+    val mb = kb * 1024
+    val gb = mb * 1024
+    val tb = gb * 1024
+
+    return when {
+        this < kb -> "$this B"
+        this < mb -> "%.2f KB".format(this / kb)
+        this < gb -> "%.2f MB".format(this / mb)
+        this < tb -> "%.2f GB".format(this / gb)
+        else -> "%.2f TB".format(this / tb)
+    }
+}
+
+/**
+ * 将时间戳转换为“智能”日期字符串
+ * - 今天、昨天、前天
+ * - 今年之内：M月d日
+ * - 其他年份：yyyy年M月d日
+ */
+fun Long.toSmartDateString(
+    todayString: String,
+    yesterdayString: String,
+    dayBeforeYesterdayString: String,
+    locale: Locale = Locale.getDefault()
+): String {
+    val now = Calendar.getInstance()
+    val target = Calendar.getInstance().apply { timeInMillis = this@toSmartDateString }
+
+    val nowYear = now.get(Calendar.YEAR)
+    val targetYear = target.get(Calendar.YEAR)
+
+    fun Calendar.isSameDay(other: Calendar): Boolean {
+        return get(Calendar.YEAR) == other.get(Calendar.YEAR) &&
+                get(Calendar.DAY_OF_YEAR) == other.get(Calendar.DAY_OF_YEAR)
+    }
+
+    val yesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
+    val dayBeforeYesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -2) }
+
+    return when {
+        target.isSameDay(now) -> todayString
+        target.isSameDay(yesterday) -> yesterdayString
+        target.isSameDay(dayBeforeYesterday) -> dayBeforeYesterdayString
+        nowYear == targetYear -> {
+            val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "MMMd")
+            SimpleDateFormat(pattern, locale).format(target.time)
+        }
+        else -> {
+            val pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "yyyyMMMd")
+            SimpleDateFormat(pattern, locale).format(target.time)
+        }
+    }
 }
 
 fun Long.toDuration(): String {

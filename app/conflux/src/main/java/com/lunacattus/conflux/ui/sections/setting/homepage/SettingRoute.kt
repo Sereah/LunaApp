@@ -5,12 +5,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ColorLens
 import androidx.compose.material.icons.rounded.Nightlight
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.LocalActivityViewModel
 import com.lunacattus.conflux.ui.LocalInnerPadding
+import com.lunacattus.conflux.ui.base.IconSource
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.SwitchItem
 import com.lunacattus.ui_design.compose.overScrollVertical
@@ -37,14 +39,16 @@ private fun SettingScreen(
     val firstItems = listOf(
         SwitchItem(
             title = stringResource(R.string.dynamic_color),
-            icon = Icons.Rounded.ColorLens,
+            icon = IconSource.Vector(Icons.Rounded.ColorLens),
+            iconTint = LocalContentColor.current,
             checked = enableDynamicColor,
             onCheckedChange = changeDynamicColor
         ),
         SwitchItem(
             title = stringResource(R.string.night_mode),
             summary = stringResource(R.string.night_mode_summary),
-            icon = Icons.Rounded.Nightlight,
+            icon = IconSource.Vector(Icons.Rounded.Nightlight),
+            iconTint = LocalContentColor.current,
             checked = enableNightMode,
             onCheckedChange = changeNightMode
         ),

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -16,6 +17,7 @@ import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.ActivityToastEvent
 import com.lunacattus.conflux.ui.LocalInnerPadding
 import com.lunacattus.conflux.ui.ToastEvent
+import com.lunacattus.conflux.ui.base.IconSource
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.NavigationItem
 import com.lunacattus.ui_design.compose.overScrollVertical
@@ -47,7 +49,8 @@ fun ConnectionScreen(
     val connectionItems = listOf(
         NavigationItem(
             title = stringResource(R.string.androidAuto),
-            icon = Icons.Rounded.DirectionsCar,
+            icon = IconSource.Vector(Icons.Rounded.DirectionsCar),
+            iconTint = LocalContentColor.current,
             onClick = navToAndroidAuto
         ),
     )

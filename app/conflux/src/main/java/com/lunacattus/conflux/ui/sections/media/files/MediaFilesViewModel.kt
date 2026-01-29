@@ -58,7 +58,15 @@ class MediaFilesViewModel @AssistedInject constructor(
     }
 
     private fun deleteMedia(mediaFile: MediaFileItem) {
+        if (mediaFile.isLocalPrivate) {
+            val file = mediaFile.mediaItem.localConfiguration?.uri?.path?.let { File(it) }
+            val success = mediaRepository.deleteFileSafely(file)
+            if (success) {
+                reduce { copy(mediaFiles = mediaFiles.filterNot { it.mediaItem.mediaId == mediaFile.mediaItem.mediaId }) }
+            }
+        } else {
 
+        }
     }
 
     private fun updateFiles() {
@@ -68,7 +76,11 @@ class MediaFilesViewModel @AssistedInject constructor(
                 when (type) {
                     MediaSourceType.AppRecording -> {
                         recordingFileRepository.getWavFiles().map { file ->
-                            file.toMediaFileItem(duration = recordingFileRepository.getWavDuration(file))
+                            file.toMediaFileItem(
+                                duration = recordingFileRepository.getWavDuration(
+                                    file
+                                )
+                            )
                         }
                     }
 
@@ -108,7 +120,11 @@ data class MediaFileItem(
     val isVideo: Boolean get() = mimeType.startsWith("video/")
 
     companion object {
-        fun File.toMediaFileItem(width: Int = 0, height: Int = 0, duration: Long = 0L): MediaFileItem {
+        fun File.toMediaFileItem(
+            width: Int = 0,
+            height: Int = 0,
+            duration: Long = 0L
+        ): MediaFileItem {
             val mediaItem = MediaItem.Builder()
                 .setMediaId(this.hashCode().toString())
                 .setUri(Uri.fromFile(this))
@@ -125,7 +141,8 @@ data class MediaFileItem(
                 size = this.length(),
                 dateModified = this.lastModified(),
                 isLocalPrivate = true,
-                mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(this.extension.lowercase()) ?: "",
+                mimeType = MimeTypeMap.getSingleton()
+                    .getMimeTypeFromExtension(this.extension.lowercase()) ?: "",
                 duration = duration
             )
         }

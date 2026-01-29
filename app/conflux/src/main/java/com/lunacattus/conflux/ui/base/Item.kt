@@ -1,5 +1,6 @@
 package com.lunacattus.conflux.ui.base
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -27,7 +28,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,15 +38,22 @@ import com.lunacattus.conflux.R
 import com.lunacattus.ui_design.compose.clickableWithDebounce
 import com.lunacattus.ui_design.compose.onClickWithDebounced
 
+sealed class IconSource {
+    data class Vector(val imageVector: ImageVector) : IconSource()
+    data class Resource(@param:DrawableRes val resId: Int) : IconSource()
+}
+
 sealed interface Item {
     val title: String
-    val icon: ImageVector
+    val icon: IconSource
+    val iconTint: Color
     val summary: String?
 }
 
 data class SwitchItem(
     override val title: String,
-    override val icon: ImageVector,
+    override val icon: IconSource,
+    override val iconTint: Color,
     override val summary: String? = null,
     val checked: Boolean,
     val onCheckedChange: (Boolean) -> Unit,
@@ -51,14 +61,16 @@ data class SwitchItem(
 
 data class NavigationItem(
     override val title: String,
-    override val icon: ImageVector,
+    override val icon: IconSource,
+    override val iconTint: Color,
     override val summary: String? = null,
     val onClick: () -> Unit,
 ) : Item
 
 data class ValueNavigationItem(
     override val title: String,
-    override val icon: ImageVector,
+    override val icon: IconSource,
+    override val iconTint: Color,
     override val summary: String? = null,
     val valueText: String,
     val onClick: () -> Unit,
@@ -84,11 +96,25 @@ fun ItemRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
 
-        Icon(
-            imageVector = item.icon,
-            contentDescription = item.title,
-            modifier = Modifier.size(36.dp)
-        )
+        when (item.icon) {
+            is IconSource.Resource -> {
+                Icon(
+                    painter = painterResource((item.icon as IconSource.Resource).resId),
+                    tint = item.iconTint,
+                    contentDescription = item.title,
+                    modifier = Modifier.size(36.dp)
+                )
+            }
+
+            is IconSource.Vector -> {
+                Icon(
+                    imageVector = (item.icon as IconSource.Vector).imageVector,
+                    tint = item.iconTint,
+                    contentDescription = item.title,
+                    modifier = Modifier.size(36.dp)
+                )
+            }
+        }
 
         Spacer(Modifier.width(12.dp))
 
