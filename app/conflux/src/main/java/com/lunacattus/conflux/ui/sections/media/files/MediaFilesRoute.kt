@@ -46,20 +46,22 @@ import com.lunacattus.ui_design.compose.clickableWithDebounce
 fun MediaFilesRoute(
     viewModel: MediaFilesViewModel,
     type: MediaSourceType,
-    navToMediaPlayerScreen: (MediaFile) -> Unit
+    navToMediaPlayerScreen: (MediaFileItem) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     MediaFilesScreen(
         uiState,
-        selectFile = navToMediaPlayerScreen,
+        selectFile = {
+            viewModel.handleUiIntent(MediaFilesUiIntent.PlayMedia(it))
+        },
         deleteFile = { viewModel.handleUiIntent(MediaFilesUiIntent.DeleteMedia(it)) })
 }
 
 @Composable
 fun MediaFilesScreen(
     uiState: MediaFilesUiState,
-    selectFile: (MediaFile) -> Unit,
-    deleteFile: (MediaFile) -> Unit
+    selectFile: (MediaFileItem) -> Unit,
+    deleteFile: (MediaFileItem) -> Unit
 ) {
     AnimatedVisibility(
         visible = uiState.hasLoaded,
@@ -71,7 +73,7 @@ fun MediaFilesScreen(
             contentPadding = LocalInnerPadding.current,
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
-            items(items = uiState.mediaFiles, key = { it.file.name }) { mediaFile ->
+            items(items = uiState.mediaFiles, key = { it.mediaItem.mediaId }) { mediaFile ->
                 SwipeToRevealItem(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -112,7 +114,7 @@ fun MediaFilesScreen(
                             Icon(imageVector = Icons.Rounded.MusicNote, contentDescription = "")
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
-                                text = "${mediaFile.file.name}", modifier = Modifier.weight(1f),
+                                text = "${mediaFile.mediaItem.mediaMetadata.title}", modifier = Modifier.weight(1f),
                                 overflow = TextOverflow.Ellipsis, maxLines = 1
                             )
                             Text(text = mediaFile.duration.toDurationStringShort())
@@ -136,4 +138,9 @@ fun MediaFilesScreen(
             Text(text)
         }
     }
+}
+
+@Composable
+private fun MediaItem(modifier: Modifier) {
+
 }

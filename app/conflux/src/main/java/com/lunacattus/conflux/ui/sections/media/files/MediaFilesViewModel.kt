@@ -1,9 +1,15 @@
 package com.lunacattus.conflux.ui.sections.media.files
 
+import android.net.Uri
+import android.webkit.MimeTypeMap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import com.lunacattus.conflux.domain.media.MediaRepository
+import com.lunacattus.conflux.domain.media.PlayerManager
 import com.lunacattus.conflux.ui.sections.media.MediaSourceType
+import com.lunacattus.conflux.ui.sections.media.files.MediaFileItem.Companion.toMediaFileItem
 import com.lunacattus.logger.Logger
 import com.lunacattus.voice.record.RecordingFileRepository
 import dagger.assisted.Assisted
@@ -22,7 +28,8 @@ import java.io.File
 class MediaFilesViewModel @AssistedInject constructor(
     @Assisted val type: MediaSourceType,
     private val recordingFileRepository: RecordingFileRepository,
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: MediaRepository,
+    private val playerManager: PlayerManager
 ) : ViewModel() {
 
     @AssistedFactory
@@ -46,19 +53,12 @@ class MediaFilesViewModel @AssistedInject constructor(
         }
     }
 
-    private fun playMedia(file: MediaFile) {
-        recordingFileRepository.playWithSystemPlayer(file.file)
+    private fun playMedia(file: MediaFileItem) {
+        playerManager.play(file.mediaItem)
     }
 
-    private fun deleteMedia(mediaFile: MediaFile) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val success = recordingFileRepository.deleteRecursivelySafely(mediaFile.file)
-            if (success) {
-                reduce {
-                    copy(mediaFiles = mediaFiles.filterNot { it.file == mediaFile.file })
-                }
-            }
-        }
+    private fun deleteMedia(mediaFile: MediaFileItem) {
+
     }
 
     private fun updateFiles() {
@@ -68,7 +68,7 @@ class MediaFilesViewModel @AssistedInject constructor(
                 when (type) {
                     MediaSourceType.AppRecording -> {
                         recordingFileRepository.getWavFiles().map { file ->
-                            MediaFile(file, recordingFileRepository.getWavDuration(file))
+                            file.toMediaFileItem(duration = recordingFileRepository.getWavDuration(file))
                         }
                     }
 
@@ -93,18 +93,52 @@ class MediaFilesViewModel @AssistedInject constructor(
     }
 }
 
-data class MediaFile(
-    val file: File,
-    val duration: Long
-)
+data class MediaFileItem(
+    val mediaItem: MediaItem,
+    val size: Long,
+    val dateModified: Long,
+    val isLocalPrivate: Boolean,
+    val mimeType: String,
+    val width: Int = 0,       // 图片/视频特有
+    val height: Int = 0,      // 图片/视频特有
+    val duration: Long = 0,   // 音频/视频特有
+) {
+    val isImage: Boolean get() = mimeType.startsWith("image/")
+    val isAudio: Boolean get() = mimeType.startsWith("audio/")
+    val isVideo: Boolean get() = mimeType.startsWith("video/")
+
+    companion object {
+        fun File.toMediaFileItem(width: Int = 0, height: Int = 0, duration: Long = 0L): MediaFileItem {
+            val mediaItem = MediaItem.Builder()
+                .setMediaId(this.hashCode().toString())
+                .setUri(Uri.fromFile(this))
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setTitle(this.name)
+                        .setIsPlayable(true)
+                        .build()
+                )
+                .build()
+
+            return MediaFileItem(
+                mediaItem = mediaItem,
+                size = this.length(),
+                dateModified = this.lastModified(),
+                isLocalPrivate = true,
+                mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(this.extension.lowercase()) ?: "",
+                duration = duration
+            )
+        }
+    }
+}
 
 data class MediaFilesUiState(
     val isLoading: Boolean = false,
-    val mediaFiles: List<MediaFile> = emptyList(),
+    val mediaFiles: List<MediaFileItem> = emptyList(),
     val hasLoaded: Boolean = false
 )
 
 sealed interface MediaFilesUiIntent {
-    data class PlayMedia(val file: MediaFile) : MediaFilesUiIntent
-    data class DeleteMedia(val file: MediaFile) : MediaFilesUiIntent
+    data class PlayMedia(val file: MediaFileItem) : MediaFilesUiIntent
+    data class DeleteMedia(val file: MediaFileItem) : MediaFilesUiIntent
 }

@@ -1,5 +1,6 @@
 package com.lunacattus.conflux.domain.media
 
+import android.app.PendingIntent
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
@@ -15,14 +16,21 @@ class PlaybackService : MediaSessionService() {
     override fun onCreate() {
         super.onCreate()
         val player = ExoPlayer.Builder(this).build()
-        session = MediaSession.Builder(this, player).build()
+
+        val intent = packageManager.getLaunchIntentForPackage(packageName)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, intent, PendingIntent.FLAG_IMMUTABLE
+        )
+
+        session = MediaSession.Builder(this, player)
+            .setSessionActivity(pendingIntent)
+            .build()
     }
 
     override fun onDestroy() {
         session?.run {
-            player.release()
             release()
-            session = null
+            player.release()
         }
         super.onDestroy()
     }

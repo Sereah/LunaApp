@@ -1,5 +1,6 @@
 package com.lunacattus.conflux.ui.sections.media.player
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,14 +10,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.lunacattus.ui_design.compose.clickableWithDebounce
 
 @Composable
-fun MediaPlayerRoute(filePath: String) {
-    MediaPlayerScreen(filePath)
+fun MediaPlayerRoute(path: String) {
+    MediaPlayerScreen(path)
 }
 
 @Composable
-fun MediaPlayerScreen(path: String) {
+fun MediaPlayerScreen(uri: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -24,6 +26,6 @@ fun MediaPlayerScreen(path: String) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("player: $path")
+        Text("player: $uri")
     }
 }

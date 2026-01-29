@@ -47,7 +47,7 @@ data class MediaFilesRoute(val type: MediaSourceType) : MainRoute {
 }
 
 @Serializable
-data class MediaPlayerRoute(val path: String) : RootRoute
+data class MediaPlayerRoute(val uri: String) : RootRoute
 
 fun EntryProviderScope<NavKey>.mediaSection() {
     entryWithNavAndVm<MediaRoute, MediaViewModel> { _, navigator, viewModel ->
@@ -78,14 +78,14 @@ fun EntryProviderScope<NavKey>.mediaSection() {
         MediaFilesRoute(
             viewModel, route.type,
             navToMediaPlayerScreen = {
-                navigator.navigate(MediaPlayerRoute(path = it.file.absolutePath))
+                navigator.navigate(MediaPlayerRoute(uri = it.mediaItem.localConfiguration?.uri.toString()))
             })
     }
 }
 
 fun EntryProviderScope<NavKey>.mediaRootSection() {
     entry<MediaPlayerRoute> {
-        MediaPlayerRoute(filePath = it.path)
+        MediaPlayerRoute(path = it.uri)
     }
 }
 
