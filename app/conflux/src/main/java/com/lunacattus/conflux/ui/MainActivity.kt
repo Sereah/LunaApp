@@ -179,17 +179,16 @@ data class NavBarItem(
 private fun buildPermissionList(): List<String> {
     return buildList {
         add(Manifest.permission.RECORD_AUDIO)
-        add(Manifest.permission.POST_NOTIFICATIONS)
         when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                add(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+            }
+
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
                 add(Manifest.permission.READ_MEDIA_AUDIO)
                 add(Manifest.permission.READ_MEDIA_VIDEO)
                 add(Manifest.permission.READ_MEDIA_IMAGES)
-                add(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
-            }
-
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                add(Manifest.permission.READ_EXTERNAL_STORAGE)
+                add(Manifest.permission.POST_NOTIFICATIONS)
             }
 
             else -> {
