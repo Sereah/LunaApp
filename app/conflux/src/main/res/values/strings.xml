@@ -45,4 +45,6 @@
     <string name="yesterday">Yesterday</string>
     <string name="day_before_yesterday">2 days ago</string>
     <string name="play">Play</string>
+    <string name="accessibility_service">Accessibility services</string>
+    <string name="toast_close_accessibility">Please manually disable the service in system settings.</string>
 </resources>

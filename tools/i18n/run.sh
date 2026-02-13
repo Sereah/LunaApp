@@ -17,8 +17,8 @@ fi
 # 3. 激活虚拟环境并安装/更新依赖
 echo "🛠️ 正在检查并安装依赖..."
 source $VENV_DIR/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install --upgrade pip --proxy http://127.0.0.1:7890
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --proxy http://127.0.0.1:7890
 
 # 5. 执行 Python 翻译脚本
 echo "🤖 正在调用 DeepSeek 翻译引擎..."

@@ -199,12 +199,6 @@ def main():
         if existing_count > 0:
             print(f"📊 已有 {existing_count} 个翻译（全部保留）")
 
-            # 显示部分已有翻译
-            print("📋 已有翻译示例（前3个）:")
-            for i, (key, value) in enumerate(list(existing_strings.items())[:3]):
-                display_value = value[:30] + "..." if len(value) > 30 else value
-                print(f"  {key}: '{display_value}'")
-
         # 找出缺失的key（只找不存在的key）
         missing_keys = find_missing_keys(source_strings, existing_strings)
         missing_count = len(missing_keys)
