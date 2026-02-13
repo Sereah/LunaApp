@@ -1,0 +1,12 @@
+// 集成apk到系统时使用
+android_app_import {
+    name: "Conflux",
+    apk: "Conflux.apk",
+    certificate: "platform",
+    // presigned: true, //保留apk原有签名
+    privileged: true,
+    system_ext_specific: true,
+    dex_preopt: {
+        enabled: false,
+    },
+}
