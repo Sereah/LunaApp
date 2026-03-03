@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "com.lunacattus.common"
 }
+
+dependencies {
+    implementation(project(":logger"))
+}
