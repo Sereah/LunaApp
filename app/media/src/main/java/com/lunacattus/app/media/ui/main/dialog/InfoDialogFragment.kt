@@ -1,9 +1,11 @@
 package com.lunacattus.app.media.ui.main.dialog
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
+import android.voice.VoiceManager
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import com.lunacattus.app.media.R
 import com.lunacattus.app.media.databinding.DialogInfoBinding
@@ -31,6 +33,10 @@ class InfoDialogFragment : BaseDialogFragment<
         stateCollector.collectProperty(MainUiState::infoDialogData) { info ->
             binding.tvTitle.text = info.dialogTitle
             binding.tvMessage.text = info.dialogMessage
+        }
+        val voiceManager = requireContext().getSystemService("voice_manager") as VoiceManager
+        binding.tvMessage.setOnClickListener {
+            voiceManager.testVoice("hello voice")
         }
     }
 

@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 // 1. 定义一个 extension class 来持有版本信息
 open class FrameworkJarExtension {
     var version: String? = null
+    var custom: Boolean = false
 }
 
 class FrameworkJarConventionPlugin : Plugin<Project> {
@@ -19,7 +20,9 @@ class FrameworkJarConventionPlugin : Plugin<Project> {
         // 3. 在项目评估后，使用配置的版本
         project.afterEvaluate {
             val frameworkVersion = extension.version ?: "12" // 如果未指定，则默认为版本 "12"
-            val frameworkJarFile = rootProject.file("frameworkLibs/framework-$frameworkVersion.jar")
+            val isCustom = extension.custom
+            val suffix = if (isCustom) "-custom" else ""
+            val frameworkJarFile = rootProject.file("frameworkLibs/framework-$frameworkVersion$suffix.jar")
 
             require(frameworkJarFile.exists()) {
                 "Framework jar not found at: ${frameworkJarFile.path}"

@@ -35,7 +35,7 @@ include(":app:gallery:presentation")
 include(":app:gallery:domain")
 include(":app:gallery:data")
 
-include(":service:media")
+include(":service:voice")
 
 include(":feature:speech")
 include(":app:conflux")

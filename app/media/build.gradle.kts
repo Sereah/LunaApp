@@ -2,6 +2,12 @@ plugins {
     alias(libs.plugins.app.android.application)
     alias(libs.plugins.app.android.application.view)
     alias(libs.plugins.app.hilt)
+    alias(libs.plugins.framework.jar)
+}
+
+frameworkJar {
+    version = "13"
+    custom = true
 }
 
 android {
