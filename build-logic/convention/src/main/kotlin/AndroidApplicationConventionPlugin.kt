@@ -12,7 +12,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             apply(plugin = libs.findPlugin("android.application").get().get().pluginId)
-            apply(plugin = libs.findPlugin("kotlin.android").get().get().pluginId)
+//            apply(plugin = libs.findPlugin("kotlin.android").get().get().pluginId)
 
             extensions.configure<ApplicationExtension> {
                 defaultConfig {

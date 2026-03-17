@@ -1,5 +1,3 @@
-import java.text.SimpleDateFormat
-
 plugins {
     alias(libs.plugins.app.android.application)
     alias(libs.plugins.app.android.application.compose)
@@ -16,15 +14,6 @@ android {
         applicationId = "com.lunacattus.app.player"
         versionCode = 1
         versionName = "1.0"
-    }
-
-    applicationVariants.configureEach {
-        val variant = this
-        val timestamp = SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis())
-        variant.outputs.configureEach {
-            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-                "Player-${variant.name}-${variant.versionName}-${timestamp}.apk"
-        }
     }
 
 }

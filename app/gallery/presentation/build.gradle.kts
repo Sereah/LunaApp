@@ -1,4 +1,5 @@
 import java.text.SimpleDateFormat
+import java.util.Date
 
 plugins {
     alias(libs.plugins.app.android.application)
@@ -14,15 +15,11 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+}
 
-    applicationVariants.configureEach {
-        val variant = this
-        val timestamp = SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis())
-        variant.outputs.configureEach {
-            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-                "Galleray-${variant.name}-${variant.versionName}-${timestamp}.apk"
-        }
-    }
+base {
+    val timestamp = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
+    archivesName.set("Galleray-${android.defaultConfig.versionName}-${timestamp}")
 }
 
 dependencies {

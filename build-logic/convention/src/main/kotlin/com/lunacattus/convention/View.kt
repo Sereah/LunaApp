@@ -6,11 +6,11 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 
 internal fun Project.configureAndroidView(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
 
     commonExtension.apply {
-        buildFeatures {
+        buildFeatures.apply {
             viewBinding = true
         }
 

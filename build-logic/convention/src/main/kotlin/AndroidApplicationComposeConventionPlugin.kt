@@ -1,6 +1,5 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.lunacattus.convention.configureAndroidCompose
-import com.lunacattus.convention.configureTest
 import com.lunacattus.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project

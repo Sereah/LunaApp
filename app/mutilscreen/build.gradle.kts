@@ -1,3 +1,6 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
 plugins {
     alias(libs.plugins.app.android.application)
     alias(libs.plugins.app.android.application.compose)
@@ -16,14 +19,11 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+}
 
-    applicationVariants.configureEach {
-        val variant = this
-        variant.outputs.configureEach {
-            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-                "MutilScreenApp-${variant.name}-${variant.versionName}.apk"
-        }
-    }
+base {
+    val timestamp = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
+    archivesName.set("MutilScreenApp-${android.defaultConfig.versionName}-${timestamp}")
 }
 
 dependencies {
