@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TabSliderView">
+        <!-- track 背景色，默认 #E0E0E0 -->
+        <attr name="tsv_trackColor" format="color" />
+        <!-- 滑块背景色，默认 #FFFFFF -->
+        <attr name="tsv_thumbColor" format="color" />
+        <!-- track 圆角半径，默认 height/2（胶囊形） -->
+        <attr name="tsv_trackCornerRadius" format="dimension" />
+        <!-- 滑块圆角半径，默认同 trackCornerRadius -->
+        <attr name="tsv_thumbCornerRadius" format="dimension" />
+        <!-- 滑块与 track 的内边距，默认 4dp -->
+        <attr name="tsv_thumbPadding" format="dimension" />
+        <!-- 切换动画时长（ms），默认 250 -->
+        <attr name="tsv_animDuration" format="integer" />
+        <!-- 滑块阴影高度，默认 4dp -->
+        <attr name="tsv_thumbElevation" format="dimension" />
+    </declare-styleable>
+</resources>

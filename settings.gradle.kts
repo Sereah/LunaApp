@@ -17,6 +17,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url=uri("https://jitpack.io") }
     }
 }
 
@@ -41,3 +42,4 @@ include(":feature:speech")
 include(":app:conflux")
 include(":app:mutilscreen")
 include(":feature:voice")
+include(":app:browser")
