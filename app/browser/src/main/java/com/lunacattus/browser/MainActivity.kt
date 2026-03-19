@@ -17,13 +17,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        AutoSizeUtil.fixDensity(this, 1920f, true)
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        AutoSize.autoConvertDensity(this, 1920f, true)
         val tabSlider = findViewById<TabSliderView>(R.id.tabSlider)
         val labels = listOf("首页", "发现", "消息", "我的")
         val tabViews = labels.map { label ->
