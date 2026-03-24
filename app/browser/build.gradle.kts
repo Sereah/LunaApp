@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.app.android.application)
     alias(libs.plugins.app.android.application.view)
     alias(libs.plugins.app.hilt)
-    alias(libs.plugins.app.screen.adaptation)
+    id("com.lunacattus.screen-adaptation")
 }
 
 screenAdaptation {
@@ -12,13 +12,12 @@ screenAdaptation {
     designDpi.set(160)
 
     // 2. 配置任意个目标屏幕：target(widthPx, heightPx, dpi)
-    target(1920, 1080, 320)
+//    target(1920, 1080, 320)
     target(3402, 1620, 432)
 
-    // (可选) 配置需要生成多少个维度的 dp，默认为 1到1000
-    // maxDp.set(1000)
     // (可选) 配置基于宽还是高适配，默认为 "width"
-    // baseOn.set("width")
+    baseOn.set("width")
+    autoTargetDevice.set(true)
 }
 
 android {

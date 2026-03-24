@@ -87,10 +87,5 @@ gradlePlugin {
             id = libs.plugins.framework.jar.get().pluginId
             implementationClass = "FrameworkJarConventionPlugin"
         }
-
-        register("screenAdaptation") {
-            id = "app.screen.adaptation"
-            implementationClass = "ScreenAdaptationPlugin"
-        }
     }
 }

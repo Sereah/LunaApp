@@ -153,4 +153,3 @@ app-android-library-jacoco = { id = "app.android.library.jacoco" }
 app-hilt = { id = "app.hilt" }
 app-android-room = { id = "app.android.room" }
 framework-jar = { id = "framework.jar" }
-app-screen-adaptation = { id = "app.screen.adaptation" }

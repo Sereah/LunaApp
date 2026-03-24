@@ -9,7 +9,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_96"
+        android:layout_height="@dimen/_96px"
         android:background="@android:color/darker_gray"
         app:layout_constraintTop_toTopOf="parent" />
 
