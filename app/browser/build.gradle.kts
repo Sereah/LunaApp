@@ -1,45 +1,41 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.app.android.application)
+    alias(libs.plugins.app.android.application.view)
+    alias(libs.plugins.app.hilt)
+    alias(libs.plugins.app.screen.adaptation)
+}
+
+screenAdaptation {
+    // 1. 配置设计图的宽、高、DPI
+    designWidthPx.set(1920)
+    designHeightPx.set(1080)
+    designDpi.set(160)
+
+    // 2. 配置任意个目标屏幕：target(widthPx, heightPx, dpi)
+    target(1920, 1080, 320)
+    target(3402, 1620, 432)
+
+    // (可选) 配置需要生成多少个维度的 dp，默认为 1到1000
+    // maxDp.set(1000)
+    // (可选) 配置基于宽还是高适配，默认为 "width"
+    // baseOn.set("width")
 }
 
 android {
-    namespace = "com.lunacattus.browser"
-    compileSdk = 36
+    namespace = "com.lunacattus.app.browser"
 
     defaultConfig {
-        applicationId = "com.lunacattus.browser"
-        minSdk = 24
-        targetSdk = 36
+        applicationId = "com.lunacattus.app.browser"
         versionCode = 1
         versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    implementation("com.github.JessYanCoding:AndroidAutoSize:v1.2.1")
-    implementation("androidx.dynamicanimation:dynamicanimation:1.0.0")
+    implementation(project(":common"))
+    implementation(project(":logger"))
+    implementation(project(":ui-design"))
+    implementation(libs.glide)
+    implementation(libs.permissionX)
+    implementation(libs.geckoview)
 }

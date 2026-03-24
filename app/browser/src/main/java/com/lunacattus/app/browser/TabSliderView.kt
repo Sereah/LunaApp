@@ -1,4 +1,4 @@
-package com.lunacattus.browser
+package com.lunacattus.app.browser
 
 import android.content.Context
 import android.graphics.*

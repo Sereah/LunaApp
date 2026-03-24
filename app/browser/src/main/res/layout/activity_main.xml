@@ -9,22 +9,22 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="96dp"
+        android:layout_height="@dimen/dp_96"
         android:background="@android:color/darker_gray"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.lunacattus.browser.TabSliderView
+    <com.lunacattus.app.browser.TabSliderView
         android:id="@+id/tabSlider"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_margin="16dp"
-        app:tsv_animDuration="200"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:tsv_animDuration="200"
         app:tsv_thumbColor="#FFFFFF"
-        app:tsv_trackCornerRadius="40dp"
         app:tsv_thumbElevation="0dp"
         app:tsv_thumbPadding="0dp"
-        app:tsv_trackColor="#F0F0F0" />
+        app:tsv_trackColor="#F0F0F0"
+        app:tsv_trackCornerRadius="40dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

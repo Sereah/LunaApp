@@ -1,4 +1,4 @@
-package com.lunacattus.browser
+package com.lunacattus.app
 
 import org.junit.Test
 

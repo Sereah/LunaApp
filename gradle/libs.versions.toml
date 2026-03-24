@@ -1,5 +1,7 @@
 [versions]
 agp = "9.1.0"
+androidautosize = "v1.2.1"
+geckoview = "148.0.20260227145000"
 kotlin = "2.3.20"
 coreKtx = "1.18.0"
 junit = "4.13.2"
@@ -111,6 +113,8 @@ androidx-media3-exoplayer-compose = { module = "androidx.media3:media3-ui-compos
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 permissionX = { module = "com.guolindev.permissionx:permissionx", version.ref = "permissionX" }
 lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
+androidautosize = { module = "com.github.JessYanCoding:AndroidAutoSize", version.ref = "androidautosize" }
+geckoview = { module = "org.mozilla.geckoview:geckoview", version.ref = "geckoview" }
 
 # test
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -149,3 +153,4 @@ app-android-library-jacoco = { id = "app.android.library.jacoco" }
 app-hilt = { id = "app.hilt" }
 app-android-room = { id = "app.android.room" }
 framework-jar = { id = "framework.jar" }
+app-screen-adaptation = { id = "app.screen.adaptation" }

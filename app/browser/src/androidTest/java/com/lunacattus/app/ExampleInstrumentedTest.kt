@@ -1,4 +1,4 @@
-package com.lunacattus.browser
+package com.lunacattus.app
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
