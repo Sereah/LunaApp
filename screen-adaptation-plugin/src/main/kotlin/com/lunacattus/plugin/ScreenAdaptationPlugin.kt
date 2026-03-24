@@ -165,22 +165,22 @@ abstract class GenerateDimensTask : DefaultTask() {
         val spFormat = spNameFormat.get()
         
         val finalTargets = targetScreens.get().toMutableList()
+        val detectedMsgs = mutableListOf<String>()
         
-        var deviceMsg = ""
         if (autoTargetDevice.get()) {
             try {
-                val detected = detectDeviceMetrics()
-                if (detected != null) {
-                    deviceMsg = "Detected ADB device: ${detected.widthPx}x${detected.heightPx} @ ${detected.dpi}dpi"
-                    println(">>> $deviceMsg")
-                    logToLogcat("ScreenAdaptationPlugin", deviceMsg)
+                val detectedList = detectAllDeviceMetrics()
+                detectedList.forEach { detected ->
+                    val msg = "Detected ADB device: ${detected.widthPx}x${detected.heightPx} @ ${detected.dpi}dpi"
+                    println(">>> $msg")
                     
                     if (finalTargets.none { it.widthPx == detected.widthPx && it.heightPx == detected.heightPx && it.dpi == detected.dpi }) {
                         finalTargets.add(detected)
                     }
+                    detectedMsgs.add(msg)
                 }
             } catch (e: Exception) {
-                println("ScreenAdaptationPlugin: Failed to detect device via ADB: ${e.message}")
+                println("ScreenAdaptationPlugin: Failed to detect devices via ADB: ${e.message}")
             }
         }
 
@@ -215,25 +215,52 @@ abstract class GenerateDimensTask : DefaultTask() {
         
         println("=".repeat(60))
         println("       SCREEN ADAPTATION PLUGIN - COMPLETED")
-        if (deviceMsg.isNotEmpty()) println("       $deviceMsg")
+        detectedMsgs.forEach { println("       $it") }
         println("=".repeat(60) + "\n")
     }
 
-    private fun detectDeviceMetrics(): TargetScreen? {
-        val sizeOutput = runAdb("shell wm size") ?: return null
-        val densityOutput = runAdb("shell wm density") ?: return null
+    private fun detectAllDeviceMetrics(): List<TargetScreen> {
+        val devicesOutput = runAdb("devices") ?: return emptyList()
+        val serials = devicesOutput.lineSequence()
+            .drop(1) // Drop "List of devices attached"
+            .map { it.trim() }
+            .filter { it.isNotEmpty() && it.endsWith("device") }
+            .map { it.substringBefore("\t") }
+            .toList()
 
-        val sizeMatch = Regex("(\\d+)x(\\d+)").find(sizeOutput) ?: return null
-        val (w, h) = sizeMatch.destructured
-        
-        val densityMatch = Regex("(\\d+)").find(densityOutput) ?: return null
-        val (dpi) = densityMatch.destructured
-        
-        return TargetScreenImpl(w.toInt(), h.toInt(), dpi.toInt())
+        val results = mutableListOf<TargetScreen>()
+        serials.forEach { serial ->
+            val sizeOutput = runAdbForDevice(serial, "shell wm size") ?: return@forEach
+            val densityOutput = runAdbForDevice(serial, "shell wm density") ?: return@forEach
+
+            val sizeMatch = Regex("(\\d+)x(\\d+)").find(sizeOutput) ?: return@forEach
+            val (w, h) = sizeMatch.destructured
+            
+            val densityMatch = Regex("(\\d+)").find(densityOutput) ?: return@forEach
+            val (dpi) = densityMatch.destructured
+            
+            val screen = TargetScreenImpl(w.toInt(), h.toInt(), dpi.toInt())
+            results.add(screen)
+            
+            // Log to each device's Logcat
+            runAdbForDevice(serial, "shell log -t ScreenAdaptationPlugin \"Detected　ADB device: ${w}x${h} @ ${dpi}dpi\"")
+        }
+        return results
     }
 
     private fun logToLogcat(tag: String, msg: String) {
-        runAdb("shell log -t $tag \"$msg\"")
+        // This is kept for compatibility but detectAllDeviceMetrics handles it per-device now
+    }
+
+    private fun runAdbForDevice(serial: String, cmd: String): String? {
+        return try {
+            val process = Runtime.getRuntime().exec("adb -s $serial $cmd")
+            val output = process.inputStream.bufferedReader().readText()
+            process.waitFor()
+            if (process.exitValue() == 0) output else null
+        } catch (e: Exception) {
+            null
+        }
     }
 
     private fun runAdb(cmd: String): String? {
