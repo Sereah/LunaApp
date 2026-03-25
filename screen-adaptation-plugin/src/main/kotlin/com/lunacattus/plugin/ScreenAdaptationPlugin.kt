@@ -257,18 +257,28 @@ abstract class GenerateDimensTask : DefaultTask() {
         }
         
         finalTargets.forEach { screen ->
-            val tWidthDp = pxToDp(screen.widthPx, screen.dpi)
-            val tHeightDp = pxToDp(screen.heightPx, screen.dpi)
+            val dIsLandscape = dWidthPx > dHeightPx
+            val tIsLandscape = screen.widthPx > screen.heightPx
             
-            // 计算缩放因子：适配屏幕的 dp / 设计图的 dp
+            // 自动对齐屏幕方向：如果设计图是横屏但设备报告的是竖屏，则在计算缩放比时逻辑上“旋转”它
+            val (tW, tH) = if (dIsLandscape != tIsLandscape) {
+                screen.heightPx to screen.widthPx
+            } else {
+                screen.widthPx to screen.heightPx
+            }
+
+            val tWidthDp = pxToDp(tW, screen.dpi)
+            val tHeightDp = pxToDp(tH, screen.dpi)
+            
+            // 计算缩放因子：适配屏幕的宽度 / 设计图的宽度
             val scale = if (isBaseOnWidth) {
                 tWidthDp / dWidthDp
             } else {
                 tHeightDp / dHeightDp
             }
             
-            // 计算限定符对应的最小宽度 SW
-            val swDp = minOf(tWidthDp, tHeightDp).toInt()
+            // 确定最小宽度限定符 swXdp (始终取宽高中的最小值)
+            val swDp = pxToDp(minOf(screen.widthPx, screen.heightPx), screen.dpi).toInt()
             generateDimensFile(buildResDir, "values-sw${swDp}dp", scale, maxD, dpFormat, spFormat)
         }
         
