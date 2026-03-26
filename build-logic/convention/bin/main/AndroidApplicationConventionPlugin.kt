@@ -1,0 +1,88 @@
+import com.android.build.api.dsl.ApplicationExtension
+import com.lunacattus.convention.configureKotlinAndroid
+import com.lunacattus.convention.configureTest
+import com.lunacattus.convention.libs
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
+
+class AndroidApplicationConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        with(target) {
+            apply(plugin = libs.findPlugin("android.application").get().get().pluginId)
+//            apply(plugin = libs.findPlugin("kotlin.android").get().get().pluginId)
+
+            extensions.configure<ApplicationExtension> {
+                defaultConfig {
+                    targetSdk = 35
+                    testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+                }
+
+                signingConfigs {
+                    create("app") {
+                        storeFile = file("$rootDir/keystore/app.jks")
+                        storePassword = "123456"
+                        keyAlias = "app"
+                        keyPassword = "123456"
+                    }
+                    create("system") {
+                        storeFile = file("$rootDir/keystore/system.jks")
+                        storePassword = "123456"
+                        keyAlias = "system"
+                        keyPassword = "123456"
+                    }
+                    create("harmony") {
+                        storeFile = file("$rootDir/keystore/harmony.jks")
+                        storePassword = "123456"
+                        keyAlias = "key0"
+                        keyPassword = "123456"
+                    }
+                }
+
+                buildTypes {
+                    release {
+                        isMinifyEnabled = false
+                        proguardFiles(
+                            getDefaultProguardFile("proguard-android-optimize.txt"),
+                            "proguard-rules.pro"
+                        )
+                        signingConfig = null
+                    }
+                    debug {
+                        isMinifyEnabled = false
+                        signingConfig = null
+                    }
+                }
+
+                flavorDimensions += "platform"
+                productFlavors {
+                    create("app") {
+                        dimension = "platform"
+                        signingConfig = signingConfigs.getByName("app")
+                    }
+                    create("system") {
+                        dimension = "platform"
+                        signingConfig = signingConfigs.getByName("system")
+                    }
+                    create("harmony") {
+                        dimension = "platform"
+                        signingConfig = signingConfigs.getByName("harmony")
+                    }
+                }
+
+                packaging {
+                    resources.excludes += "META-INF/*.md"
+                }
+
+                dependencies {
+                    "implementation"(libs.findLibrary("androidx.core.ktx").get())
+                }
+
+                configureKotlinAndroid(this)
+                configureTest(this)
+            }
+        }
+    }
+}
