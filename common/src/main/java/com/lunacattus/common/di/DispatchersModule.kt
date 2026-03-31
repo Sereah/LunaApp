@@ -1,4 +1,4 @@
-package com.lunacattus.common.util.di
+package com.lunacattus.common.di
 
 import dagger.Module
 import dagger.Provides

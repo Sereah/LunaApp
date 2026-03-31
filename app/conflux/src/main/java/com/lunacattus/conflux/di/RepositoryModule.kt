@@ -1,7 +1,7 @@
 package com.lunacattus.conflux.di
 
 import android.content.Context
-import com.lunacattus.common.util.Utils
+import com.lunacattus.common.utils.isSystemSignature
 import com.lunacattus.conflux.domain.bluetooth.BluetoothRepository
 import com.lunacattus.conflux.domain.bluetooth.IBluetoothRepository
 import com.lunacattus.conflux.domain.bluetooth.SystemBluetoothRepository
@@ -23,7 +23,7 @@ object RepositoryModule {
         bluetoothRepository: dagger.Lazy<BluetoothRepository>,
         systemBluetoothRepository: dagger.Lazy<SystemBluetoothRepository>
     ): IBluetoothRepository {
-        return if (Utils.isSystemSignature(context)) {
+        return if (context.isSystemSignature()) {
             systemBluetoothRepository.get()
         } else {
             bluetoothRepository.get()

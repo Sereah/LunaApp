@@ -1,4 +1,4 @@
-package com.lunacattus.common.util
+package com.lunacattus.common
 
 import com.lunacattus.logger.Logger
 import kotlinx.coroutines.CancellationException

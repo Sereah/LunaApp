@@ -48,8 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.lunacattus.common.util.toFileSizeString
-import com.lunacattus.common.util.toSmartDateString
+import com.lunacattus.common.utils.toFileSizeString
+import com.lunacattus.common.utils.toSmartDateString
 import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.LocalInnerPadding
 import com.lunacattus.conflux.ui.sections.media.MediaSourceType

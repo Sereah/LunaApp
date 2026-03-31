@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lunacattus.common.util.statemachine;
+package com.lunacattus.common.statemachine;
 
 import android.os.Handler;
 import android.os.HandlerThread;

@@ -9,7 +9,7 @@ import com.lunacattus.app.domain.model.Gallery
 import com.lunacattus.app.domain.model.GalleryImage
 import com.lunacattus.app.domain.model.GalleryVideo
 import com.lunacattus.app.domain.model.id
-import com.lunacattus.common.util.toDateTimeString
+import com.lunacattus.common.utils.toDateTimeString
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

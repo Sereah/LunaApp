@@ -18,7 +18,7 @@ import com.lunacattus.app.gallery.feature.list.mvi.ListUiIntent
 import com.lunacattus.app.gallery.feature.list.mvi.ListUiState
 import com.lunacattus.app.gallery.feature.list.mvi.ListViewModel
 import com.lunacattus.app.gallery.feature.list.mvi.ListViewModel.Companion.PAGE_SIZE
-import com.lunacattus.common.util.dpToPx
+import com.lunacattus.common.utils.dpToPx
 import com.lunacattus.ui_design.view.ItemSpacingDecoration
 import dagger.hilt.android.AndroidEntryPoint
 

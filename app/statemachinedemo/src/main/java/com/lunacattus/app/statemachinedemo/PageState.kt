@@ -1,8 +1,8 @@
 package com.lunacattus.app.statemachinedemo
 
 import android.os.Message
-import com.lunacattus.common.util.statemachine.State
-import com.lunacattus.common.util.statemachine.StateMachine
+import com.lunacattus.common.statemachine.State
+import com.lunacattus.common.statemachine.StateMachine
 import javax.inject.Inject
 import javax.inject.Singleton
 

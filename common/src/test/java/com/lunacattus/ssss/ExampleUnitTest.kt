@@ -1,4 +1,4 @@
-package com.lunacattus.common
+package com.lunacattus.ssss
 
 import org.junit.Test
 

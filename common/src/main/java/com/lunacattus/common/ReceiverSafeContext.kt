@@ -1,4 +1,4 @@
-package com.lunacattus.common.util
+package com.lunacattus.common
 
 import android.content.BroadcastReceiver
 import android.content.Context
