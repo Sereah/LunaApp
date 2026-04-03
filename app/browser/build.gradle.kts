@@ -11,9 +11,12 @@ screenAdaptation {
     designHeightPx.set(1080)
     designDpi.set(160)
 
-    // 2. 配置任意个目标屏幕：target(widthPx, heightPx, dpi)
+    // 2. 方式一：在 Gradle 中手动配置任意个目标屏幕：target(widthPx, heightPx, dpi)
 //    target(1920, 1080, 320)
     target(3402, 1620, 432)
+    
+    // 方式二：指定外部配置文件（自动读取 CSV 内的设备列表）
+    targetConfigFile.set(file("devices.csv"))
 
     // (可选) 配置基于宽还是高适配，默认为 "width"
     baseOn.set("width")

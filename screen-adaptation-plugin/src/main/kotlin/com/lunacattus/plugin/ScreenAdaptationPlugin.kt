@@ -6,7 +6,9 @@ import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -63,6 +65,9 @@ abstract class ScreenAdaptationExtension {
     // 是否开启 ADB 自动探测：开启后插件会自动获取当前连接手机的参数并生成对应的适配文件
     abstract val autoTargetDevice: Property<Boolean>
     
+    // 可选：指定外部配置文件（如 CSV 格式）的路径，用于批量引入目标屏幕
+    abstract val targetConfigFile: RegularFileProperty
+    
     init {
         // 设置默认配置，简化用户的 build.gradle.kts 编写
         baseOn.convention("width")
@@ -107,6 +112,7 @@ class ScreenAdaptationPlugin : Plugin<Project> {
             dpNameFormat.set(extension.dpNameFormat)
             spNameFormat.set(extension.spNameFormat)
             autoTargetDevice.set(extension.autoTargetDevice)
+            targetConfigFile.set(extension.targetConfigFile)
             
             outputDir.set(outputDirectory)
             // 获取项目源码中的 res 目录，用于存放通用的 values/dimens.xml
@@ -178,6 +184,10 @@ abstract class GenerateDimensTask : DefaultTask() {
     @get:Input abstract val spNameFormat: Property<String>
     @get:Input abstract val autoTargetDevice: Property<Boolean>
 
+    @get:InputFile
+    @get:Optional
+    abstract val targetConfigFile: RegularFileProperty
+
     @get:OutputDirectory abstract val outputDir: DirectoryProperty
     @get:OutputDirectory abstract val srcResDir: DirectoryProperty
 
@@ -210,6 +220,42 @@ abstract class GenerateDimensTask : DefaultTask() {
         // 汇总最终需要生成的屏幕配置列表
         val finalTargets = targetScreens.get().toMutableList()
         val detectedMsgs = mutableListOf<String>()
+        
+        // 0. 读取外部配置文件 (CSV) 逻辑
+        if (targetConfigFile.isPresent) {
+            val file = targetConfigFile.get().asFile
+            if (file.exists()) {
+                var loadedCount = 0
+                file.readLines().forEach { line ->
+                    if (line.isNotBlank() && !line.trim().startsWith("#")) {
+                        val parts = line.split(",")
+                        if (parts.size >= 3) {
+                            try {
+                                val w = parts[0].trim().toInt()
+                                val h = parts[1].trim().toInt()
+                                val dpi = parts[2].trim().toInt()
+                                
+                                // 去重判断
+                                val exists = finalTargets.any { it.widthPx == w && it.heightPx == h && it.dpi == dpi }
+                                if (!exists) {
+                                    finalTargets.add(TargetScreenImpl(w, h, dpi))
+                                    loadedCount++
+                                }
+                            } catch (e: Exception) {
+                                println("ScreenAdaptationPlugin: Failed to parse line in config file [${line.trim()}]. Please ensure format is width,height,dpi")
+                            }
+                        }
+                    }
+                }
+                val msg = "Loaded $loadedCount new devices from ${file.name}"
+                println(">>> $msg")
+                detectedMsgs.add(msg)
+            } else {
+                val warnMsg = "Config file specified but not found: ${file.absolutePath}"
+                println(">>> $warnMsg")
+                detectedMsgs.add(warnMsg)
+            }
+        }
         
         // 1. ADB 自动探测逻辑
         if (autoTargetDevice.get()) {
