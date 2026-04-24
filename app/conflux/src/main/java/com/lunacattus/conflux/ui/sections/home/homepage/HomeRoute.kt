@@ -12,17 +12,19 @@ import com.lunacattus.ui_design.compose.clickableWithDebounce
 
 @Composable
 fun HomeRoute(viewModel: HomeViewModel, navToRoot: () -> Unit) {
-    HomeScreen(navToRoot)
+    HomeScreen() {
+        viewModel.runHardcodedTest()
+    }
 }
 
 @Composable
-fun HomeScreen(navToRoot: () -> Unit) {
+fun HomeScreen(click: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text(stringResource(R.string.homepage), modifier = Modifier.clickableWithDebounce {
-            navToRoot.invoke()
+            click.invoke()
         })
     }
 }
