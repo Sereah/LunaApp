@@ -15,6 +15,7 @@
   <string name="empty">空</string>
   <string name="files_title">文件</string>
   <string name="home_title">首页</string>
+  <string name="llm_title">大模型</string>
   <string name="homepage">主页</string>
   <string name="leak_canary_display_activity_label">ConfluxLeak</string>
   <string name="listening">正在聆听…</string>
@@ -49,4 +50,91 @@
   <string name="unlock">解锁</string>
   <string name="unlocking">解锁中</string>
   <string name="yesterday">昨天</string>
+
+    <!-- LLM -->
+    <string name="llm_ai_center">AI 能力中心</string>
+    <string name="llm_ai_subtitle">语音合成 · 语义理解 · 智能对话</string>
+    <string name="llm_available_caps">可用能力</string>
+    <string name="llm_coming_soon">即将推出</string>
+    <string name="llm_enter">进入</string>
+    <string name="llm_soon_tag">即将推出</string>
+
+    <string name="llm_tts_title">语音合成</string>
+    <string name="llm_tts_desc">使用大模型 Qwen-TTS-1.7B，支持多种音色和语言。</string>
+    <string name="llm_tts_available">可用</string>
+
+    <string name="llm_translate_title">文本翻译</string>
+    <string name="llm_translate_desc">多语种实时互译，支持中英日韩等主流语言。</string>
+    <string name="llm_chat_title">智能对话</string>
+    <string name="llm_chat_desc">端侧 LLM 本地推理，无网络也能流畅对话。</string>
+    <string name="llm_nlu_title">语义理解</string>
+    <string name="llm_nlu_desc">NLU 意图识别，精准解析用户指令与上下文。</string>
+    <string name="llm_asr_title">语音识别</string>
+    <string name="llm_asr_desc">端到端 ASR，将语音实时转换为文字。</string>
+
+    <!-- TTS UI -->
+    <string name="tts_edit_host">修改</string>
+    <string name="tts_collapse_host">收起</string>
+    <string name="tts_ws_connected">WS 已连接</string>
+    <string name="tts_ws_connecting">WS 连接中…</string>
+    <string name="tts_ws_disconnected">WS 未连接</string>
+    <string name="tts_http_requesting">HTTP 请求中</string>
+    <string name="tts_http_idle">HTTP 空闲</string>
+    <string name="tts_ws_connect_cd">WS 连接</string>
+    <string name="tts_health_check_cd">健康检查</string>
+    <string name="tts_instruct_hint">instruct（可选，如：语速慢一点、更温柔）</string>
+    <string name="tts_close">关闭</string>
+    <string name="tts_placeholder_empty">输入文字开始语音合成</string>
+    <string name="tts_long_text">长文本</string>
+    <string name="tts_play_all">全部播放</string>
+    <string name="tts_play_all_cd">全部播放</string>
+    <string name="tts_segment">片段 %d</string>
+    <string name="tts_play_cd">播放</string>
+    <string name="tts_synthesizing">合成中… %d/%d</string>
+    <string name="tts_waiting">等待合成…</string>
+    <string name="tts_no_audio">无音频</string>
+    <string name="tts_total_chunks">共 %d 段 · %dms</string>
+    <string name="tts_playing">播放中</string>
+    <string name="tts_short_text">短文本</string>
+    <string name="tts_long_text_file">长文本/文件</string>
+    <string name="tts_pick_file">选择文件</string>
+    <string name="tts_long_text_hint">在此粘贴长文本，或点击「选择文件」上传 .txt</string>
+    <string name="tts_input_hint">输入需要合成语音的文字…</string>
+    <string name="tts_send_cd">发送</string>
+    <string name="tts_delete_cd">删除</string>
+    <string name="tts_clear_all">清空全部</string>
+    <string name="tts_http_failed">HTTP 请求失败: %s</string>
+    <string name="tts_ws_send_failed">WebSocket 发送失败</string>
+    <string name="tts_ws_error">WS 错误: %s</string>
+    <string name="tts_health_status">服务: %1$s | 模型加载: %2$s | 活跃: %3$d</string>
+    <string name="tts_health_failed">健康检查失败: %s</string>
+
+    <!-- TTS Speakers -->
+    <string name="tts_speaker_vivian">Vivian</string>
+    <string name="tts_speaker_vivian_desc">明亮、略带锐气的年轻女声</string>
+    <string name="tts_speaker_vivian_lang">中文</string>
+    <string name="tts_speaker_serena">Serena</string>
+    <string name="tts_speaker_serena_desc">温暖柔和的年轻女声</string>
+    <string name="tts_speaker_serena_lang">中文</string>
+    <string name="tts_speaker_uncle_fu">Uncle Fu</string>
+    <string name="tts_speaker_uncle_fu_desc">音色低沉醇厚的成熟男声</string>
+    <string name="tts_speaker_uncle_fu_lang">中文</string>
+    <string name="tts_speaker_dylan">Dylan</string>
+    <string name="tts_speaker_dylan_desc">清晰自然的北京青年男声</string>
+    <string name="tts_speaker_dylan_lang">中文（北京方言）</string>
+    <string name="tts_speaker_eric">Eric</string>
+    <string name="tts_speaker_eric_desc">活泼、略带沙哑明亮感的成都男声</string>
+    <string name="tts_speaker_eric_lang">中文（四川方言）</string>
+    <string name="tts_speaker_ryan">Ryan</string>
+    <string name="tts_speaker_ryan_desc">富有节奏感的动态男声</string>
+    <string name="tts_speaker_ryan_lang">英语</string>
+    <string name="tts_speaker_aiden">Aiden</string>
+    <string name="tts_speaker_aiden_desc">清晰中频的阳光美式男声</string>
+    <string name="tts_speaker_aiden_lang">英语</string>
+    <string name="tts_speaker_ono_anna">Ono Anna</string>
+    <string name="tts_speaker_ono_anna_desc">轻快灵活的俏皮日语女声</string>
+    <string name="tts_speaker_ono_anna_lang">日语</string>
+    <string name="tts_speaker_sohee">Sohee</string>
+    <string name="tts_speaker_sohee_desc">富含情感的温暖韩语女声</string>
+    <string name="tts_speaker_sohee_lang">韩语</string>
 </resources>

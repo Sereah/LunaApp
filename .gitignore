@@ -17,4 +17,5 @@ local.properties
 .idea
 .kotlin
 /tools/i18n/venv
-.vscode
+/.vscode
+/.vscode/settings.json

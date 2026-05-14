@@ -49,4 +49,17 @@
   <string name="unlock">Débloquer</string>
   <string name="unlocking">Déverrouillage</string>
   <string name="yesterday">Hier</string>
+
+    <string name="llm_ai_center">Centre IA</string>
+    <string name="llm_tts_desc">Propulsé par Qwen-TTS-1.7B, prend en charge plusieurs voix et langues.</string>
+    <string name="tts_edit_host">Modifier</string>
+    <string name="tts_collapse_host">Réduire</string>
+    <string name="tts_close">Fermer</string>
+    <string name="tts_play_all">Tout lire</string>
+    <string name="tts_play_cd">Lire</string>
+    <string name="tts_playing">Lecture</string>
+    <string name="tts_short_text">Texte court</string>
+    <string name="tts_long_text_file">Texte long / Fichier</string>
+    <string name="tts_pick_file">Choisir fichier</string>
+    <string name="tts_send_cd">Envoyer</string>
 </resources>

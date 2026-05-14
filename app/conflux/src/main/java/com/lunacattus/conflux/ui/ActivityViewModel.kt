@@ -10,7 +10,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ActivityViewModel @Inject constructor() : ViewModel() {
 
-    var dynamicColor by mutableStateOf(true)
+    var dynamicColor by mutableStateOf(false)
         private set
 
     var nightMode by mutableStateOf(false)

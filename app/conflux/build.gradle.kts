@@ -17,8 +17,9 @@ android {
 dependencies {
     implementation(project(":ui-design"))
     implementation(project(":common"))
+    implementation(project(":network"))
+    implementation(project(":record"))
     implementation(project(":logger"))
-    implementation(project(":feature:voice"))
     debugImplementation(libs.leakcanary.android)
     implementation(libs.haze.android)
     implementation(libs.haze.material)
@@ -26,6 +27,7 @@ dependencies {
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.media3.ui)
     implementation(libs.coil.compose)
+    implementation(libs.gson)
 //    implementation("com.google.mediapipe:tasks-genai:0.10.27")
 //    implementation("com.google.ai.edge.litertlm:litertlm-android:latest.release")
     implementation("com.google.ai.edge.litertlm:litertlm-android:0.10.0")

@@ -27,6 +27,8 @@ rootProject.name = "LunaApp"
 
 include(":logger")
 include(":common")
+include(":network")
+include(":record")
 include(":ui-design")
 
 include(":app:videoplayer")
@@ -40,6 +42,3 @@ include(":app:gallery:data")
 
 include(":app:conflux")
 include(":feature:voice")
-include(":app:browser")
-include(":app:voice")
-include(":app:agent")

@@ -35,7 +35,7 @@ import com.lunacattus.conflux.ui.base.NavigationState
 import com.lunacattus.conflux.ui.base.Navigator
 import com.lunacattus.conflux.ui.base.toEntries
 import com.lunacattus.conflux.ui.sections.connection.connectSection
-import com.lunacattus.conflux.ui.sections.home.homeSection
+import com.lunacattus.conflux.ui.sections.llm.homeSection
 import com.lunacattus.conflux.ui.sections.media.mediaSection
 import com.lunacattus.conflux.ui.sections.setting.settingSection
 import com.lunacattus.conflux.ui.theme.slideInFromBottom

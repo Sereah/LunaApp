@@ -49,4 +49,17 @@
   <string name="unlock">فتح</string>
   <string name="unlocking">فتح</string>
   <string name="yesterday">أمس</string>
+
+    <string name="llm_ai_center">AI Center</string>
+    <string name="llm_tts_desc">Powered by Qwen-TTS-1.7B, supporting multiple voices and languages.</string>
+    <string name="tts_edit_host">تعديل</string>
+    <string name="tts_collapse_host">طي</string>
+    <string name="tts_close">إغلاق</string>
+    <string name="tts_play_all">تشغيل الكل</string>
+    <string name="tts_play_cd">تشغيل</string>
+    <string name="tts_playing">قيد التشغيل</string>
+    <string name="tts_short_text">نص قصير</string>
+    <string name="tts_long_text_file">نص طويل / ملف</string>
+    <string name="tts_pick_file">اختيار ملف</string>
+    <string name="tts_send_cd">إرسال</string>
 </resources>

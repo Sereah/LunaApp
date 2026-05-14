@@ -11,7 +11,7 @@ import com.lunacattus.conflux.domain.media.PlayerManager
 import com.lunacattus.conflux.ui.sections.media.MediaSourceType
 import com.lunacattus.conflux.ui.sections.media.files.MediaFileItem.Companion.toMediaFileItem
 import com.lunacattus.logger.Logger
-import com.lunacattus.voice.record.RecordingFileRepository
+import com.lunacattus.record.RecordingFileRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

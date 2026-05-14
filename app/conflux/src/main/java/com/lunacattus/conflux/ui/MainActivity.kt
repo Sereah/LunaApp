@@ -43,7 +43,7 @@ import com.lunacattus.conflux.ui.base.Main
 import com.lunacattus.conflux.ui.base.Navigator
 import com.lunacattus.conflux.ui.base.rememberNavigationState
 import com.lunacattus.conflux.ui.sections.connection.ConnectionRoute
-import com.lunacattus.conflux.ui.sections.home.HomeRoute
+import com.lunacattus.conflux.ui.sections.llm.LlmRoute
 import com.lunacattus.conflux.ui.sections.media.MediaRoute
 import com.lunacattus.conflux.ui.sections.root.rootSection
 import com.lunacattus.conflux.ui.sections.setting.SettingRoute
@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
                     SystemBarAppearance(viewModel.nightMode)
                     val rootBackStack = rememberNavBackStack(Main)
                     val mainNavigationState = rememberNavigationState(
-                        startRoute = HomeRoute,
+                        startRoute = LlmRoute,
                         topLevelRoutesKey = topLevelRoutes().keys
                     )
                     val navigator = remember(rootBackStack, mainNavigationState) {
@@ -165,7 +165,7 @@ val LocalActivityViewModel = staticCompositionLocalOf<ActivityViewModel> {
 
 @Composable
 fun topLevelRoutes() = mapOf(
-    HomeRoute to NavBarItem(icon = Icons.Rounded.Home, title = stringResource(R.string.home_title)),
+    LlmRoute to NavBarItem(icon = Icons.Rounded.Home, title = stringResource(R.string.llm_title)),
     ConnectionRoute to NavBarItem(icon = Icons.Rounded.Link, title = stringResource(R.string.connection_title)),
     MediaRoute to NavBarItem(icon = Icons.Rounded.MusicVideo, title = stringResource(R.string.media_title)),
     SettingRoute to NavBarItem(icon = Icons.Rounded.Settings, title = stringResource(R.string.setting_title)),

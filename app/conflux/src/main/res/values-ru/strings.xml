@@ -49,4 +49,17 @@
   <string name="unlock">Разблокировать</string>
   <string name="unlocking">Разблокировка</string>
   <string name="yesterday">Вчера</string>
+
+    <string name="llm_ai_center">Центр ИИ</string>
+    <string name="llm_tts_desc">На базе Qwen-TTS-1.7B, поддержка множества голосов и языков.</string>
+    <string name="tts_edit_host">Изменить</string>
+    <string name="tts_collapse_host">Свернуть</string>
+    <string name="tts_close">Закрыть</string>
+    <string name="tts_play_all">Воспроизвести всё</string>
+    <string name="tts_play_cd">Воспр.</string>
+    <string name="tts_playing">Воспр.</string>
+    <string name="tts_short_text">Короткий</string>
+    <string name="tts_long_text_file">Длинный / Файл</string>
+    <string name="tts_pick_file">Выбрать файл</string>
+    <string name="tts_send_cd">Отправить</string>
 </resources>
