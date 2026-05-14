@@ -137,4 +137,5 @@
     <string name="tts_speaker_sohee">Sohee</string>
     <string name="tts_speaker_sohee_desc">富含情感的温暖韩语女声</string>
     <string name="tts_speaker_sohee_lang">韩语</string>
+    <string name="tts_settings_title">更改配置</string>
 </resources>

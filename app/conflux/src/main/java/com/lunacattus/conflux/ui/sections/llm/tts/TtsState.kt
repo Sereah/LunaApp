@@ -1,25 +1,27 @@
 package com.lunacattus.conflux.ui.sections.llm.tts
 
+import androidx.annotation.StringRes
+import com.lunacattus.conflux.R
 import com.lunacattus.conflux.domain.tts.TtsConfig
 
 enum class RequestMode { HTTP, WebSocket }
 
 data class Speaker(
     val name: String,
-    val description: String,
-    val nativeLanguage: String,
+    @StringRes val descriptionRes: Int,
+    @StringRes val nativeLanguageRes: Int,
 ) {
     companion object {
         val ALL = listOf(
-            Speaker("Vivian", "明亮、略带锐气的年轻女声", "中文"),
-            Speaker("Serena", "温暖柔和的年轻女声", "中文"),
-            Speaker("Uncle_Fu", "音色低沉醇厚的成熟男声", "中文"),
-            Speaker("Dylan", "清晰自然的北京青年男声", "中文（北京方言）"),
-            Speaker("Eric", "活泼、略带沙哑明亮感的成都男声", "中文（四川方言）"),
-            Speaker("Ryan", "富有节奏感的动态男声", "英语"),
-            Speaker("Aiden", "清晰中频的阳光美式男声", "英语"),
-            Speaker("Ono_Anna", "轻快灵活的俏皮日语女声", "日语"),
-            Speaker("Sohee", "富含情感的温暖韩语女声", "韩语"),
+            Speaker("Vivian", R.string.tts_speaker_vivian_desc, R.string.tts_speaker_vivian_lang),
+            Speaker("Serena", R.string.tts_speaker_serena_desc, R.string.tts_speaker_serena_lang),
+            Speaker("Uncle_Fu", R.string.tts_speaker_uncle_fu_desc, R.string.tts_speaker_uncle_fu_lang),
+            Speaker("Dylan", R.string.tts_speaker_dylan_desc, R.string.tts_speaker_dylan_lang),
+            Speaker("Eric", R.string.tts_speaker_eric_desc, R.string.tts_speaker_eric_lang),
+            Speaker("Ryan", R.string.tts_speaker_ryan_desc, R.string.tts_speaker_ryan_lang),
+            Speaker("Aiden", R.string.tts_speaker_aiden_desc, R.string.tts_speaker_aiden_lang),
+            Speaker("Ono_Anna", R.string.tts_speaker_ono_anna_desc, R.string.tts_speaker_ono_anna_lang),
+            Speaker("Sohee", R.string.tts_speaker_sohee_desc, R.string.tts_speaker_sohee_lang),
         )
         val DEFAULT = ALL[0]
     }
@@ -52,6 +54,7 @@ data class TtsState(
 
 data class TtsMessageGroup(
     val id: String,
+    val requestId: String = "",
     val text: String,
     val timestamp: Long,
     val speaker: String = Speaker.DEFAULT.name,

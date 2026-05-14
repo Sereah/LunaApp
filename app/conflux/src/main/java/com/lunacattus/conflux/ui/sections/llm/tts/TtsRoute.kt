@@ -1,29 +1,44 @@
 package com.lunacattus.conflux.ui.sections.llm.tts
 
-import android.annotation.SuppressLint
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,8 +52,6 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Headphones
-import androidx.compose.material.icons.rounded.HealthAndSafety
-import androidx.compose.material.icons.rounded.Hub
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Person
@@ -68,18 +81,25 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -90,6 +110,7 @@ import com.lunacattus.ui_design.compose.clickableWithDebounce
 import com.lunacattus.ui_design.compose.overScrollVertical
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import kotlin.math.roundToInt
 
 @Composable
 fun TtsRoute(
@@ -134,14 +155,18 @@ private fun TtsScreen(
     onPickTextFile: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var configExpanded by remember { mutableStateOf(false) }
+    var settingsExpanded by remember { mutableStateOf(false) }
     var inputMode by remember { mutableStateOf(false) }
+
+    BackHandler(enabled = settingsExpanded) {
+        settingsExpanded = false
+    }
 
     val listState = rememberLazyListState()
 
     LaunchedEffect(state.messageGroups.size) {
         if (state.messageGroups.isNotEmpty()) {
-            listState.animateScrollToItem(state.messageGroups.size + 7)
+            listState.animateScrollToItem(state.messageGroups.size + 3)
         }
     }
 
@@ -157,35 +182,173 @@ private fun TtsScreen(
                 .fillMaxSize()
                 .overScrollVertical(),
         ) {
-            item(key = "config") {
-                ConfigSection(
-                    state,
-                    sendIntent,
-                    configExpanded
-                ) { configExpanded = !configExpanded }
-            }
-            item(key = "status") { StatusBar(state, sendIntent) }
-            item(key = "divider1") {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = 0.06f
+            item(key = "settings_bar") {
+                val wsColor = when {
+                    state.wsConnected -> Color(0xFF4CAF50)
+                    state.wsConnecting -> Color(0xFFFFC107)
+                    else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                }
+                val wsColorAnim by animateColorAsState(wsColor, tween(300))
+                val httpColor = when {
+                    state.httpRequesting -> Color(0xFFFFC107)
+                    else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                }
+                val httpColorAnim by animateColorAsState(httpColor, tween(300))
+                
+                val infiniteTransition = rememberInfiniteTransition()
+                val glowAlpha by infiniteTransition.animateFloat(
+                    initialValue = 0.12f,
+                    targetValue = 0.28f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(2000),
+                        repeatMode = RepeatMode.Reverse
                     )
                 )
-            }
-            item(key = "speaker") { SpeakerSection(state, sendIntent) }
-            item(key = "playback") { PlaybackControls(state, sendIntent) }
-            item(key = "divider2") {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = 0.06f
-                    )
-                )
+                
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .clickableWithDebounce { settingsExpanded = true }
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = glowAlpha),
+                                    MaterialTheme.colorScheme.secondaryContainer.copy(alpha = glowAlpha * 0.5f),
+                                    MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = glowAlpha * 0.3f)
+                                ),
+                                start = Offset(0f, 0f),
+                                end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+                            )
+                        )
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                ) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        FilterChip(
+                            state.requestMode == RequestMode.WebSocket,
+                            { 
+                                sendIntent(TtsIntent.SetRequestMode(RequestMode.WebSocket))
+                                if (!state.wsConnected && !state.wsConnecting) {
+                                    sendIntent(TtsIntent.ConnectWs)
+                                }
+                            },
+                            label = { Text("WS", fontSize = 11.sp) },
+                            modifier = Modifier.height(26.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                selectedLabelColor = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Box(Modifier.size(7.dp).clip(CircleShape).background(wsColorAnim))
+                        Spacer(Modifier.width(3.dp))
+                        Text(
+                            if (state.wsConnected) "已连接"
+                            else if (state.wsConnecting) "连接中"
+                            else "未连接",
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        )
+                        
+                        Spacer(Modifier.width(12.dp))
+                        
+                        FilterChip(
+                            state.requestMode == RequestMode.HTTP,
+                            { sendIntent(TtsIntent.SetRequestMode(RequestMode.HTTP)) },
+                            label = { Text("HTTP", fontSize = 11.sp) },
+                            modifier = Modifier.height(26.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                selectedLabelColor = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Box(Modifier.size(7.dp).clip(CircleShape).background(httpColorAnim))
+                        Spacer(Modifier.width(3.dp))
+                        Text(
+                            if (state.httpRequesting) "请求中" else "空闲",
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        )
+                        
+                        Spacer(Modifier.weight(1f))
+                        
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Rounded.Tune,
+                                null,
+                                Modifier.size(14.dp),
+                                MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(Modifier.width(2.dp))
+                            Text(
+                                stringResource(R.string.tts_settings_title),
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
             }
             if (state.error != null) {
                 item(key = "error") { ErrorBanner(state.error) { sendIntent(TtsIntent.DismissError) } }
             }
             if (state.messageGroups.isEmpty()) {
-                item(key = "empty") { EmptyPlaceholder(Modifier.fillMaxWidth()) }
+                item(key = "empty") {
+                    val emptyInfiniteTransition = rememberInfiniteTransition()
+                    val emptyGlowScale by emptyInfiniteTransition.animateFloat(
+                        initialValue = 0.9f,
+                        targetValue = 1.1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(2000),
+                            repeatMode = RepeatMode.Reverse
+                        )
+                    )
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(320.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Box(
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .scale(emptyGlowScale),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(80.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            Brush.radialGradient(
+                                                colors = listOf(
+                                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                                    MaterialTheme.colorScheme.primary.copy(alpha = 0f)
+                                                )
+                                            )
+                                        )
+                                )
+                                Icon(
+                                    Icons.Rounded.SettingsVoice,
+                                    null,
+                                    Modifier.size(56.dp),
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                                )
+                            }
+                            Spacer(Modifier.height(12.dp))
+                            Text(
+                                stringResource(R.string.tts_placeholder_empty),
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                            )
+                        }
+                    }
+                }
             } else {
                 item(key = "clear_all") {
                     TextButton(
@@ -207,20 +370,23 @@ private fun TtsScreen(
                     }
                 }
                 items(state.messageGroups, key = { it.id }) { group ->
-                    Column(Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
-                        MessageCard(
-                            group = group, isPlaying = state.playingGroupId == group.id,
-                            onPlayGroup = { sendIntent(TtsIntent.PlayGroup(group.id)) },
-                            onPlayChunk = { idx ->
-                                sendIntent(
-                                    TtsIntent.PlaySingleChunk(
-                                        group.id,
-                                        idx
+                    Column(Modifier.animateItem().padding(horizontal = 12.dp, vertical = 4.dp)) {
+                        SwipeableDeleteItem(
+                            onDelete = { sendIntent(TtsIntent.DeleteGroup(group.id)) }
+                        ) {
+                            MessageCard(
+                                group = group, isPlaying = state.playingGroupId == group.id,
+                                onPlayGroup = { sendIntent(TtsIntent.PlayGroup(group.id)) },
+                                onPlayChunk = { idx ->
+                                    sendIntent(
+                                        TtsIntent.PlaySingleChunk(
+                                            group.id,
+                                            idx
+                                        )
                                     )
-                                )
-                            },
-                            onStop = { sendIntent(TtsIntent.StopAudio) },
-                            onDelete = { sendIntent(TtsIntent.DeleteGroup(group.id)) })
+                                },
+                                onStop = { sendIntent(TtsIntent.StopAudio) })
+                        }
                     }
                 }
             }
@@ -231,167 +397,129 @@ private fun TtsScreen(
             inputMode = inputMode, onToggleInputMode = { inputMode = !inputMode },
             modifier = Modifier.align(Alignment.BottomCenter)
         )
-    }
-}
 
-@Composable
-private fun ConfigSection(
-    state: TtsState,
-    sendIntent: (TtsIntent) -> Unit,
-    expanded: Boolean,
-    toggle: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-            .clickableWithDebounce { toggle() }
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                Icons.Rounded.Hub,
-                null,
-                Modifier.size(16.dp),
-                MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(Modifier.width(6.dp))
-            Text(
-                "${state.host}:${state.port}",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f)
-            )
-            Text(
-                if (expanded) stringResource(R.string.tts_collapse_host) else stringResource(R.string.tts_edit_host),
-                fontSize = 12.sp, color = MaterialTheme.colorScheme.primary
-            )
-        }
-        AnimatedVisibility(visible = expanded) {
-            Row(
-                Modifier.padding(top = 6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+        AnimatedVisibility(
+            visible = settingsExpanded,
+            enter = fadeIn(tween(200)) + scaleIn(initialScale = 0.92f, animationSpec = tween(200)),
+            exit = fadeOut(tween(150)) + scaleOut(targetScale = 0.92f, animationSpec = tween(150))
+        ) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .clickableWithDebounce { settingsExpanded = false },
+                contentAlignment = Alignment.Center
             ) {
-                OutlinedTextField(
-                    state.host,
-                    { sendIntent(TtsIntent.UpdateHost(it)) },
-                    Modifier.weight(1f),
-                    placeholder = { Text("host", fontSize = 12.sp) },
-                    textStyle = MaterialTheme.typography.bodySmall,
-                    singleLine = true,
-                    shape = RoundedCornerShape(8.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-                    )
-                )
-                OutlinedTextField(
-                    state.port,
-                    { sendIntent(TtsIntent.UpdatePort(it)) },
-                    Modifier.width(80.dp),
-                    placeholder = { Text("port", fontSize = 12.sp) },
-                    textStyle = MaterialTheme.typography.bodySmall,
-                    singleLine = true,
-                    shape = RoundedCornerShape(8.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-                    )
-                )
+                Card(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .heightIn(max = 560.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    elevation = CardDefaults.cardElevation(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+                ) {
+                    Column(
+                        Modifier
+                            .verticalScroll(rememberScrollState())
+                            .padding(20.dp)
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Rounded.Tune,
+                                    null,
+                                    Modifier.size(18.dp),
+                                    MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(Modifier.width(6.dp))
+                                Text(
+                                    stringResource(R.string.tts_settings_title),
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                            IconButton(
+                                onClick = { settingsExpanded = false },
+                                modifier = Modifier.size(28.dp)
+                            ) {
+                                Icon(
+                                    Icons.Rounded.Close,
+                                    stringResource(R.string.tts_close),
+                                    Modifier.size(18.dp),
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(16.dp))
+
+                        Text(
+                            "服务器地址",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedTextField(
+                                state.host,
+                                { sendIntent(TtsIntent.UpdateHost(it)) },
+                                Modifier.weight(1f),
+                                placeholder = { Text("host", fontSize = 12.sp) },
+                                textStyle = MaterialTheme.typography.bodySmall,
+                                singleLine = true,
+                                shape = RoundedCornerShape(10.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                                )
+                            )
+                            OutlinedTextField(
+                                state.port,
+                                { sendIntent(TtsIntent.UpdatePort(it)) },
+                                Modifier.width(80.dp),
+                                placeholder = { Text("port", fontSize = 12.sp) },
+                                textStyle = MaterialTheme.typography.bodySmall,
+                                singleLine = true,
+                                shape = RoundedCornerShape(10.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                                )
+                            )
+                        }
+
+                        Spacer(Modifier.height(12.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
+                        Spacer(Modifier.height(12.dp))
+
+                        SpeakerAndLangSection(state, sendIntent)
+
+                        Spacer(Modifier.height(12.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
+                        Spacer(Modifier.height(12.dp))
+
+                        PlaybackControlsContent(state, sendIntent)
+
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-private fun StatusBar(state: TtsState, sendIntent: (TtsIntent) -> Unit) {
-    val wsColor = when {
-        state.wsConnected -> Color(0xFF4CAF50); state.wsConnecting -> Color(0xFFFFC107); else -> MaterialTheme.colorScheme.onSurface.copy(
-            alpha = 0.3f
-        )
-    }
-    val wsColorAnim by animateColorAsState(wsColor, tween(300))
-    val httpColor =
-        if (state.httpRequesting) Color(0xFFFFC107) else MaterialTheme.colorScheme.onSurface.copy(
-            alpha = 0.3f
-        )
-    val httpColorAnim by animateColorAsState(httpColor, tween(300))
-
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier
-                .size(8.dp)
-                .clip(CircleShape)
-                .background(wsColorAnim))
-            Spacer(Modifier.width(4.dp))
-            Text(
-                if (state.wsConnected) stringResource(R.string.tts_ws_connected) else if (state.wsConnecting) stringResource(
-                    R.string.tts_ws_connecting
-                ) else stringResource(R.string.tts_ws_disconnected),
-                fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier
-                .size(8.dp)
-                .clip(CircleShape)
-                .background(httpColorAnim))
-            Spacer(Modifier.width(4.dp))
-            Text(
-                if (state.httpRequesting) stringResource(R.string.tts_http_requesting) else stringResource(
-                    R.string.tts_http_idle
-                ),
-                fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        Spacer(Modifier.weight(1f))
-        FilterChip(
-            state.requestMode == RequestMode.WebSocket,
-            { sendIntent(TtsIntent.SetRequestMode(RequestMode.WebSocket)) },
-            label = { Text("WS", fontSize = 11.sp) },
-            modifier = Modifier.height(24.dp),
-            colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = MaterialTheme.colorScheme.primary.copy(
-                    alpha = 0.15f
-                ), selectedLabelColor = MaterialTheme.colorScheme.primary
-            )
-        )
-        FilterChip(
-            state.requestMode == RequestMode.HTTP,
-            { sendIntent(TtsIntent.SetRequestMode(RequestMode.HTTP)) },
-            label = { Text("HTTP", fontSize = 11.sp) },
-            modifier = Modifier.height(24.dp),
-            colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = MaterialTheme.colorScheme.primary.copy(
-                    alpha = 0.15f
-                ), selectedLabelColor = MaterialTheme.colorScheme.primary
-            )
-        )
-        SmallIconButton(
-            if (state.wsConnected) Icons.Rounded.CloudOff else Icons.Rounded.Cloud,
-            stringResource(R.string.tts_ws_connect_cd)
-        ) {
-            if (state.wsConnected) sendIntent(TtsIntent.DisconnectWs) else sendIntent(TtsIntent.ConnectWs)
-        }
-        SmallIconButton(
-            Icons.Rounded.HealthAndSafety,
-            stringResource(R.string.tts_health_check_cd)
-        ) { sendIntent(TtsIntent.HealthCheck) }
-    }
-}
-
-@Composable
-private fun SpeakerSection(state: TtsState, sendIntent: (TtsIntent) -> Unit) {
-    Column(Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 12.dp, vertical = 6.dp)) {
+private fun SpeakerAndLangSection(state: TtsState, sendIntent: (TtsIntent) -> Unit) {
+    Column(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -400,21 +528,73 @@ private fun SpeakerSection(state: TtsState, sendIntent: (TtsIntent) -> Unit) {
             SpeakerDropdown(state.speaker, sendIntent, Modifier.weight(1f))
             LangDropdown(state.language, sendIntent, Modifier.weight(1f))
         }
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(6.dp))
         OutlinedTextField(
             state.instruct,
             { sendIntent(TtsIntent.UpdateInstruct(it)) },
             Modifier.fillMaxWidth(),
-            placeholder = { Text(stringResource(R.string.tts_instruct_hint), fontSize = 12.sp) },
-            textStyle = MaterialTheme.typography.bodySmall,
+            placeholder = { 
+                Text(
+                    stringResource(R.string.tts_instruct_hint), 
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                ) 
+            },
+            textStyle = MaterialTheme.typography.bodySmall.copy(
+                color = MaterialTheme.colorScheme.onSurface
+            ),
             singleLine = true,
             shape = RoundedCornerShape(8.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary.copy(
-                    alpha = 0.3f
-                ), unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
             )
         )
+    }
+}
+
+@Composable
+private fun PlaybackControlsContent(state: TtsState, sendIntent: (TtsIntent) -> Unit) {
+    Column(Modifier.padding(vertical = 4.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Rounded.Speed, null, Modifier.size(14.dp), MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.width(6.dp))
+            Text(
+                "${String.format("%.1f", state.playbackSpeed)}x",
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.width(52.dp)
+            )
+            Slider(
+                state.playbackSpeed,
+                { sendIntent(TtsIntent.SetPlaybackSpeed(it)) },
+                valueRange = 0.5f..3.0f,
+                modifier = Modifier.weight(1f),
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Rounded.VolumeUp, null, Modifier.size(14.dp), MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.width(6.dp))
+            Text(
+                "${(state.playbackVolume * 100).toInt()}%",
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.width(52.dp)
+            )
+            Slider(
+                state.playbackVolume,
+                { sendIntent(TtsIntent.SetPlaybackVolume(it)) },
+                modifier = Modifier.weight(1f),
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
     }
 }
 
@@ -447,7 +627,7 @@ private fun SpeakerDropdown(
             Column(Modifier.weight(1f)) {
                 Text(speaker.name, fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 Text(
-                    "${speaker.description} · ${speaker.nativeLanguage}",
+                    "${stringResource(speaker.descriptionRes)} · ${stringResource(speaker.nativeLanguageRes)}",
                     fontSize = 10.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -486,7 +666,7 @@ private fun SpeakerDropdown(
                             )
                         }
                         Text(
-                            "${spk.description} · ${spk.nativeLanguage}",
+                            "${stringResource(spk.descriptionRes)} · ${stringResource(spk.nativeLanguageRes)}",
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -601,21 +781,63 @@ private fun ErrorBanner(message: String, onDismiss: () -> Unit) {
 }
 
 @Composable
-private fun EmptyPlaceholder(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+private fun SwipeableDeleteItem(
+    onDelete: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    var isSwipedOpen by remember { mutableStateOf(false) }
+    val deleteButtonWidth = 100.dp
+    val deleteButtonWidthPx = with(LocalDensity.current) { deleteButtonWidth.toPx() }
+    val maxOffset = -deleteButtonWidthPx
+    val deleteColor = Color(0xFFE53935)
+
+    val animatedOffset by animateFloatAsState(
+        targetValue = offsetX,
+        animationSpec = tween(durationMillis = 250),
+        label = "swipeOffset"
+    )
+
+    Box {
+        Box(
+            Modifier
+                .align(Alignment.CenterEnd)
+                .width(deleteButtonWidth)
+                .fillMaxHeight()
+                .clickableWithDebounce { onDelete() },
+            contentAlignment = Alignment.Center
+        ) {
             Icon(
-                Icons.Rounded.SettingsVoice,
+                Icons.Rounded.Delete,
                 null,
-                Modifier.size(56.dp),
-                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f)
+                Modifier.size(28.dp),
+                deleteColor
             )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                stringResource(R.string.tts_placeholder_empty),
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-            )
+        }
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .offset { IntOffset(animatedOffset.roundToInt(), 0) }
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = {
+                            if (offsetX < maxOffset / 2) {
+                                offsetX = maxOffset
+                                isSwipedOpen = true
+                            } else {
+                                offsetX = 0f
+                                isSwipedOpen = false
+                            }
+                        },
+                        onHorizontalDrag = { _, dragAmount ->
+                            val newOffset = (offsetX + dragAmount).coerceIn(maxOffset, 0f)
+                            offsetX = newOffset
+                            isSwipedOpen = newOffset == maxOffset
+                        }
+                    )
+                }
+        ) {
+            content()
         }
     }
 }
@@ -626,150 +848,140 @@ private fun MessageCard(
     isPlaying: Boolean,
     onPlayGroup: () -> Unit,
     onPlayChunk: (Int) -> Unit,
-    onStop: () -> Unit,
-    onDelete: () -> Unit
+    onStop: () -> Unit
 ) {
     Card(
         Modifier
             .fillMaxWidth()
             .padding(horizontal = 0.dp), shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
-                alpha = 0.6f
-            )
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         elevation = CardDefaults.cardElevation(0.dp)
     ) {
-        Column(Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                val modeColor =
-                    if (group.mode == RequestMode.WebSocket) Color(0xFF4CAF50) else Color(0xFFFFC107)
-                Box(
-                    Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(modeColor.copy(alpha = 0.15f))
-                        .padding(horizontal = 6.dp, vertical = 1.dp)
-                ) {
-                    Text(group.mode.name, fontSize = 9.sp, color = modeColor)
-                }
-                if (group.isLongText) {
-                    Spacer(Modifier.width(4.dp))
+        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val modeColor =
+                        if (group.mode == RequestMode.WebSocket) Color(0xFF4CAF50) else Color(0xFFFFC107)
                     Box(
                         Modifier
                             .clip(RoundedCornerShape(4.dp))
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                            .background(modeColor.copy(alpha = 0.15f))
                             .padding(horizontal = 6.dp, vertical = 1.dp)
                     ) {
+                        Text(group.mode.name, fontSize = 9.sp, color = modeColor)
+                    }
+                    if (group.isLongText) {
+                        Spacer(Modifier.width(4.dp))
+                        Box(
+                            Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                                .padding(horizontal = 6.dp, vertical = 1.dp)
+                        ) {
+                            Text(
+                                stringResource(R.string.tts_long_text),
+                                fontSize = 9.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        "${group.speaker} · ${group.language}",
+                        fontSize = 10.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Text(
+                        "request_id: " + group.requestId,
+                        fontSize = 9.sp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                }
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    group.text,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    lineHeight = 20.sp
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val hasAudio = group.chunks.isNotEmpty()
+                    val bgColor by animateColorAsState(
+                        if (isPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(
+                            alpha = 0.1f
+                        ), tween(200)
+                    )
+                    Box(
+                        Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(bgColor)
+                            .clickableWithDebounce { if (isPlaying) onStop() else onPlayGroup() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isPlaying) MusicBars(
+                            Modifier.size(18.dp),
+                            barCount = 4,
+                            barColor = MaterialTheme.colorScheme.onPrimary,
+                            barSpacing = 1.dp,
+                            cycleDurationMillis = 800
+                        )
+                        else Icon(
+                            Icons.Rounded.PlayArrow,
+                            stringResource(R.string.tts_play_all_cd),
+                            Modifier.size(20.dp),
+                            if (hasAudio) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
+                                alpha = 0.2f
+                            )
+                        )
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    Column(Modifier.weight(1f)) {
                         Text(
-                            stringResource(R.string.tts_long_text),
-                            fontSize = 9.sp,
+                            when {
+                                !group.isCompleted && group.totalChunks > 0 -> stringResource(
+                                    R.string.tts_synthesizing,
+                                    group.chunks.size,
+                                    group.totalChunks
+                                )
+
+                                !group.isCompleted -> stringResource(R.string.tts_waiting)
+                                group.chunks.isEmpty() -> stringResource(R.string.tts_no_audio)
+                                else -> stringResource(
+                                    R.string.tts_total_chunks,
+                                    group.chunks.size,
+                                    group.chunks.sumOf { it.durationMs })
+                            },
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        )
+                    }
+                    if (group.chunks.size > 1 && group.isCompleted) {
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            stringResource(R.string.tts_play_all),
+                            fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    "${group.speaker} · ${group.language}",
-                    fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(Modifier.weight(1f))
-                Text(
-                    group.id.takeLast(8),
-                    fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                )
-                Spacer(Modifier.width(4.dp))
-                IconButton(onClick = onDelete, modifier = Modifier.size(22.dp)) {
-                    Icon(
-                        Icons.Rounded.Delete,
-                        stringResource(R.string.tts_delete_cd),
-                        Modifier.size(14.dp),
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f)
-                    )
-                }
-            }
-            Spacer(Modifier.height(6.dp))
-            Text(
-                group.text,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-                lineHeight = 20.sp
-            )
-            Spacer(Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                val hasAudio = group.chunks.isNotEmpty()
-                val bgColor by animateColorAsState(
-                    if (isPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(
-                        alpha = 0.1f
-                    ), tween(200)
-                )
-                Box(
-                    Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(bgColor)
-                        .clickableWithDebounce { if (isPlaying) onStop() else onPlayGroup() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (isPlaying) MusicBars(
-                        Modifier.size(18.dp),
-                        barCount = 4,
-                        barColor = MaterialTheme.colorScheme.onPrimary,
-                        barSpacing = 1.dp,
-                        cycleDurationMillis = 800
-                    )
-                    else Icon(
-                        Icons.Rounded.PlayArrow,
-                        stringResource(R.string.tts_play_all_cd),
-                        Modifier.size(20.dp),
-                        if (hasAudio) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
-                            alpha = 0.2f
-                        )
-                    )
-                }
-                Spacer(Modifier.width(10.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        when {
-                            !group.isCompleted && group.totalChunks > 0 -> stringResource(
-                                R.string.tts_synthesizing,
-                                group.chunks.size,
-                                group.totalChunks
-                            )
-
-                            !group.isCompleted -> stringResource(R.string.tts_waiting)
-                            group.chunks.isEmpty() -> stringResource(R.string.tts_no_audio)
-                            else -> stringResource(
-                                R.string.tts_total_chunks,
-                                group.chunks.size,
-                                group.chunks.sumOf { it.durationMs })
-                        },
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                    )
-                }
                 if (group.chunks.size > 1 && group.isCompleted) {
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        stringResource(R.string.tts_play_all),
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-            if (group.chunks.size > 1 && group.isCompleted) {
-                Spacer(Modifier.height(8.dp))
-                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
-                Spacer(Modifier.height(6.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    group.chunks.forEachIndexed { index, chunk ->
-                        ChunkItem(
-                            chunk,
-                            index,
-                            { onPlayChunk(index) })
+                    Spacer(Modifier.height(8.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
+                    Spacer(Modifier.height(6.dp))
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        group.chunks.forEachIndexed { index, chunk ->
+                            ChunkItem(
+                                chunk,
+                                index,
+                                { onPlayChunk(index) })
+                        }
                     }
                 }
             }
@@ -812,45 +1024,6 @@ private fun ChunkItem(chunk: TtsAudioChunk, index: Int, onPlay: () -> Unit) {
             Modifier.size(16.dp),
             MaterialTheme.colorScheme.primary
         )
-    }
-}
-
-@SuppressLint("DefaultLocale")
-@Composable
-private fun PlaybackControls(state: TtsState, sendIntent: (TtsIntent) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    val label = "${String.format("%.1f", state.playbackSpeed)}x · ${(state.playbackVolume * 100).toInt()}%"
-    Column(
-        modifier = Modifier.fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
-            .clickableWithDebounce { expanded = !expanded }
-            .padding(horizontal = 12.dp, vertical = 4.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Rounded.Tune, null, Modifier.size(14.dp), MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
-            Spacer(Modifier.width(6.dp))
-            Text(label, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
-            Text(if (expanded) stringResource(R.string.tts_collapse_host) else stringResource(R.string.tts_edit_host),
-                fontSize = 11.sp, color = MaterialTheme.colorScheme.primary)
-        }
-        AnimatedVisibility(visible = expanded) {
-            Column(Modifier.padding(top = 4.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Rounded.Speed, null, Modifier.size(14.dp), MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.width(6.dp))
-                    Text("${String.format("%.1f", state.playbackSpeed)}x", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(52.dp))
-                    Slider(state.playbackSpeed, { sendIntent(TtsIntent.SetPlaybackSpeed(it)) }, valueRange = 0.5f..3.0f, modifier = Modifier.weight(1f),
-                        colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary, activeTrackColor = MaterialTheme.colorScheme.primary))
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Rounded.VolumeUp, null, Modifier.size(14.dp), MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.width(6.dp))
-                    Text("${(state.playbackVolume * 100).toInt()}%", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(52.dp))
-                    Slider(state.playbackVolume, { sendIntent(TtsIntent.SetPlaybackVolume(it)) }, modifier = Modifier.weight(1f),
-                        colors = SliderDefaults.colors(thumbColor = MaterialTheme.colorScheme.primary, activeTrackColor = MaterialTheme.colorScheme.primary))
-                }
-            }
-        }
     }
 }
 
@@ -915,7 +1088,8 @@ private fun InputSection(state: TtsState, sendIntent: (TtsIntent) -> Unit, onPic
                     placeholder = {
                         Text(
                             stringResource(R.string.tts_long_text_hint),
-                            fontSize = 12.sp
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                         )
                     },
                     textStyle = MaterialTheme.typography.bodySmall,

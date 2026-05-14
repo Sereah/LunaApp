@@ -127,4 +127,5 @@
     <string name="tts_speaker_sohee">소희</string>
     <string name="tts_speaker_sohee_desc">감정이 풍부하고 따뜻한 한국어 여성 음성.</string>
     <string name="tts_speaker_sohee_lang">한국어</string>
+    <string name="tts_settings_title">설정 변경</string>
 </resources>

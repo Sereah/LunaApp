@@ -128,4 +128,5 @@
     <string name="tts_speaker_sohee">Sohee</string>
     <string name="tts_speaker_sohee_desc">Emotional, warm Korean female voice.</string>
     <string name="tts_speaker_sohee_lang">Korean</string>
+    <string name="tts_settings_title">Settings</string>
 </resources>

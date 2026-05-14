@@ -127,4 +127,5 @@
     <string name="tts_speaker_sohee">ソヒ</string>
     <string name="tts_speaker_sohee_desc">感情豊かで温かい韓国語の女性の声。</string>
     <string name="tts_speaker_sohee_lang">韓国語</string>
+    <string name="tts_settings_title">設定を変更</string>
 </resources>

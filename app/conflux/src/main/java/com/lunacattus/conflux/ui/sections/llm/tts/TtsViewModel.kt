@@ -126,40 +126,39 @@ class TtsViewModel @Inject constructor(
         val now = System.currentTimeMillis()
         val totalGroups = texts.size
 
-        val groupIds = texts.mapIndexed { index, text ->
-            val groupId = if (isLong && index < pendingLongTextGroups.size) {
+        val pendingIds = texts.mapIndexed { index, _ ->
+            if (isLong && index < pendingLongTextGroups.size) {
                 pendingLongTextGroups[index]
             } else {
-                "group_${System.currentTimeMillis()}_$index"
+                "pending_${System.currentTimeMillis()}_$index"
             }
-            val displayText = if (isLong) "[${index + 1}/$totalGroups] $text" else text
-            val group = TtsMessageGroup(
-                id = groupId, text = displayText, timestamp = now + index,
-                speaker = state.speaker.name, language = state.language,
-                mode = RequestMode.HTTP, isLongText = isLong,
-            )
-            reduce { copy(messageGroups = messageGroups + group) }
-            groupId to group
         }
-        persistGroups()
 
         viewModelScope.launch {
             var failed = false
-            for ((index, pair) in groupIds.withIndex()) {
+            for ((index, text) in texts.withIndex()) {
                 if (failed) break
-                val (groupId, _) = pair
-                val result = httpService.synthesize(texts[index], state.speaker.name, state.language, state.instruct.ifBlank { null })
+                val pendingId = pendingIds[index]
+                val displayText = if (isLong) "[${index + 1}/$totalGroups] $text" else text
+
+                val result = httpService.synthesize(text, state.speaker.name, state.language, state.instruct.ifBlank { null })
                 result.onSuccess { response ->
                     val chunks = response.chunks.map { c -> TtsAudioChunk(c.index, c.audioB64, c.durationMs) }
-                    updateGroup(groupId) { copy(chunks = chunks, totalChunks = chunks.size, isCompleted = true) }
+                    val group = TtsMessageGroup(
+                        id = pendingId, requestId = response.requestId, text = displayText, timestamp = now + index,
+                        speaker = state.speaker.name, language = state.language,
+                        chunks = chunks, totalChunks = chunks.size, isCompleted = true,
+                        mode = RequestMode.HTTP, isLongText = isLong,
+                    )
+                    reduce { copy(messageGroups = messageGroups + group) }
                     persistGroups()
                 }.onFailure { e ->
                     Logger.e(TAG, "HTTP TTS failed: ${e.message}")
-                    if (isLong) updateGroup(groupId) { copy(isCompleted = true) } else removeGroup(groupId)
-                    persistGroups()
-                    reduce { copy(error = "HTTP 请求失败: ${e.message}", httpRequesting = false) }
-                    emitEffect(TtsEffect.ShowToast("HTTP 请求失败"))
-                    failed = true
+                    if (!isLong) {
+                        reduce { copy(error = "HTTP 请求失败: ${e.message}", httpRequesting = false) }
+                        emitEffect(TtsEffect.ShowToast("HTTP 请求失败"))
+                        failed = true
+                    }
                 }
             }
             if (!failed) reduce { copy(httpRequesting = false) }
@@ -201,7 +200,7 @@ class TtsViewModel @Inject constructor(
     private suspend fun handleChunkStart(event: TtsWsEvent.ChunkStart) {
         if (_state.value.messageGroups.any { it.id == event.requestId }) return
         val state = _state.value
-        val group = TtsMessageGroup(id = event.requestId, text = event.text, timestamp = System.currentTimeMillis(),
+        val group = TtsMessageGroup(id = event.requestId, requestId = event.requestId, text = event.text, timestamp = System.currentTimeMillis(),
             speaker = state.speaker.name, language = state.language, totalChunks = event.total, mode = RequestMode.WebSocket)
         reduce { copy(messageGroups = sortGroups(messageGroups + group)) }
         persistGroups()
