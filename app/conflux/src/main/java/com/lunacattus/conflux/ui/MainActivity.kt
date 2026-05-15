@@ -12,10 +12,10 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.MusicVideo
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.SmartToy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -165,7 +165,7 @@ val LocalActivityViewModel = staticCompositionLocalOf<ActivityViewModel> {
 
 @Composable
 fun topLevelRoutes() = mapOf(
-    LlmRoute to NavBarItem(icon = Icons.Rounded.Home, title = stringResource(R.string.llm_title)),
+    LlmRoute to NavBarItem(icon = Icons.Rounded.SmartToy, title = stringResource(R.string.llm_title)),
     ConnectionRoute to NavBarItem(icon = Icons.Rounded.Link, title = stringResource(R.string.connection_title)),
     MediaRoute to NavBarItem(icon = Icons.Rounded.MusicVideo, title = stringResource(R.string.media_title)),
     SettingRoute to NavBarItem(icon = Icons.Rounded.Settings, title = stringResource(R.string.setting_title)),
