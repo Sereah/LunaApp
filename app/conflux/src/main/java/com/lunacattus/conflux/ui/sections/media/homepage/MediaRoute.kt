@@ -6,12 +6,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardVoice
 import androidx.compose.material.icons.rounded.MusicNote
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,14 +54,15 @@ fun MediaScreen(
             title = stringResource(R.string.record),
             summary = if (uiState.isRecord) stringResource(R.string.recording) else null,
             icon = IconSource.Vector(Icons.Rounded.KeyboardVoice),
-            iconTint = if (uiState.isRecord) Color.Green else LocalContentColor.current,
+            iconTint = MaterialTheme.colorScheme.tertiary,
+            accentColor = MaterialTheme.colorScheme.primary,
             checked = uiState.isRecord,
             onCheckedChange = switchRecord
         ),
         NavigationItem(
             title = stringResource(R.string.open_record_file),
             icon = IconSource.Resource(R.drawable.ic_record_file),
-            iconTint = LocalContentColor.current,
+            iconTint = MaterialTheme.colorScheme.primary,
             onClick = {
                 if (uiState.isRecord) {
                     scope.launch { ActivityToastEvent.send(ToastEvent.ShowToast("请先停止录制")) }
@@ -77,7 +77,7 @@ fun MediaScreen(
         NavigationItem(
             title = stringResource(R.string.open_music_file),
             icon = IconSource.Vector(Icons.Rounded.MusicNote),
-            iconTint = LocalContentColor.current,
+            iconTint = MaterialTheme.colorScheme.secondary,
             onClick = {
                 navToMediaFilesScreen(MediaSourceType.SystemMusic)
             }

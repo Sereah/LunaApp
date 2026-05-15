@@ -83,6 +83,10 @@
     <string name="tts_play_all">すべて再生</string>
     <string name="tts_play_all_cd">すべて再生</string>
     <string name="tts_segment">セグメント %d</string>
+    <string name="tts_expand">展開</string>
+    <string name="tts_collapse">折りたたむ</string>
+    <string name="tts_audio_segments">音声セグメント (%d件)</string>
+    <string name="tts_audio_segments_progress">音声セグメント (%d/%d)</string>
     <string name="tts_play_cd">再生</string>
     <string name="tts_synthesizing">合成中… %d/%d</string>
     <string name="tts_waiting">待機中…</string>

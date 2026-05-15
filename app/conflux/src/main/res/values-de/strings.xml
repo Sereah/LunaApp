@@ -83,6 +83,10 @@
     <string name="tts_play_all">Alle abspielen</string>
     <string name="tts_play_all_cd">Alle abspielen</string>
     <string name="tts_segment">Segment %d</string>
+    <string name="tts_expand">Ausklappen</string>
+    <string name="tts_collapse">Einklappen</string>
+    <string name="tts_audio_segments">Audiosegmente (%d)</string>
+    <string name="tts_audio_segments_progress">Audiosegmente (%d/%d)</string>
     <string name="tts_play_cd">Abspielen</string>
     <string name="tts_synthesizing">Synthetisiere… %d/%d</string>
     <string name="tts_waiting">Warte…</string>

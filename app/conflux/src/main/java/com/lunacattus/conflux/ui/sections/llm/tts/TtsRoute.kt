@@ -368,9 +368,9 @@ private fun TtsHeader(
         )
         Spacer(Modifier.width(3.dp))
         Text(
-            if (state.wsConnected) "已连接"
-            else if (state.wsConnecting) "连接中"
-            else "未连接",
+            if (state.wsConnected) stringResource(R.string.tts_ws_connected)
+            else if (state.wsConnecting) stringResource(R.string.tts_ws_connecting)
+            else stringResource(R.string.tts_ws_disconnected),
             fontSize = 10.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
         )
@@ -396,7 +396,7 @@ private fun TtsHeader(
         )
         Spacer(Modifier.width(3.dp))
         Text(
-            if (state.httpRequesting) "请求中" else "空闲",
+            if (state.httpRequesting) stringResource(R.string.tts_http_requesting) else stringResource(R.string.tts_http_idle),
             fontSize = 10.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
         )
@@ -954,7 +954,7 @@ private fun MessageCard(
                 )
                 if (textDidOverflow || textExpanded) {
                     Text(
-                        if (textExpanded) "收起" else "展开",
+                        if (textExpanded) stringResource(R.string.tts_collapse) else stringResource(R.string.tts_expand),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
@@ -1044,8 +1044,8 @@ private fun MessageCard(
                         Spacer(Modifier.width(4.dp))
                         Text(
                             when {
-                                !group.isCompleted && group.totalChunks > 0 -> "分段音频 (${group.chunks.size}/${group.totalChunks})"
-                                else -> "分段音频 (${group.chunks.size}段)"
+                                !group.isCompleted && group.totalChunks > 0 -> stringResource(R.string.tts_audio_segments_progress, group.chunks.size, group.totalChunks)
+                                else -> stringResource(R.string.tts_audio_segments, group.chunks.size)
                             },
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.primary,

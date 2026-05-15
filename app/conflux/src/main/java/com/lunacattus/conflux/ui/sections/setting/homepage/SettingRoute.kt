@@ -7,19 +7,30 @@ import android.content.Intent
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Accessibility
 import androidx.compose.material.icons.rounded.ColorLens
+import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Nightlight
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -27,8 +38,10 @@ import com.lunacattus.conflux.R
 import com.lunacattus.conflux.domain.settings.ConfluxAccessibilityService
 import com.lunacattus.conflux.ui.LocalActivityViewModel
 import com.lunacattus.conflux.ui.LocalInnerPadding
+import com.lunacattus.conflux.ui.base.GradientHeader
 import com.lunacattus.conflux.ui.base.IconSource
 import com.lunacattus.conflux.ui.base.ItemCard
+import com.lunacattus.conflux.ui.base.NavigationItem
 import com.lunacattus.conflux.ui.base.SwitchItem
 import com.lunacattus.ui_design.compose.overScrollVertical
 
@@ -79,6 +92,9 @@ fun SettingRoute(viewModel: SettingViewModel) {
                 val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                 context.startActivity(intent)
             }
+        },
+        openLanguageSettings = {
+            context.startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
         }
     )
 }
@@ -90,49 +106,108 @@ private fun SettingScreen(
     enableNightMode: Boolean,
     changeNightMode: (Boolean) -> Unit,
     enableAccessibility: Boolean,
-    changeAccessibility: (Boolean) -> Unit
+    changeAccessibility: (Boolean) -> Unit,
+    openLanguageSettings: () -> Unit,
 ) {
-
-    val firstItems = listOf(
+    val appearanceItems = listOf(
         SwitchItem(
             title = stringResource(R.string.dynamic_color),
             icon = IconSource.Vector(Icons.Rounded.ColorLens),
-            iconTint = LocalContentColor.current,
+            iconTint = MaterialTheme.colorScheme.primary,
             checked = enableDynamicColor,
-            onCheckedChange = changeDynamicColor
+            onCheckedChange = changeDynamicColor,
         ),
         SwitchItem(
             title = stringResource(R.string.night_mode),
             summary = stringResource(R.string.night_mode_summary),
             icon = IconSource.Vector(Icons.Rounded.Nightlight),
-            iconTint = LocalContentColor.current,
+            iconTint = MaterialTheme.colorScheme.tertiary,
             checked = enableNightMode,
-            onCheckedChange = changeNightMode
+            onCheckedChange = changeNightMode,
+        ),
+    )
+
+    val systemItems = listOf(
+        NavigationItem(
+            title = stringResource(R.string.language),
+            summary = stringResource(R.string.language_summary),
+            icon = IconSource.Vector(Icons.Rounded.Language),
+            iconTint = MaterialTheme.colorScheme.secondary,
+            onClick = openLanguageSettings,
         ),
         SwitchItem(
             title = stringResource(R.string.accessibility_service),
             icon = IconSource.Vector(Icons.Rounded.Accessibility),
-            iconTint = LocalContentColor.current,
+            iconTint = MaterialTheme.colorScheme.primary,
             checked = enableAccessibility,
-            onCheckedChange = changeAccessibility
+            onCheckedChange = changeAccessibility,
         ),
     )
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .overScrollVertical(),
-        contentPadding = LocalInnerPadding.current
+        contentPadding = LocalInnerPadding.current,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            ItemCard(firstItems)
+            GradientHeader(
+                title = stringResource(R.string.setting_title),
+                subtitle = stringResource(R.string.app_name),
+                icon = Icons.Rounded.Settings,
+                modifier = Modifier.padding(horizontal = 20.dp),
+            )
         }
+
+        item {
+            AnimatedCard(
+                index = 0,
+                items = appearanceItems,
+                categoryText = stringResource(R.string.settings_appearance),
+            )
+        }
+
+        item {
+            AnimatedCard(
+                index = 1,
+                items = systemItems,
+                categoryText = stringResource(R.string.settings_system),
+            )
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
+    }
+}
+
+@Composable
+private fun AnimatedCard(
+    index: Int,
+    items: List<com.lunacattus.conflux.ui.base.Item>,
+    categoryText: String,
+) {
+    AnimatedVisibility(
+        visible = true,
+        enter = fadeIn(
+            animationSpec = tween(
+                durationMillis = 400,
+                delayMillis = 150 + index * 120,
+            )
+        ) + slideInVertically(
+            animationSpec = tween(
+                durationMillis = 400,
+                delayMillis = 150 + index * 120,
+            ),
+            initialOffsetY = { it / 4 },
+        ),
+    ) {
+        ItemCard(items = items, categoryText = categoryText)
     }
 }
 
 fun isAccessibilityServiceEnabled(context: Context, serviceClass: Class<out AccessibilityService>): Boolean {
     val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
     val expectedId = "${context.packageName}/${serviceClass.canonicalName}"
-    // 获取当前系统中所有已启用的无障碍服务
     val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
 
     for (service in enabledServices) {

@@ -2,6 +2,7 @@
     <string name="app_name">Conflux</string>
     <string name="media_title">Media</string>
     <string name="connection_title">Connection</string>
+    <string name="connection_subtitle">Device connection and projection</string>
     <string name="setting_title">Setting</string>
     <string name="home_title">Home</string>
     <string name="llm_title">LLM</string>
@@ -46,6 +47,10 @@
     <string name="yesterday">Yesterday</string>
     <string name="day_before_yesterday">2 days ago</string>
     <string name="play">Play</string>
+    <string name="language">Language</string>
+    <string name="language_summary">Open system language settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_system">System</string>
     <string name="accessibility_service">Accessibility services</string>
     <string name="toast_close_accessibility">Please manually disable the service in system settings.</string>
 
@@ -56,6 +61,8 @@
     <string name="llm_coming_soon">Coming Soon</string>
     <string name="llm_enter">Enter</string>
     <string name="llm_soon_tag">Coming Soon</string>
+    <string name="feature_enter">Enter</string>
+    <string name="feature_coming_soon">Coming Soon</string>
 
     <string name="llm_tts_title">TTS</string>
     <string name="llm_tts_desc">Powered by Qwen-TTS-1.7B, supporting multiple voices and languages.</string>
@@ -87,6 +94,10 @@
     <string name="tts_play_all">Play All</string>
     <string name="tts_play_all_cd">Play All</string>
     <string name="tts_segment">Segment %d</string>
+    <string name="tts_expand">Expand</string>
+    <string name="tts_collapse">Collapse</string>
+    <string name="tts_audio_segments">Audio Segments (%d)</string>
+    <string name="tts_audio_segments_progress">Audio Segments (%d/%d)</string>
     <string name="tts_play_cd">Play</string>
     <string name="tts_synthesizing">Synthesizing… %d/%d</string>
     <string name="tts_waiting">Waiting…</string>

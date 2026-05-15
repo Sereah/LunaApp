@@ -84,6 +84,10 @@
     <string name="tts_play_all">Play All</string>
     <string name="tts_play_all_cd">Play All</string>
     <string name="tts_segment">Segment %d</string>
+    <string name="tts_expand">Expand</string>
+    <string name="tts_collapse">Collapse</string>
+    <string name="tts_audio_segments">Audio Segments (%d)</string>
+    <string name="tts_audio_segments_progress">Audio Segments (%d/%d)</string>
     <string name="tts_play_cd">Play</string>
     <string name="tts_synthesizing">Synthesizing… %d/%d</string>
     <string name="tts_waiting">Waiting…</string>

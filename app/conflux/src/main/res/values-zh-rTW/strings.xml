@@ -83,6 +83,10 @@
     <string name="tts_play_all">全部播放</string>
     <string name="tts_play_all_cd">全部播放</string>
     <string name="tts_segment">片段 %d</string>
+    <string name="tts_expand">展開</string>
+    <string name="tts_collapse">收起</string>
+    <string name="tts_audio_segments">分段音訊 (%d段)</string>
+    <string name="tts_audio_segments_progress">分段音訊 (%d/%d)</string>
     <string name="tts_play_cd">播放</string>
     <string name="tts_synthesizing">合成中… %d/%d</string>
     <string name="tts_waiting">等待合成…</string>

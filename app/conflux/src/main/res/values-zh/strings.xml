@@ -9,6 +9,7 @@
   <string name="asr_title">语音识别</string>
   <string name="click_to_start">点击开始</string>
   <string name="connection_title">连接</string>
+  <string name="connection_subtitle">设备连接与投屏</string>
   <string name="day_before_yesterday">前天</string>
   <string name="delete">删除</string>
   <string name="dynamic_color">动态色彩</string>
@@ -17,6 +18,10 @@
   <string name="home_title">首页</string>
   <string name="llm_title">大模型</string>
   <string name="homepage">主页</string>
+  <string name="language">语言</string>
+  <string name="language_summary">打开系统语言设置</string>
+  <string name="settings_appearance">外观</string>
+  <string name="settings_system">系统</string>
   <string name="leak_canary_display_activity_label">ConfluxLeak</string>
   <string name="listening">正在聆听…</string>
   <string name="loading">正在加载…</string>
@@ -58,6 +63,8 @@
     <string name="llm_coming_soon">即将推出</string>
     <string name="llm_enter">进入</string>
     <string name="llm_soon_tag">即将推出</string>
+    <string name="feature_enter">进入</string>
+    <string name="feature_coming_soon">即将推出</string>
 
     <string name="llm_tts_title">语音合成</string>
     <string name="llm_tts_desc">使用大模型 Qwen-TTS-1.7B，支持多种音色和语言。</string>
@@ -89,6 +96,10 @@
     <string name="tts_play_all">全部播放</string>
     <string name="tts_play_all_cd">全部播放</string>
     <string name="tts_segment">片段 %d</string>
+    <string name="tts_expand">展开</string>
+    <string name="tts_collapse">收起</string>
+    <string name="tts_audio_segments">分段音频 (%d段)</string>
+    <string name="tts_audio_segments_progress">分段音频 (%d/%d)</string>
     <string name="tts_play_cd">播放</string>
     <string name="tts_synthesizing">合成中… %d/%d</string>
     <string name="tts_waiting">等待合成…</string>

@@ -83,6 +83,10 @@
     <string name="tts_play_all">전체 재생</string>
     <string name="tts_play_all_cd">전체 재생</string>
     <string name="tts_segment">세그먼트 %d</string>
+    <string name="tts_expand">펼치기</string>
+    <string name="tts_collapse">접기</string>
+    <string name="tts_audio_segments">오디오 세그먼트 (%d개)</string>
+    <string name="tts_audio_segments_progress">오디오 세그먼트 (%d/%d)</string>
     <string name="tts_play_cd">재생</string>
     <string name="tts_synthesizing">합성 중… %d/%d</string>
     <string name="tts_waiting">대기 중…</string>
