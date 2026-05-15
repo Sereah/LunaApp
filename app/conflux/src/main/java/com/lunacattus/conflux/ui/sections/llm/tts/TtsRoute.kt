@@ -1,10 +1,8 @@
 package com.lunacattus.conflux.ui.sections.llm.tts
 
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -12,10 +10,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -38,16 +32,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.Cloud
-import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material.icons.rounded.ErrorOutline
@@ -102,12 +94,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.LocalInnerPadding
 import com.lunacattus.ui_design.compose.MusicBars
 import com.lunacattus.ui_design.compose.clickableWithDebounce
-import com.lunacattus.ui_design.compose.overScrollVertical
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import kotlin.math.roundToInt
@@ -136,14 +128,11 @@ fun TtsRoute(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.effects.collect {}
-    }
-
     TtsScreen(
         state = state,
         sendIntent = sendIntent,
         onPickTextFile = { textFileLauncher.launch(arrayOf("text/*")) },
+        effects = viewModel.effects,
         modifier = modifier,
     )
 }
@@ -153,202 +142,45 @@ private fun TtsScreen(
     state: TtsState,
     sendIntent: (TtsIntent) -> Unit,
     onPickTextFile: () -> Unit,
+    effects: kotlinx.coroutines.flow.Flow<TtsEffect>,
     modifier: Modifier = Modifier,
 ) {
     var settingsExpanded by remember { mutableStateOf(false) }
     var inputMode by remember { mutableStateOf(false) }
 
-    BackHandler(enabled = settingsExpanded) {
-        settingsExpanded = false
-    }
-
     val listState = rememberLazyListState()
 
-    LaunchedEffect(state.messageGroups.size) {
-        if (state.messageGroups.isNotEmpty()) {
-            listState.animateScrollToItem(state.messageGroups.size + 3)
+    LaunchedEffect(Unit) {
+        effects.collect { effect ->
+            if (effect is TtsEffect.ScrollToBottom && state.messageGroups.isNotEmpty()) {
+                listState.animateScrollToItem(state.messageGroups.size + 3)
+            }
         }
     }
 
-    Box(
+    Column(
         modifier = modifier
             .padding(LocalInnerPadding.current)
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        TtsHeader(
+            state = state,
+            sendIntent = sendIntent,
+            onSettingsClick = { settingsExpanded = true }
+        )
+        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
         LazyColumn(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .overScrollVertical(),
+                .weight(1f)
         ) {
-            item(key = "settings_bar") {
-                val wsColor = when {
-                    state.wsConnected -> Color(0xFF4CAF50)
-                    state.wsConnecting -> Color(0xFFFFC107)
-                    else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                }
-                val wsColorAnim by animateColorAsState(wsColor, tween(300))
-                val httpColor = when {
-                    state.httpRequesting -> Color(0xFFFFC107)
-                    else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                }
-                val httpColorAnim by animateColorAsState(httpColor, tween(300))
-                
-                val infiniteTransition = rememberInfiniteTransition()
-                val glowAlpha by infiniteTransition.animateFloat(
-                    initialValue = 0.12f,
-                    targetValue = 0.28f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(2000),
-                        repeatMode = RepeatMode.Reverse
-                    )
-                )
-                
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .clickableWithDebounce { settingsExpanded = true }
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = glowAlpha),
-                                    MaterialTheme.colorScheme.secondaryContainer.copy(alpha = glowAlpha * 0.5f),
-                                    MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = glowAlpha * 0.3f)
-                                ),
-                                start = Offset(0f, 0f),
-                                end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
-                            )
-                        )
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                ) {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        FilterChip(
-                            state.requestMode == RequestMode.WebSocket,
-                            { 
-                                sendIntent(TtsIntent.SetRequestMode(RequestMode.WebSocket))
-                                if (!state.wsConnected && !state.wsConnecting) {
-                                    sendIntent(TtsIntent.ConnectWs)
-                                }
-                            },
-                            label = { Text("WS", fontSize = 11.sp) },
-                            modifier = Modifier.height(26.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                                selectedLabelColor = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Box(Modifier.size(7.dp).clip(CircleShape).background(wsColorAnim))
-                        Spacer(Modifier.width(3.dp))
-                        Text(
-                            if (state.wsConnected) "已连接"
-                            else if (state.wsConnecting) "连接中"
-                            else "未连接",
-                            fontSize = 10.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                        )
-                        
-                        Spacer(Modifier.width(12.dp))
-                        
-                        FilterChip(
-                            state.requestMode == RequestMode.HTTP,
-                            { sendIntent(TtsIntent.SetRequestMode(RequestMode.HTTP)) },
-                            label = { Text("HTTP", fontSize = 11.sp) },
-                            modifier = Modifier.height(26.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                                selectedLabelColor = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Box(Modifier.size(7.dp).clip(CircleShape).background(httpColorAnim))
-                        Spacer(Modifier.width(3.dp))
-                        Text(
-                            if (state.httpRequesting) "请求中" else "空闲",
-                            fontSize = 10.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                        )
-                        
-                        Spacer(Modifier.weight(1f))
-                        
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                Icons.Rounded.Tune,
-                                null,
-                                Modifier.size(14.dp),
-                                MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(Modifier.width(2.dp))
-                            Text(
-                                stringResource(R.string.tts_settings_title),
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                }
-                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
-            }
             if (state.error != null) {
                 item(key = "error") { ErrorBanner(state.error) { sendIntent(TtsIntent.DismissError) } }
             }
             if (state.messageGroups.isEmpty()) {
-                item(key = "empty") {
-                    val emptyInfiniteTransition = rememberInfiniteTransition()
-                    val emptyGlowScale by emptyInfiniteTransition.animateFloat(
-                        initialValue = 0.9f,
-                        targetValue = 1.1f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(2000),
-                            repeatMode = RepeatMode.Reverse
-                        )
-                    )
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(320.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Box(
-                                modifier = Modifier
-                                    .size(80.dp)
-                                    .scale(emptyGlowScale),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(80.dp)
-                                        .clip(CircleShape)
-                                        .background(
-                                            Brush.radialGradient(
-                                                colors = listOf(
-                                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                                                    MaterialTheme.colorScheme.primary.copy(alpha = 0f)
-                                                )
-                                            )
-                                        )
-                                )
-                                Icon(
-                                    Icons.Rounded.SettingsVoice,
-                                    null,
-                                    Modifier.size(56.dp),
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
-                                )
-                            }
-                            Spacer(Modifier.height(12.dp))
-                            Text(
-                                stringResource(R.string.tts_placeholder_empty),
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                            )
-                        }
-                    }
-                }
+                item(key = "empty") { EmptyPlaceholder() }
             } else {
                 item(key = "clear_all") {
                     TextButton(
@@ -370,7 +202,11 @@ private fun TtsScreen(
                     }
                 }
                 items(state.messageGroups, key = { it.id }) { group ->
-                    Column(Modifier.animateItem().padding(horizontal = 12.dp, vertical = 4.dp)) {
+                    Column(
+                        Modifier
+                            .animateItem()
+                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
                         SwipeableDeleteItem(
                             onDelete = { sendIntent(TtsIntent.DeleteGroup(group.id)) }
                         ) {
@@ -395,123 +231,306 @@ private fun TtsScreen(
         InputSection(
             state = state, sendIntent = sendIntent, onPickTextFile = onPickTextFile,
             inputMode = inputMode, onToggleInputMode = { inputMode = !inputMode },
-            modifier = Modifier.align(Alignment.BottomCenter)
         )
+    }
 
-        AnimatedVisibility(
-            visible = settingsExpanded,
-            enter = fadeIn(tween(200)) + scaleIn(initialScale = 0.92f, animationSpec = tween(200)),
-            exit = fadeOut(tween(150)) + scaleOut(targetScale = 0.92f, animationSpec = tween(150))
-        ) {
+    if (settingsExpanded) {
+        SettingsDialog(
+            state = state,
+            sendIntent = sendIntent,
+            onDismiss = { settingsExpanded = false }
+        )
+    }
+}
+
+@Composable
+private fun EmptyPlaceholder() {
+    val emptyInfiniteTransition = rememberInfiniteTransition()
+    val emptyGlowScale by emptyInfiniteTransition.animateFloat(
+        initialValue = 0.9f,
+        targetValue = 1.1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(320.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Box(
-                Modifier
-                    .fillMaxSize()
-                    .clickableWithDebounce { settingsExpanded = false },
+                modifier = Modifier
+                    .size(80.dp)
+                    .scale(emptyGlowScale),
                 contentAlignment = Alignment.Center
             ) {
-                Card(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .heightIn(max = 560.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    elevation = CardDefaults.cardElevation(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
-                ) {
-                    Column(
-                        Modifier
-                            .verticalScroll(rememberScrollState())
-                            .padding(20.dp)
-                    ) {
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    Icons.Rounded.Tune,
-                                    null,
-                                    Modifier.size(18.dp),
-                                    MaterialTheme.colorScheme.primary
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(CircleShape)
+                        .background(
+                            Brush.radialGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0f)
                                 )
-                                Spacer(Modifier.width(6.dp))
-                                Text(
-                                    stringResource(R.string.tts_settings_title),
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                            IconButton(
-                                onClick = { settingsExpanded = false },
-                                modifier = Modifier.size(28.dp)
-                            ) {
-                                Icon(
-                                    Icons.Rounded.Close,
-                                    stringResource(R.string.tts_close),
-                                    Modifier.size(18.dp),
-                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                )
-                            }
-                        }
-
-                        Spacer(Modifier.height(16.dp))
-
-                        Text(
-                            "服务器地址",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                            )
                         )
-                        Spacer(Modifier.height(4.dp))
-                        Row(
-                            Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            OutlinedTextField(
-                                state.host,
-                                { sendIntent(TtsIntent.UpdateHost(it)) },
-                                Modifier.weight(1f),
-                                placeholder = { Text("host", fontSize = 12.sp) },
-                                textStyle = MaterialTheme.typography.bodySmall,
-                                singleLine = true,
-                                shape = RoundedCornerShape(10.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-                                )
-                            )
-                            OutlinedTextField(
-                                state.port,
-                                { sendIntent(TtsIntent.UpdatePort(it)) },
-                                Modifier.width(80.dp),
-                                placeholder = { Text("port", fontSize = 12.sp) },
-                                textStyle = MaterialTheme.typography.bodySmall,
-                                singleLine = true,
-                                shape = RoundedCornerShape(10.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-                                )
-                            )
-                        }
+                )
+                Icon(
+                    Icons.Rounded.SettingsVoice,
+                    null,
+                    Modifier.size(56.dp),
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                )
+            }
+            Spacer(Modifier.height(12.dp))
+            Text(
+                stringResource(R.string.tts_placeholder_empty),
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+            )
+        }
+    }
+}
 
-                        Spacer(Modifier.height(12.dp))
-                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
-                        Spacer(Modifier.height(12.dp))
+@Composable
+private fun TtsHeader(
+    state: TtsState,
+    sendIntent: (TtsIntent) -> Unit,
+    onSettingsClick: () -> Unit
+) {
+    val wsColor = when {
+        state.wsConnected -> Color(0xFF4CAF50)
+        state.wsConnecting -> Color(0xFFFFC107)
+        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+    }
+    val wsColorAnim by animateColorAsState(wsColor, tween(300))
+    val httpColor = when {
+        state.httpRequesting -> Color(0xFFFFC107)
+        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+    }
+    val httpColorAnim by animateColorAsState(httpColor, tween(300))
 
-                        SpeakerAndLangSection(state, sendIntent)
+    val infiniteTransition = rememberInfiniteTransition()
+    val glowAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.12f,
+        targetValue = 0.28f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
 
-                        Spacer(Modifier.height(12.dp))
-                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
-                        Spacer(Modifier.height(12.dp))
 
-                        PlaybackControlsContent(state, sendIntent)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = glowAlpha),
+                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = glowAlpha * 0.5f),
+                        MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = glowAlpha * 0.3f)
+                    ),
+                    start = Offset(0f, 0f),
+                    end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+                )
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        FilterChip(
+            state.requestMode == RequestMode.WebSocket,
+            {
+                sendIntent(TtsIntent.SetRequestMode(RequestMode.WebSocket))
+                if (!state.wsConnected && !state.wsConnecting) {
+                    sendIntent(TtsIntent.ConnectWs)
+                }
+            },
+            label = { Text("WS", fontSize = 11.sp) },
+            modifier = Modifier.height(26.dp),
+            enabled = !state.httpRequesting,
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                selectedLabelColor = MaterialTheme.colorScheme.primary
+            )
+        )
+        Spacer(Modifier.width(4.dp))
+        Box(
+            Modifier
+                .size(7.dp)
+                .clip(CircleShape)
+                .background(wsColorAnim)
+        )
+        Spacer(Modifier.width(3.dp))
+        Text(
+            if (state.wsConnected) "已连接"
+            else if (state.wsConnecting) "连接中"
+            else "未连接",
+            fontSize = 10.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+        )
 
-                        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.width(12.dp))
+
+        FilterChip(
+            state.requestMode == RequestMode.HTTP,
+            { sendIntent(TtsIntent.SetRequestMode(RequestMode.HTTP)) },
+            label = { Text("HTTP", fontSize = 11.sp) },
+            modifier = Modifier.height(26.dp),
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                selectedLabelColor = MaterialTheme.colorScheme.primary
+            )
+        )
+        Spacer(Modifier.width(4.dp))
+        Box(
+            Modifier
+                .size(7.dp)
+                .clip(CircleShape)
+                .background(httpColorAnim)
+        )
+        Spacer(Modifier.width(3.dp))
+        Text(
+            if (state.httpRequesting) "请求中" else "空闲",
+            fontSize = 10.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+        )
+
+        Spacer(Modifier.weight(1f))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickableWithDebounce {
+                onSettingsClick()
+            }) {
+            Icon(
+                Icons.Rounded.Tune,
+                null,
+                Modifier.size(14.dp),
+                MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.width(2.dp))
+            Text(
+                stringResource(R.string.tts_settings_title),
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+private fun SettingsDialog(
+    state: TtsState,
+    sendIntent: (TtsIntent) -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            Modifier
+                .fillMaxWidth()
+                .heightIn(max = 560.dp),
+            shape = RoundedCornerShape(20.dp),
+            elevation = CardDefaults.cardElevation(12.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+        ) {
+            Column(
+                Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(20.dp)
+            ) {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Rounded.Tune,
+                            null,
+                            Modifier.size(18.dp),
+                            MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            stringResource(R.string.tts_settings_title),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.size(28.dp)
+                    ) {
+                        Icon(
+                            Icons.Rounded.Close,
+                            stringResource(R.string.tts_close),
+                            Modifier.size(18.dp),
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                        )
                     }
                 }
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    "服务器地址",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                )
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        state.host,
+                        { sendIntent(TtsIntent.UpdateHost(it)) },
+                        Modifier.weight(1f),
+                        placeholder = { Text("host", fontSize = 12.sp) },
+                        textStyle = MaterialTheme.typography.bodySmall,
+                        singleLine = true,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                        )
+                    )
+                    OutlinedTextField(
+                        state.port,
+                        { sendIntent(TtsIntent.UpdatePort(it)) },
+                        Modifier.width(80.dp),
+                        placeholder = { Text("port", fontSize = 12.sp) },
+                        textStyle = MaterialTheme.typography.bodySmall,
+                        singleLine = true,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                        )
+                    )
+                }
+
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
+                Spacer(Modifier.height(12.dp))
+
+                SpeakerAndLangSection(state, sendIntent)
+
+                Spacer(Modifier.height(12.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
+                Spacer(Modifier.height(12.dp))
+
+                PlaybackControlsContent(state, sendIntent)
+
+                Spacer(Modifier.height(8.dp))
             }
         }
     }
@@ -519,7 +538,11 @@ private fun TtsScreen(
 
 @Composable
 private fun SpeakerAndLangSection(state: TtsState, sendIntent: (TtsIntent) -> Unit) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -533,12 +556,12 @@ private fun SpeakerAndLangSection(state: TtsState, sendIntent: (TtsIntent) -> Un
             state.instruct,
             { sendIntent(TtsIntent.UpdateInstruct(it)) },
             Modifier.fillMaxWidth(),
-            placeholder = { 
+            placeholder = {
                 Text(
-                    stringResource(R.string.tts_instruct_hint), 
+                    stringResource(R.string.tts_instruct_hint),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                ) 
+                )
             },
             textStyle = MaterialTheme.typography.bodySmall.copy(
                 color = MaterialTheme.colorScheme.onSurface
@@ -557,7 +580,12 @@ private fun SpeakerAndLangSection(state: TtsState, sendIntent: (TtsIntent) -> Un
 private fun PlaybackControlsContent(state: TtsState, sendIntent: (TtsIntent) -> Unit) {
     Column(Modifier.padding(vertical = 4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Rounded.Speed, null, Modifier.size(14.dp), MaterialTheme.colorScheme.onSurfaceVariant)
+            Icon(
+                Icons.Rounded.Speed,
+                null,
+                Modifier.size(14.dp),
+                MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(Modifier.width(6.dp))
             Text(
                 "${String.format("%.1f", state.playbackSpeed)}x",
@@ -577,7 +605,12 @@ private fun PlaybackControlsContent(state: TtsState, sendIntent: (TtsIntent) -> 
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Rounded.VolumeUp, null, Modifier.size(14.dp), MaterialTheme.colorScheme.onSurfaceVariant)
+            Icon(
+                Icons.Rounded.VolumeUp,
+                null,
+                Modifier.size(14.dp),
+                MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(Modifier.width(6.dp))
             Text(
                 "${(state.playbackVolume * 100).toInt()}%",
@@ -850,6 +883,17 @@ private fun MessageCard(
     onPlayChunk: (Int) -> Unit,
     onStop: () -> Unit
 ) {
+    var textExpanded by remember { mutableStateOf(false) }
+    var textDidOverflow by remember { mutableStateOf(false) }
+    var chunksExpanded by remember { mutableStateOf(false) }
+
+    val rawText = group.text
+    val displayText = if (textExpanded) {
+        if (rawText.length > 500) rawText.take(500) + "…" else rawText
+    } else {
+        rawText
+    }
+
     Card(
         Modifier
             .fillMaxWidth()
@@ -859,11 +903,18 @@ private fun MessageCard(
         ),
         elevation = CardDefaults.cardElevation(0.dp)
     ) {
-        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Column(Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val modeColor =
-                        if (group.mode == RequestMode.WebSocket) Color(0xFF4CAF50) else Color(0xFFFFC107)
+                        if (group.mode == RequestMode.WebSocket) Color(0xFF4CAF50) else Color(
+                            0xFFFFC107
+                        )
                     Box(
                         Modifier
                             .clip(RoundedCornerShape(4.dp))
@@ -871,21 +922,6 @@ private fun MessageCard(
                             .padding(horizontal = 6.dp, vertical = 1.dp)
                     ) {
                         Text(group.mode.name, fontSize = 9.sp, color = modeColor)
-                    }
-                    if (group.isLongText) {
-                        Spacer(Modifier.width(4.dp))
-                        Box(
-                            Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                                .padding(horizontal = 6.dp, vertical = 1.dp)
-                        ) {
-                            Text(
-                                stringResource(R.string.tts_long_text),
-                                fontSize = 9.sp,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
                     }
                     Spacer(Modifier.width(6.dp))
                     Text(
@@ -904,11 +940,28 @@ private fun MessageCard(
                 }
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    group.text,
+                    displayText,
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurface,
-                    lineHeight = 20.sp
+                    lineHeight = 20.sp,
+                    maxLines = if (textExpanded) Int.MAX_VALUE else 3,
+                    overflow = TextOverflow.Ellipsis,
+                    onTextLayout = { layoutResult ->
+                        if (!textExpanded) {
+                            textDidOverflow = layoutResult.hasVisualOverflow
+                        }
+                    }
                 )
+                if (textDidOverflow || textExpanded) {
+                    Text(
+                        if (textExpanded) "收起" else "展开",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .clickableWithDebounce { textExpanded = !textExpanded }
+                            .padding(vertical = 2.dp)
+                    )
+                }
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val hasAudio = group.chunks.isNotEmpty()
@@ -971,16 +1024,49 @@ private fun MessageCard(
                         )
                     }
                 }
-                if (group.chunks.size > 1 && group.isCompleted) {
-                    Spacer(Modifier.height(8.dp))
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
-                    Spacer(Modifier.height(6.dp))
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        group.chunks.forEachIndexed { index, chunk ->
-                            ChunkItem(
-                                chunk,
-                                index,
-                                { onPlayChunk(index) })
+                if (group.chunks.size > 1) {
+                    Spacer(Modifier.height(4.dp))
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.4f))
+                            .clickableWithDebounce { chunksExpanded = !chunksExpanded }
+                            .padding(horizontal = 8.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Rounded.Headphones,
+                            null,
+                            Modifier.size(14.dp),
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            when {
+                                !group.isCompleted && group.totalChunks > 0 -> "分段音频 (${group.chunks.size}/${group.totalChunks})"
+                                else -> "分段音频 (${group.chunks.size}段)"
+                            },
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            Icons.Rounded.ArrowDropDown,
+                            null,
+                            Modifier.size(18.dp),
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                        )
+                    }
+                    if (chunksExpanded) {
+                        Spacer(Modifier.height(4.dp))
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            group.chunks.forEachIndexed { index, chunk ->
+                                ChunkItem(
+                                    chunk,
+                                    index,
+                                    { onPlayChunk(index) })
+                            }
                         }
                     }
                 }
@@ -1028,10 +1114,19 @@ private fun ChunkItem(chunk: TtsAudioChunk, index: Int, onPlay: () -> Unit) {
 }
 
 @Composable
-private fun InputSection(state: TtsState, sendIntent: (TtsIntent) -> Unit, onPickTextFile: () -> Unit, inputMode: Boolean, onToggleInputMode: () -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier = modifier
-        .fillMaxWidth()
-        .background(MaterialTheme.colorScheme.surface)) {
+private fun InputSection(
+    state: TtsState,
+    sendIntent: (TtsIntent) -> Unit,
+    onPickTextFile: () -> Unit,
+    inputMode: Boolean,
+    onToggleInputMode: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
         if (state.requestMode == RequestMode.HTTP && state.httpRequesting) {
             LinearProgressIndicator(
                 Modifier.fillMaxWidth(),
@@ -1175,16 +1270,5 @@ private fun InputSection(state: TtsState, sendIntent: (TtsIntent) -> Unit, onPic
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun SmallIconButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    description: String,
-    onClick: () -> Unit
-) {
-    IconButton(onClick = onClick, modifier = Modifier.size(28.dp)) {
-        Icon(icon, description, Modifier.size(16.dp), MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

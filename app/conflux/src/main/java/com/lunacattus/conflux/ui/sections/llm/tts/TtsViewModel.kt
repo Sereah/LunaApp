@@ -47,6 +47,7 @@ class TtsViewModel @Inject constructor(
         observeWsEvents()
         observeWsState()
         observePlayerState()
+        connectWs()
     }
 
     fun handleIntent(intent: TtsIntent) {
@@ -56,7 +57,10 @@ class TtsViewModel @Inject constructor(
             is TtsIntent.SelectSpeaker -> reduce { copy(speaker = intent.speaker) }
             is TtsIntent.SelectLanguage -> reduce { copy(language = intent.language) }
             is TtsIntent.UpdateInstruct -> reduce { copy(instruct = intent.instruct) }
-            is TtsIntent.SetRequestMode -> reduce { copy(requestMode = intent.mode) }
+            is TtsIntent.SetRequestMode -> {
+                if (intent.mode == RequestMode.WebSocket && _state.value.httpRequesting) return
+                reduce { copy(requestMode = intent.mode) }
+            }
             is TtsIntent.UpdateText -> reduce { copy(inputText = intent.text) }
             is TtsIntent.UpdateLongText -> reduce { copy(longText = intent.text) }
             is TtsIntent.SetLongTextFromFile -> reduce { copy(longText = intent.text, longTextFilename = intent.filename) }
@@ -148,7 +152,7 @@ class TtsViewModel @Inject constructor(
                         id = pendingId, requestId = response.requestId, text = displayText, timestamp = now + index,
                         speaker = state.speaker.name, language = state.language,
                         chunks = chunks, totalChunks = chunks.size, isCompleted = true,
-                        mode = RequestMode.HTTP, isLongText = isLong,
+                        mode = RequestMode.HTTP,
                     )
                     reduce { copy(messageGroups = messageGroups + group) }
                     persistGroups()
@@ -198,7 +202,12 @@ class TtsViewModel @Inject constructor(
     }
 
     private suspend fun handleChunkStart(event: TtsWsEvent.ChunkStart) {
-        if (_state.value.messageGroups.any { it.id == event.requestId }) return
+        val existing = _state.value.messageGroups.find { it.id == event.requestId }
+        if (existing != null) {
+            updateGroup(event.requestId) { copy(text = text + event.text) }
+            emitEffect(TtsEffect.ScrollToBottom)
+            return
+        }
         val state = _state.value
         val group = TtsMessageGroup(id = event.requestId, requestId = event.requestId, text = event.text, timestamp = System.currentTimeMillis(),
             speaker = state.speaker.name, language = state.language, totalChunks = event.total, mode = RequestMode.WebSocket)
@@ -210,16 +219,25 @@ class TtsViewModel @Inject constructor(
     private suspend fun handleAudioChunk(event: TtsWsEvent.Audio) {
         updateGroup(event.requestId) { copy(chunks = (chunks + TtsAudioChunk(event.chunkIndex, event.audioB64, event.durationMs)).sortedBy { it.index }) }
         persistGroups()
+        if (_state.value.playingGroupId == event.requestId) {
+            audioPlayer.appendChunk(event.requestId, event.chunkIndex, event.audioB64)
+        }
     }
 
     private suspend fun handleWsDone(event: TtsWsEvent.Done) {
-        updateGroup(event.requestId) { copy(isCompleted = true) }
+        updateGroup(event.requestId) { copy(isCompleted = true, totalChunks = event.totalChunks) }
         persistGroups()
+        if (_state.value.playingGroupId == event.requestId) {
+            audioPlayer.endStreamingPlay()
+        }
     }
 
     private suspend fun handleWsError(event: TtsWsEvent.Error) {
         updateGroup(event.requestId) { copy(isCompleted = true) }
         persistGroups()
+        if (_state.value.playingGroupId == event.requestId) {
+            audioPlayer.endStreamingPlay()
+        }
         reduce { copy(error = "WS 错误 [${event.requestId}]: ${event.message}") }
         emitEffect(TtsEffect.ShowToast("WS 错误: ${event.message}"))
     }
@@ -240,7 +258,11 @@ class TtsViewModel @Inject constructor(
         val group = _state.value.messageGroups.find { it.id == groupId } ?: return
         val b64List = group.chunks.map { it.audioB64 }
         if (b64List.isEmpty()) return
-        audioPlayer.playAllChunks(b64List, groupId)
+        if (!group.isCompleted && group.totalChunks > 1) {
+            audioPlayer.startStreamingPlay(b64List, groupId)
+        } else {
+            audioPlayer.playAllChunks(b64List, groupId)
+        }
         reduce { copy(playingGroupId = groupId, playbackSpeed = audioPlayer.playbackSpeed.value, playbackVolume = audioPlayer.playbackVolume.value) }
     }
 

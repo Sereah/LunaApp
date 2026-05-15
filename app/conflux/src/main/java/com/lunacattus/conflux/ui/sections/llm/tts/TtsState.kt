@@ -63,7 +63,6 @@ data class TtsMessageGroup(
     val isCompleted: Boolean = false,
     val totalChunks: Int = 0,
     val mode: RequestMode = RequestMode.WebSocket,
-    val isLongText: Boolean = false,
 )
 
 data class TtsAudioChunk(

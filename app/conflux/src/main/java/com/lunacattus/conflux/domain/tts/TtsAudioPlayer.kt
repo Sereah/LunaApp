@@ -21,9 +21,10 @@ class TtsAudioPlayer @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
     private var player: ExoPlayer? = null
-    private var chunkFiles: List<File> = emptyList()
+    private var chunkFiles: MutableList<File> = mutableListOf()
     private var currentChunkIdx = -1
     private var currentGroupId: String? = null
+    private var streamingMode = false
 
     val audioDir: File
         get() = File(context.filesDir, "tts_audio").also { it.mkdirs() }
@@ -68,11 +69,12 @@ class TtsAudioPlayer @Inject constructor(
 
     fun playAllChunks(chunks: List<String>, groupId: String) {
         stop()
+        streamingMode = false
         try {
             val files = chunks.mapIndexed { index, b64 ->
                 persistBase64Audio(groupId, index, b64)
             }
-            chunkFiles = files
+            chunkFiles = files.toMutableList()
             currentChunkIdx = 0
             currentGroupId = groupId
             _playingGroupId.value = groupId
@@ -93,6 +95,51 @@ class TtsAudioPlayer @Inject constructor(
         }
     }
 
+    fun startStreamingPlay(chunks: List<String>, groupId: String) {
+        stop()
+        streamingMode = true
+        try {
+            val files = chunks.mapIndexed { index, b64 ->
+                persistBase64Audio(groupId, index, b64)
+            }
+            chunkFiles = files.toMutableList()
+            currentChunkIdx = 0
+            currentGroupId = groupId
+            _playingGroupId.value = groupId
+            _totalChunks.value = files.size
+            _currentChunkIndex.value = 0
+
+            val exoPlayer = ExoPlayer.Builder(context).build()
+            exoPlayer.setPlaybackSpeed(_playbackSpeed.value)
+            exoPlayer.setVolume(_playbackVolume.value)
+            exoPlayer.addListener(createListener())
+            exoPlayer.setMediaItem(MediaItem.fromUri(files[0].toURI().toString()))
+            exoPlayer.prepare()
+            exoPlayer.play()
+            player = exoPlayer
+        } catch (e: Exception) {
+            Logger.e(TAG, "Failed to start streaming play: ${e.message}")
+            stop()
+        }
+    }
+
+    fun appendChunk(groupId: String, chunkIndex: Int, base64: String) {
+        if (currentGroupId != groupId || !streamingMode) return
+        val file = persistBase64Audio(groupId, chunkIndex, base64)
+        chunkFiles.add(file)
+        _totalChunks.value = chunkFiles.size
+        if (currentChunkIdx >= chunkFiles.size - 1 && player != null) {
+            playNextChunk()
+        }
+    }
+
+    fun endStreamingPlay() {
+        streamingMode = false
+        if (player != null && currentChunkIdx >= chunkFiles.size - 1) {
+            stop()
+        }
+    }
+
     fun playSingleChunk(base64Audio: String, groupId: String) {
         playAllChunks(listOf(base64Audio), groupId)
     }
@@ -108,6 +155,7 @@ class TtsAudioPlayer @Inject constructor(
     }
 
     fun stop() {
+        streamingMode = false
         player?.stop()
         player?.release()
         player = null
@@ -115,7 +163,7 @@ class TtsAudioPlayer @Inject constructor(
         _playingGroupId.value = null
         _currentChunkIndex.value = -1
         _totalChunks.value = 0
-        chunkFiles = emptyList()
+        chunkFiles = mutableListOf()
         currentChunkIdx = -1
         currentGroupId = null
     }
@@ -148,7 +196,7 @@ class TtsAudioPlayer @Inject constructor(
             player?.setMediaItem(MediaItem.fromUri(chunkFiles[currentChunkIdx].toURI().toString()))
             player?.prepare()
             player?.play()
-        } else {
+        } else if (!streamingMode) {
             stop()
         }
     }
