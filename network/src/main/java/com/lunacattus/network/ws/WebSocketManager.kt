@@ -22,10 +22,9 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlin.math.pow
 
-class WebSocketManager @Inject constructor() : IWebSocketClient {
+class WebSocketManager : IWebSocketClient {
 
     private var scope: CoroutineScope? = null
     private var client: OkHttpClient? = null

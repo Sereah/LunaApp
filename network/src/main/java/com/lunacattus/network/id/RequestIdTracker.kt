@@ -1,11 +1,8 @@
 package com.lunacattus.network.id
 
 import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class RequestIdTracker @Inject constructor() {
+class RequestIdTracker {
 
     private val activeIds = ConcurrentHashMap.newKeySet<String>()
 

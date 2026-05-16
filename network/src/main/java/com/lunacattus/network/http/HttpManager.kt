@@ -8,11 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
-
-@Singleton
-class HttpManager @Inject constructor() : IHttpClient {
+class HttpManager : IHttpClient {
 
     @Volatile
     private var config: HttpConfig = HttpConfig()

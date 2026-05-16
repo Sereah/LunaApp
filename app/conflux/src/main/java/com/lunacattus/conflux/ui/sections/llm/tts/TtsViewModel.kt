@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.lunacattus.conflux.domain.tts.TtsAudioPlayer
-import com.lunacattus.conflux.domain.tts.TtsConfig
-import com.lunacattus.conflux.domain.tts.TtsHttpService
-import com.lunacattus.conflux.domain.tts.TtsWebSocketService
-import com.lunacattus.conflux.domain.tts.TtsWsEvent
+import com.lunacattus.conflux.domain.llm.tts.TtsAudioPlayer
+import com.lunacattus.conflux.domain.llm.tts.TtsConfig
+import com.lunacattus.conflux.domain.llm.tts.TtsHttpService
+import com.lunacattus.conflux.domain.llm.tts.TtsWebSocketService
+import com.lunacattus.conflux.domain.llm.tts.TtsWsEvent
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

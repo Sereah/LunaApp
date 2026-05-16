@@ -8,6 +8,7 @@
     <string name="llm_title">LLM</string>
     <string name="asr_title">ASR</string>
     <string name="tts_title">TTS</string>
+    <string name="polish_title">Polish</string>
     <string name="files_title">Files</string>
     <string name="music_title">MusicFiles</string>
     <string name="record_title">RecordFiles</string>
@@ -147,4 +148,26 @@
     <string name="tts_speaker_sohee_desc">Emotional, warm Korean female voice.</string>
     <string name="tts_speaker_sohee_lang">Korean</string>
     <string name="tts_settings_title">Settings</string>
+
+    <!-- Polish -->
+    <string name="llm_polish_title">Polish</string>
+    <string name="llm_polish_desc">Text polishing powered by LLM, refine and improve your writing.</string>
+    <string name="polish_input_hint">Enter text to polish…</string>
+    <string name="polish_temperature">Temperature: %.2f</string>
+    <string name="polish_send">Polish</string>
+    <string name="polish_requesting">Polishing…</string>
+    <string name="polish_idle">Idle</string>
+    <string name="polish_presets">Presets</string>
+    <string name="polish_clear_all">Clear All</string>
+    <string name="polish_no_results">No results yet.\nEnter text and tap Polish</string>
+    <string name="polish_result_original">Original</string>
+    <string name="polish_result_polished">Polished</string>
+    <string name="polish_result_temperature">Temperature: %.2f</string>
+    <string name="polish_result_request_id">Request ID: %s</string>
+    <string name="polish_error">Error</string>
+    <string name="polish_delete">Delete</string>
+    <string name="polish_http_failed">Request failed: %s</string>
+    <string name="polish_settings">Settings</string>
+    <string name="polish_close">Close</string>
+    <string name="polish_save">Save</string>
 </resources>

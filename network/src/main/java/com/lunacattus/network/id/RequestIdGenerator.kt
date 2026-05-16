@@ -1,12 +1,9 @@
 package com.lunacattus.network.id
 
 import java.util.concurrent.atomic.AtomicLong
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class RequestIdGenerator @Inject constructor(
-    @param:DeviceCode private val deviceCode: String,
+class RequestIdGenerator(
+    private val deviceCode: String,
 ) {
     private val counter = AtomicLong(0)
 

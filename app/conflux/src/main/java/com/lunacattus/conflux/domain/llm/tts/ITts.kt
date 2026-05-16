@@ -1,4 +1,4 @@
-package com.lunacattus.conflux.domain.tts
+package com.lunacattus.conflux.domain.llm.tts
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow

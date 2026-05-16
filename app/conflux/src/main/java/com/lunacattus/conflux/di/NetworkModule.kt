@@ -2,14 +2,12 @@ package com.lunacattus.conflux.di
 
 import android.content.Context
 import android.provider.Settings
-import com.lunacattus.conflux.domain.tts.ITts
-import com.lunacattus.conflux.domain.tts.TtsRepository
 import com.lunacattus.network.http.HttpManager
 import com.lunacattus.network.http.IHttpClient
-import com.lunacattus.network.id.DeviceCode
+import com.lunacattus.network.id.RequestIdGenerator
+import com.lunacattus.network.id.RequestIdTracker
 import com.lunacattus.network.ws.IWebSocketClient
 import com.lunacattus.network.ws.WebSocketManager
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,34 +18,42 @@ import kotlin.math.abs
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class NetworkModule {
+object NetworkModule {
 
-    @Binds
+    @Provides
     @Singleton
-    abstract fun bindHttpClient(impl: HttpManager): IHttpClient
+    fun provideRequestIdGenerator(@ApplicationContext context: Context): RequestIdGenerator {
+        val deviceCode = computeDeviceCode(context)
+        return RequestIdGenerator(deviceCode)
+    }
 
-    @Binds
+    @Provides
     @Singleton
-    abstract fun bindWebSocketClient(impl: WebSocketManager): IWebSocketClient
+    fun provideRequestIdTracker(): RequestIdTracker {
+        return RequestIdTracker()
+    }
 
-    @Binds
+    @Provides
     @Singleton
-    abstract fun bindTts(impl: TtsRepository): ITts
+    fun provideHttpClient(): IHttpClient {
+        return HttpManager()
+    }
 
-    companion object {
-        @Provides
-        @Singleton
-        @DeviceCode
-        fun provideDeviceCode(@ApplicationContext context: Context): String {
-            val raw = try {
-                Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-                    ?: "0000000000000000"
-            } catch (e: Exception) {
-                "0000000000000000"
-            }
-            val safe = raw.substring(0, minOf(10, raw.length))
-            val code = abs(safe.toLong(16) % 1_000_000L)
-            return code.toString().padStart(6, '0')
+    @Provides
+    @Singleton
+    fun provideWebSocketClient(): IWebSocketClient {
+        return WebSocketManager()
+    }
+
+    private fun computeDeviceCode(context: Context): String {
+        val raw = try {
+            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+                ?: "0000000000000000"
+        } catch (e: Exception) {
+            "0000000000000000"
         }
+        val safe = raw.substring(0, minOf(10, raw.length))
+        val code = abs(safe.toLong(16) % 1_000_000L)
+        return code.toString().padStart(6, '0')
     }
 }

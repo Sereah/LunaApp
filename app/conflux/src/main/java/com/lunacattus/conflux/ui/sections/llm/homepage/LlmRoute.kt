@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.RecordVoiceOver
 import androidx.compose.material.icons.rounded.SmartToy
@@ -36,6 +37,7 @@ import com.lunacattus.ui_design.compose.overScrollVertical
 fun LlmRoute(
     viewModel: LlmViewModel,
     navToTts: () -> Unit,
+    navToPolish: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val capabilities = listOf(
@@ -46,6 +48,14 @@ fun LlmRoute(
             description = stringResource(R.string.llm_tts_desc),
             statusText = stringResource(R.string.llm_tts_available),
             onClick = navToTts,
+        ),
+        FeatureCardData(
+            icon = Icons.Rounded.AutoAwesome,
+            accentColor = MaterialTheme.colorScheme.secondary,
+            title = stringResource(R.string.llm_polish_title),
+            description = stringResource(R.string.llm_polish_desc),
+            statusText = stringResource(R.string.llm_tts_available),
+            onClick = navToPolish,
         ),
     )
 

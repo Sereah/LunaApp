@@ -2,7 +2,7 @@ package com.lunacattus.conflux.ui.sections.llm.tts
 
 import androidx.annotation.StringRes
 import com.lunacattus.conflux.R
-import com.lunacattus.conflux.domain.tts.TtsConfig
+import com.lunacattus.conflux.domain.llm.tts.TtsConfig
 
 enum class RequestMode { HTTP, WebSocket }
 

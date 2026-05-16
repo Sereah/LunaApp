@@ -1,4 +1,4 @@
-package com.lunacattus.conflux.domain.tts
+package com.lunacattus.conflux.domain.llm.tts
 
 import android.content.Context
 import android.util.Base64

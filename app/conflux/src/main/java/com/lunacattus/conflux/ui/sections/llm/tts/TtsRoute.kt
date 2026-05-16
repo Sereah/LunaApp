@@ -5,10 +5,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -84,6 +87,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -210,18 +214,20 @@ private fun TtsScreen(
                         SwipeableDeleteItem(
                             onDelete = { sendIntent(TtsIntent.DeleteGroup(group.id)) }
                         ) {
-                            MessageCard(
-                                group = group, isPlaying = state.playingGroupId == group.id,
-                                onPlayGroup = { sendIntent(TtsIntent.PlayGroup(group.id)) },
-                                onPlayChunk = { idx ->
-                                    sendIntent(
-                                        TtsIntent.PlaySingleChunk(
-                                            group.id,
-                                            idx
+                            JellyItem(listSize = state.messageGroups.size) {
+                                MessageCard(
+                                    group = group, isPlaying = state.playingGroupId == group.id,
+                                    onPlayGroup = { sendIntent(TtsIntent.PlayGroup(group.id)) },
+                                    onPlayChunk = { idx ->
+                                        sendIntent(
+                                            TtsIntent.PlaySingleChunk(
+                                                group.id,
+                                                idx
+                                            )
                                         )
-                                    )
-                                },
-                                onStop = { sendIntent(TtsIntent.StopAudio) })
+                                    },
+                                    onStop = { sendIntent(TtsIntent.StopAudio) })
+                            }
                         }
                     }
                 }
@@ -814,21 +820,52 @@ private fun ErrorBanner(message: String, onDismiss: () -> Unit) {
 }
 
 @Composable
+private fun JellyItem(
+    listSize: Int,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val scale = remember { Animatable(1f) }
+
+    LaunchedEffect(listSize) {
+        scale.snapTo(0.90f)
+        scale.animateTo(
+            targetValue = 1f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessVeryLow,
+            ),
+        )
+    }
+
+    Box(
+        modifier = modifier.graphicsLayer {
+            scaleX = scale.value
+            scaleY = scale.value
+        },
+    ) {
+        content()
+    }
+}
+
+@Composable
 private fun SwipeableDeleteItem(
     onDelete: () -> Unit,
     content: @Composable () -> Unit
 ) {
     var offsetX by remember { mutableFloatStateOf(0f) }
-    var isSwipedOpen by remember { mutableStateOf(false) }
-    val deleteButtonWidth = 100.dp
+    val deleteButtonWidth = 60.dp
     val deleteButtonWidthPx = with(LocalDensity.current) { deleteButtonWidth.toPx() }
     val maxOffset = -deleteButtonWidthPx
     val deleteColor = Color(0xFFE53935)
 
     val animatedOffset by animateFloatAsState(
         targetValue = offsetX,
-        animationSpec = tween(durationMillis = 250),
-        label = "swipeOffset"
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+        ),
+        label = "swipeOffset",
     )
 
     Box {
@@ -854,18 +891,10 @@ private fun SwipeableDeleteItem(
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
                         onDragEnd = {
-                            if (offsetX < maxOffset / 2) {
-                                offsetX = maxOffset
-                                isSwipedOpen = true
-                            } else {
-                                offsetX = 0f
-                                isSwipedOpen = false
-                            }
+                            offsetX = if (offsetX < maxOffset * 0.35f) maxOffset else 0f
                         },
                         onHorizontalDrag = { _, dragAmount ->
-                            val newOffset = (offsetX + dragAmount).coerceIn(maxOffset, 0f)
-                            offsetX = newOffset
-                            isSwipedOpen = newOffset == maxOffset
+                            offsetX = (offsetX + dragAmount).coerceIn(maxOffset * 1.05f, 0f)
                         }
                     )
                 }

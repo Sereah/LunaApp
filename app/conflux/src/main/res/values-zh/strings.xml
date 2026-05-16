@@ -149,4 +149,26 @@
     <string name="tts_speaker_sohee_desc">富含情感的温暖韩语女声</string>
     <string name="tts_speaker_sohee_lang">韩语</string>
     <string name="tts_settings_title">更改配置</string>
+
+    <!-- Polish -->
+    <string name="llm_polish_title">文本润色</string>
+    <string name="llm_polish_desc">使用大模型对文本进行润色优化，让你的表达更出彩。</string>
+    <string name="polish_input_hint">输入需要润色的文本…</string>
+    <string name="polish_temperature">创意度: %.2f</string>
+    <string name="polish_send">润色</string>
+    <string name="polish_requesting">润色中…</string>
+    <string name="polish_idle">空闲</string>
+    <string name="polish_presets">预设句子</string>
+    <string name="polish_clear_all">清空全部</string>
+    <string name="polish_no_results">暂无结果。\n输入文本后点击润色</string>
+    <string name="polish_result_original">原文</string>
+    <string name="polish_result_polished">润色结果</string>
+    <string name="polish_result_temperature">温度: %.2f</string>
+    <string name="polish_result_request_id">请求ID: %s</string>
+    <string name="polish_error">错误</string>
+    <string name="polish_delete">删除</string>
+    <string name="polish_http_failed">请求失败: %s</string>
+    <string name="polish_settings">设置</string>
+    <string name="polish_close">关闭</string>
+    <string name="polish_save">保存</string>
 </resources>
