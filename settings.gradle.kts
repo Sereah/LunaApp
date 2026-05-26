@@ -42,3 +42,4 @@ include(":app:gallery:data")
 
 include(":app:conflux")
 include(":feature:voice")
+include(":statemachine")

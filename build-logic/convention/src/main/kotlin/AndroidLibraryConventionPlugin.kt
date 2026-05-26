@@ -16,7 +16,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
                 buildTypes {
                     release {
-                        isMinifyEnabled = false
+                        isMinifyEnabled = true
                     }
                     debug {
                         isMinifyEnabled = false

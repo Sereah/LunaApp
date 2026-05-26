@@ -2,10 +2,8 @@ package com.lunacattus.app.statemachinedemo
 
 import android.app.Application
 import com.lunacattus.logger.Logger
-import dagger.hilt.android.HiltAndroidApp
 
-@HiltAndroidApp
-class App: Application() {
+class App : Application() {
     override fun onCreate() {
         super.onCreate()
         Logger.initBaseTag("StateMachineDemo")

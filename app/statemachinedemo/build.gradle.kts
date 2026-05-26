@@ -1,7 +1,5 @@
 plugins {
     alias(libs.plugins.app.android.application)
-    alias(libs.plugins.app.android.application.compose)
-    alias(libs.plugins.app.hilt)
 }
 
 android {
@@ -15,6 +13,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
     implementation(project(":logger"))
+    implementation(files("libs/statemachine-1.0.0.aar"))
 }

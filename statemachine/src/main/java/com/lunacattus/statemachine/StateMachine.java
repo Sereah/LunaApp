@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lunacattus.common.statemachine;
+package com.lunacattus.statemachine;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -33,12 +33,11 @@ import java.util.Iterator;
 import java.util.Vector;
 
 /**
- * {@hide}
  *
  * <p>The state machine defined here is a hierarchical state machine which processes messages
  * and can have states arranged hierarchically.</p>
  *
- * <p>A state is a <code>State</code> object and must implement
+ * <p>A state is a <code>ISampleState</code> object and must implement
  * <code>processMessage</code> and optionally <code>enter/exit/getName</code>.
  * The enter/exit methods are equivalent to the construction and destruction
  * in Object Oriented programming and are used to perform initialization and
@@ -86,7 +85,7 @@ import java.util.Vector;
  * <code>quitNow</code>. These will call <code>exit</code> of the current state and its parents,
  * call <code>onQuitting</code> and then exit Thread/Loopers.</p>
  *
- * <p>In addition to <code>processMessage</code> each <code>State</code> has
+ * <p>In addition to <code>processMessage</code> each <code>ISampleState</code> has
  * an <code>enter</code> method and <code>exit</code> method which may be overridden.</p>
  *
  * <p>Since the states are arranged in a hierarchy transitioning to a new state
@@ -148,7 +147,7 @@ import java.util.Vector;
  * return hw;
  * }
  *
- * class State1 extends State {
+ * class State1 extends ISampleState {
  * &#64;Override public boolean processMessage(Message message) {
  * log("Hello World");
  * return HANDLED;
@@ -263,7 +262,7 @@ import java.util.Vector;
  * log("ctor X");
  * }
  *
- * class P1 extends State {
+ * class P1 extends ISampleState {
  * &#64;Override public void enter() {
  * log("mP1.enter");
  * }
@@ -290,7 +289,7 @@ import java.util.Vector;
  * }
  * }
  *
- * class S1 extends State {
+ * class S1 extends ISampleState {
  * &#64;Override public void enter() {
  * log("mS1.enter");
  * }
@@ -310,7 +309,7 @@ import java.util.Vector;
  * }
  * }
  *
- * class S2 extends State {
+ * class S2 extends ISampleState {
  * &#64;Override public void enter() {
  * log("mS2.enter");
  * }
@@ -338,7 +337,7 @@ import java.util.Vector;
  * }
  * }
  *
- * class P2 extends State {
+ * class P2 extends ISampleState {
  * &#64;Override public void enter() {
  * log("mP2.enter");
  * sendMessage(obtainMessage(CMD_5));
@@ -732,12 +731,12 @@ public class StateMachine {
         private int mTempStateStackCount;
 
         /**
-         * State used when state machine is halted
+         * ISampleState used when state machine is halted
          */
         private HaltingState mHaltingState = new HaltingState();
 
         /**
-         * State used when state machine is quitting
+         * ISampleState used when state machine is quitting
          */
         private QuittingState mQuittingState = new QuittingState();
 
@@ -794,7 +793,7 @@ public class StateMachine {
         /**
          * Indicates if a transition is in progress
          * <p>
-         * This will be true for all calls of State.exit and all calls of State.enter except for the
+         * This will be true for all calls of ISampleState.exit and all calls of ISampleState.enter except for the
          * last enter call for the current destination state.
          */
         private boolean mTransitionInProgress = false;
@@ -805,7 +804,7 @@ public class StateMachine {
         private ArrayList<Message> mDeferredMessages = new ArrayList<Message>();
 
         /**
-         * State entered when transitionToHaltingState is called.
+         * ISampleState entered when transitionToHaltingState is called.
          */
         private class HaltingState extends State {
             @Override
@@ -816,7 +815,7 @@ public class StateMachine {
         }
 
         /**
-         * State entered when a valid quit message is handled.
+         * ISampleState entered when a valid quit message is handled.
          */
         private class QuittingState extends State {
             @Override
@@ -843,7 +842,7 @@ public class StateMachine {
                 /** Save the current message */
                 mMsg = msg;
 
-                /** State that processed the message */
+                /** ISampleState that processed the message */
                 State msgProcessedState = null;
                 if (mIsConstructionCompleted || (mMsg.what == SM_QUIT_CMD)) {
                     /** Normal path */
