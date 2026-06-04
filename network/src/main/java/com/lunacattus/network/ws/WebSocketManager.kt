@@ -23,6 +23,7 @@ import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import java.util.concurrent.TimeUnit
 import kotlin.math.pow
+import kotlin.time.Duration.Companion.milliseconds
 
 class WebSocketManager : IWebSocketClient {
 
@@ -195,7 +196,7 @@ class WebSocketManager : IWebSocketClient {
         val currentScope = scope
         if (currentScope != null && currentScope.isActive) {
             reconnectJob = currentScope.launch {
-                delay(delayMs)
+                delay(delayMs.milliseconds)
                 if (isActive && !intentionalClose) {
                     createWebSocket()
                 }

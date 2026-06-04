@@ -42,12 +42,12 @@ class HttpManager : IHttpClient {
                 .post(requestBody)
             headers.forEach { (key, value) -> requestBuilder.addHeader(key, value) }
             val response = client.newCall(requestBuilder.build()).execute()
-            val responseBody = response.body?.string()
-            if (response.isSuccessful && responseBody != null) {
+            val responseBody = response.body.string()
+            if (response.isSuccessful) {
                 Result.success(responseBody)
             } else {
                 Result.failure(
-                    HttpException(response.code, responseBody ?: "no response body")
+                    HttpException(response.code, responseBody)
                 )
             }
         } catch (e: Exception) {
@@ -64,12 +64,12 @@ class HttpManager : IHttpClient {
             val requestBuilder = Request.Builder().url(url).get()
             headers.forEach { (key, value) -> requestBuilder.addHeader(key, value) }
             val response = client.newCall(requestBuilder.build()).execute()
-            val responseBody = response.body?.string()
-            if (response.isSuccessful && responseBody != null) {
+            val responseBody = response.body.string()
+            if (response.isSuccessful) {
                 Result.success(responseBody)
             } else {
                 Result.failure(
-                    HttpException(response.code, responseBody ?: "no response body")
+                    HttpException(response.code, responseBody)
                 )
             }
         } catch (e: Exception) {

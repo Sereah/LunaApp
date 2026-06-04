@@ -1,3 +1,5 @@
+import com.android.build.gradle.tasks.BundleAar
+
 plugins {
     alias(libs.plugins.app.android.library)
     alias(libs.plugins.app.hilt)
@@ -5,6 +7,15 @@ plugins {
 
 android {
     namespace = "com.lunacattus.network"
+}
+
+val version = "1.0.0"
+
+tasks.withType<BundleAar>().configureEach {
+    val buildType = if (name.contains("release", ignoreCase = true)) "release" else "debug"
+    val versionName = version
+
+    archiveFileName.set("network-v${versionName}-${buildType}.aar")
 }
 
 dependencies {
