@@ -30,8 +30,8 @@ base {
 
 dependencies {
     implementation(project(":ui-design"))
-    implementation(project(":common"))
-    implementation(project(":logger"))
+    implementation(libs.common)
+    implementation(libs.logger)
     implementation(libs.haze.android)
     implementation(libs.haze.material)
 }

@@ -9,6 +9,6 @@ android {
 }
 
 dependencies {
-    api(project(":common"))
-    api(project(":logger"))
+    api(libs.common)
+    api(libs.logger)
 }

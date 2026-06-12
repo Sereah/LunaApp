@@ -13,8 +13,10 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
 
             extensions.getByType<ApplicationExtension>().apply {
                 buildTypes.configureEach {
-                    enableAndroidTestCoverage = true
-                    enableUnitTestCoverage = true
+                    if (name != "release") {
+                        enableAndroidTestCoverage = true
+                        enableUnitTestCoverage = true
+                    }
                 }
                 testOptions.animationsDisabled = true
             }

@@ -3,7 +3,6 @@ package com.lunacattus.conflux.domain.llm.polish
 import com.google.gson.Gson
 import com.lunacattus.network.http.IHttpClient
 import com.lunacattus.network.id.RequestIdGenerator
-import com.lunacattus.network.id.RequestIdTracker
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,7 +10,6 @@ import javax.inject.Singleton
 class PolishHttpService @Inject constructor(
     private val httpClient: IHttpClient,
     private val idGenerator: RequestIdGenerator,
-    private val idTracker: RequestIdTracker,
 ) {
     private val gson = Gson()
     private var config: PolishConfig = PolishConfig()
@@ -33,7 +31,6 @@ class PolishHttpService @Inject constructor(
     }
 
     suspend fun polish(request: PolishRequest): Result<PolishResponse> {
-        idTracker.register(request.requestId)
         val json = gson.toJson(request)
         val result = httpClient.post(
             url = "${config.httpBaseUrl}/polish",
@@ -41,7 +38,6 @@ class PolishHttpService @Inject constructor(
         ).map { responseBody ->
             gson.fromJson(responseBody, PolishResponse::class.java)
         }
-        idTracker.expire(request.requestId)
         return result
     }
 

@@ -9,7 +9,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":logger"))
+    implementation(libs.logger)
     implementation(libs.kotlinx.coroutines.core)
 }
 

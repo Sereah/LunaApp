@@ -25,9 +25,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "LunaApp"
 
-include(":logger")
-include(":common")
-include(":network")
 include(":record")
 include(":ui-design")
 

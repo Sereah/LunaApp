@@ -5,7 +5,6 @@ import android.provider.Settings
 import com.lunacattus.network.http.HttpManager
 import com.lunacattus.network.http.IHttpClient
 import com.lunacattus.network.id.RequestIdGenerator
-import com.lunacattus.network.id.RequestIdTracker
 import com.lunacattus.network.ws.IWebSocketClient
 import com.lunacattus.network.ws.WebSocketManager
 import dagger.Module
@@ -25,12 +24,6 @@ object NetworkModule {
     fun provideRequestIdGenerator(@ApplicationContext context: Context): RequestIdGenerator {
         val deviceCode = computeDeviceCode(context)
         return RequestIdGenerator(deviceCode)
-    }
-
-    @Provides
-    @Singleton
-    fun provideRequestIdTracker(): RequestIdTracker {
-        return RequestIdTracker()
     }
 
     @Provides

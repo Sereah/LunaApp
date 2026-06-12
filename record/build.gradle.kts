@@ -8,8 +8,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":logger"))
+    implementation(libs.common)
+    implementation(libs.logger)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 }

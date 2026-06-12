@@ -13,6 +13,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":logger"))
+    implementation(libs.logger)
     implementation(files("libs/statemachine-1.0.0.aar"))
 }

@@ -9,7 +9,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
 
     implementation(libs.coil.compose)
     implementation(libs.coil.gif)

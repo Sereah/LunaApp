@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.lunacattus.logger.Logger
 import com.lunacattus.network.id.RequestIdGenerator
-import com.lunacattus.network.id.RequestIdTracker
 import com.lunacattus.network.ws.IWebSocketClient
 import com.lunacattus.network.ws.WebSocketConfig
 import com.lunacattus.network.ws.WebSocketEvent
@@ -26,7 +25,6 @@ import javax.inject.Singleton
 class TtsWebSocketService @Inject constructor(
     private val wsClient: IWebSocketClient,
     private val idGenerator: RequestIdGenerator,
-    private val idTracker: RequestIdTracker,
 ) {
     private val gson = Gson()
     private var config: TtsConfig = TtsConfig()
@@ -92,15 +90,12 @@ class TtsWebSocketService @Inject constructor(
     }
 
     suspend fun sendTextMessage(message: TtsWsTextMessage): Boolean {
-        idTracker.register(message.requestId)
         val json = gson.toJson(message)
         val ok = wsClient.send(json)
-        if (!ok) idTracker.expire(message.requestId)
         return ok
     }
 
     suspend fun cancel(requestId: String) {
-        idTracker.expire(requestId)
         val message = TtsWsCancelMessage(requestId = requestId)
         wsClient.send(gson.toJson(message))
     }

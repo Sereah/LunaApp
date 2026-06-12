@@ -1,13 +1,31 @@
 package com.lunacattus.conflux
 
 import android.app.Application
+import com.lunacattus.common.CommonLog
 import com.lunacattus.logger.Logger
+import com.lunacattus.network.NetworkLog
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        Logger.initBaseTag("Conflux", true)
+        Logger.initBaseTag("Conflux")
+        CommonLog.setLogger(
+            debug = { tag, msg ->
+                Logger.d(tag, msg)
+            },
+            error = { tag, msg, tr ->
+                Logger.e(tag, msg + tr)
+            }
+        )
+        NetworkLog.setLogger(
+            debug = { tag, msg ->
+                Logger.d(tag, msg)
+            },
+            error = { tag, msg, tr ->
+                Logger.e(tag, msg + tr)
+            }
+        )
     }
 }

@@ -3,7 +3,6 @@ package com.lunacattus.conflux.domain.llm.tts
 import com.google.gson.Gson
 import com.lunacattus.network.http.IHttpClient
 import com.lunacattus.network.id.RequestIdGenerator
-import com.lunacattus.network.id.RequestIdTracker
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,7 +10,6 @@ import javax.inject.Singleton
 class TtsHttpService @Inject constructor(
     private val httpClient: IHttpClient,
     private val idGenerator: RequestIdGenerator,
-    private val idTracker: RequestIdTracker,
 ) {
     private val gson = Gson()
     private var config: TtsConfig = TtsConfig()
@@ -37,7 +35,6 @@ class TtsHttpService @Inject constructor(
     }
 
     suspend fun synthesize(request: TtsHttpRequest): Result<TtsHttpResponse> {
-        idTracker.register(request.requestId)
         val json = gson.toJson(request)
         val result = httpClient.post(
             url = "${config.httpBaseUrl}/api/tts",
@@ -45,7 +42,6 @@ class TtsHttpService @Inject constructor(
         ).map { responseBody ->
             gson.fromJson(responseBody, TtsHttpResponse::class.java)
         }
-        idTracker.expire(request.requestId)
         return result
     }
 

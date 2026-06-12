@@ -8,8 +8,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.lunacattus.common.utils.dpToPx
-import com.lunacattus.common.utils.setOnClickListenerWithDebounce
 import com.lunacattus.ui_design.R
 
 class BottomNavigationBar @JvmOverloads constructor(
@@ -26,7 +24,7 @@ class BottomNavigationBar @JvmOverloads constructor(
     init {
         orientation = HORIZONTAL
         background = ContextCompat.getDrawable(context, R.drawable.rounded_corners_background)
-        elevation = 6f.dpToPx(context)
+        elevation = 6f
     }
 
     fun setItems(items: List<BottomNavItem>, defaultPosition: Int = 0) {
@@ -47,7 +45,7 @@ class BottomNavigationBar @JvmOverloads constructor(
                 textSize = 13f
             }
             itemIcon.setImageResource(item.iconResId)
-            itemView.setOnClickListenerWithDebounce {
+            itemView.setOnClickListener {
                 onItemClick(index)
             }
 

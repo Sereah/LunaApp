@@ -19,8 +19,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":logger"))
+    implementation(libs.common)
+    implementation(libs.logger)
     implementation(project(":ui-design"))
 
     implementation(libs.gson)

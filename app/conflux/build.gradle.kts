@@ -16,10 +16,10 @@ android {
 
 dependencies {
     implementation(project(":ui-design"))
-    implementation(project(":common"))
-    implementation(project(":network"))
+    implementation(libs.common)
+    implementation(libs.network)
     implementation(project(":record"))
-    implementation(project(":logger"))
+    implementation(libs.logger)
     debugImplementation(libs.leakcanary.android)
     implementation(libs.haze.android)
     implementation(libs.haze.material)
