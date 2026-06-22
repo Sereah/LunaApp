@@ -35,6 +35,8 @@ class MainViewModel @Inject constructor(
         super.onCleared()
     }
 
+    fun isModelReady(): Boolean = llm.isModelReady()
+
     private fun initEngine() {
         viewModelScope.launchSafe("initEngine") {
             llm.init().onStart {

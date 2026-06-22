@@ -3,6 +3,7 @@ package com.lunacattus.llm.domain.local
 import android.content.Context
 import com.lunacattus.common.utils.AssetUtils
 import com.lunacattus.llm.domain.ILlm
+import com.lunacattus.llm.domain.LlmException
 import com.lunacattus.logger.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dalvik.annotation.optimization.FastNative
@@ -27,12 +28,18 @@ class LlmCppRepository @Inject constructor(
         try {
             initModel()
             val result = loadModel()
-            emit(Result.success(result))
+            emit(result)
         } catch (e: Exception) {
             Logger.e(TAG, "init failed", e)
             emit(Result.failure(e))
         }
     }.flowOn(LlmSingleThreadDispatcher)
+
+    override fun isModelReady(): Boolean  {
+        val isReady = isReady()
+        Logger.d(TAG, "isModelReady: $isReady")
+        return isReady
+    }
 
     private fun initModel() {
         Logger.d(TAG, "initModel")
@@ -40,7 +47,7 @@ class LlmCppRepository @Inject constructor(
         initModel(context.applicationInfo.nativeLibraryDir)
     }
 
-    private fun loadModel(): Boolean {
+    private fun loadModel(): Result<Boolean> {
         val modelDir = AssetUtils.copyToFiles(context, "gguf")
         val modelPath = if (modelDir != null) {
             val dir = File(modelDir)
@@ -49,13 +56,16 @@ class LlmCppRepository @Inject constructor(
             null
         }
         Logger.d(TAG, "loadModel: $modelPath")
-        val result = if (modelPath != null) {
-            loadModel(modelPath)
-        } else {
-            1
+        if (modelPath == null) {
+            return Result.failure(LlmException.ModelPathNull())
         }
-        Logger.d(TAG, "loadModel result: $result")
-        return result == 0
+        if (loadModel(modelPath) != 0) {
+            return Result.failure(LlmException.ModelLoadFail())
+        }
+        if (prepare() != 0) {
+            return Result.failure(LlmException.ModelPrepareFail())
+        }
+        return Result.success(true)
     }
 
     @FastNative
@@ -66,4 +76,7 @@ class LlmCppRepository @Inject constructor(
 
     @FastNative
     private external fun prepare(): Int
+
+    @FastNative
+    private external fun isReady(): Boolean
 }

@@ -26,7 +26,8 @@ set(LLAMA_SRC ${CMAKE_CURRENT_LIST_DIR}/../../../../../third_party/llama.cpp/)
 add_subdirectory(${LLAMA_SRC} build-llama)
 
 add_library(${CMAKE_PROJECT_NAME} SHARED
-        llmCppJni.cpp)
+        llmCppJni.cpp
+        llm/LlmCppEngine.cpp)
 
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
         GGML_SYSTEM_ARCH=${GGML_SYSTEM_ARCH}
@@ -35,6 +36,7 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 )
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}
         ${LLAMA_SRC}
         ${LLAMA_SRC}/common
         ${LLAMA_SRC}/include

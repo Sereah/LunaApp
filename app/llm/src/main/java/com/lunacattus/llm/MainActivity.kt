@@ -33,6 +33,9 @@ class MainActivity : AppCompatActivity() {
         viewModel.state.map { it.modelStatus }.distinctUntilChanged().onEach {
             binding.textView.text = it.toString()
         }.launchIn(lifecycleScope)
+        binding.textView.setOnClickListener {
+            viewModel.isModelReady()
+        }
     }
 
     companion object {
