@@ -15,7 +15,7 @@ class App : Application() {
 
     @Suppress("kotlin:S5324")
     private fun initLog() {
-        Logger.initBaseTag("LunaLLM")
+        Logger.initBaseTag("LunaLLMApp")
         getExternalFilesDir(null)?.let {
             Logger.initFileLogger(it)
         }

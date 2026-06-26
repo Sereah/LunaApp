@@ -4,7 +4,7 @@
 #include "ggml/include/ggml.h"
 
 #ifndef LOG_TAG
-#define LOG_TAG "LunaLLM-LlmCppNative"
+#define LOG_TAG "LunaLLMNative"
 #endif
 
 #ifndef LOG_MIN_LEVEL

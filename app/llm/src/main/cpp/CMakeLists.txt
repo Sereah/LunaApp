@@ -27,7 +27,9 @@ add_subdirectory(${LLAMA_SRC} build-llama)
 
 add_library(${CMAKE_PROJECT_NAME} SHARED
         llmCppJni.cpp
-        llm/LlmCppEngine.cpp)
+        llm/LlmCppEngine.cpp
+        encoderCppJni.cpp
+        encoder/EncoderCppEngine.cpp)
 
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
         GGML_SYSTEM_ARCH=${GGML_SYSTEM_ARCH}

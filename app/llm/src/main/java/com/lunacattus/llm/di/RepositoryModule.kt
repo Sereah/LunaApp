@@ -1,22 +1,21 @@
 package com.lunacattus.llm.di
 
-import com.lunacattus.llm.domain.ILlm
-import com.lunacattus.llm.domain.local.LlmCppRepository
+import com.lunacattus.llm.domain.base.IBertLlm
+import com.lunacattus.llm.domain.base.IGenerateLlm
+import com.lunacattus.llm.domain.local.BertLLmRepository
+import com.lunacattus.llm.domain.local.GenerateLLmRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Qualifier
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
 
     @Binds
-    @LlmCpp
-    abstract fun bindLlm(impl: LlmCppRepository): ILlm
-}
+    abstract fun bindLlm(impl: GenerateLLmRepository): IGenerateLlm
 
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class LlmCpp
+    @Binds
+    abstract fun bindBert(impl: BertLLmRepository): IBertLlm
+}
