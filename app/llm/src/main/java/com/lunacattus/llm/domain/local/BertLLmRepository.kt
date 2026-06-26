@@ -19,7 +19,7 @@ class BertLLmRepository @Inject constructor(
     companion object {
         const val TAG = "BertLLmRepository"
         private val EncoderSingleThreadDispatcher = Dispatchers.IO.limitedParallelism(1)
-        private const val MODEL_FILE_NAME = "nlu_model-bert-base-chinese-F32-pooler.gguf"
+        private const val MODEL_FILE_NAME = "nlu_model-bert-base-chinese-Q8_0-pooler.gguf"
     }
 
     override val tag = TAG

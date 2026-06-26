@@ -78,35 +78,28 @@ namespace lunacattus::encoder {
         pooler_w_.assign(pw_data, pw_data + pw_n);
         pooler_b_.assign(pb_data, pb_data + pb_n);
 
-        // --- cls.output 张量通过文件 seek 读取（仅 ~28KB，避免重复映射整模型）---
-        const int64_t cw_tid = gguf_find_tensor(gguf_ctx, "cls.output.weight");
-        const int64_t cb_tid = gguf_find_tensor(gguf_ctx, "cls.output.bias");
-        if (cw_tid < 0 || cb_tid < 0) {
-            LOGE("%s: cls.output tensors not found in GGUF", __func__);
+        // --- 分类头从 KV metadata 读取（float32，不受量化影响）---
+        const int64_t cw_idx = gguf_find_key(gguf_ctx, "bert.classifier.output_weight");
+        const int64_t cb_idx = gguf_find_key(gguf_ctx, "bert.classifier.output_bias");
+        if (cw_idx < 0 || cb_idx < 0) {
+            LOGE("%s: cls.output KV not found in GGUF", __func__);
             gguf_free(gguf_ctx);
             return 1;
         }
-        n_cls_ = (int) (gguf_get_tensor_size(gguf_ctx, cb_tid) / sizeof(float));
-
-        const size_t data_base = gguf_get_data_offset(gguf_ctx);
-        const size_t cw_off = gguf_get_tensor_offset(gguf_ctx, cw_tid);
-        const size_t cb_off = gguf_get_tensor_offset(gguf_ctx, cb_tid);
-        gguf_free(gguf_ctx);
-
-        cls_w_.resize((size_t) n_cls_ * n_embd_);
-        cls_b_.resize((size_t) n_cls_);
-
-        FILE *f = fopen(model_path, "rb");
-        if (!f) {
-            LOGE("%s: fopen failed", __func__);
+        const size_t cb_n = gguf_get_arr_n(gguf_ctx, cb_idx);
+        const size_t cw_n = gguf_get_arr_n(gguf_ctx, cw_idx);
+        n_cls_ = (int) cb_n;
+        if (cw_n != (size_t) (n_cls_ * n_embd_)) {
+            LOGE("%s: unexpected output_weight size %zu", __func__, cw_n);
+            gguf_free(gguf_ctx);
             return 1;
         }
-        fseeko(f, (off_t) (data_base + cw_off), SEEK_SET);
-        fread(cls_w_.data(), sizeof(float), (size_t) n_cls_ * n_embd_, f);
-        fseeko(f, (off_t) (data_base + cb_off), SEEK_SET);
-        fread(cls_b_.data(), sizeof(float), (size_t) n_cls_, f);
-        fclose(f);
+        const auto *cw_data = (const float *) gguf_get_arr_data(gguf_ctx, cw_idx);
+        const auto *cb_data = (const float *) gguf_get_arr_data(gguf_ctx, cb_idx);
+        cls_w_.assign(cw_data, cw_data + cw_n);
+        cls_b_.assign(cb_data, cb_data + cb_n);
 
+        gguf_free(gguf_ctx);
         LOGI("%s: pooler [%d×%d], cls_head [%d×%d]", __func__, n_embd_, n_embd_, n_cls_, n_embd_);
         return 0;
     }
