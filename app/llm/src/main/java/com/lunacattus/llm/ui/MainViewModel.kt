@@ -35,12 +35,13 @@ class MainViewModel @Inject constructor(
 
         private val LABELS = mapOf(
             0 to "出行",
-            1 to "影音",
-            2 to "感知车控",
-            3 to "搜索",
-            4 to "直接车控",
-            5 to "车书",
-            6 to "闲聊"
+            1 to "多意图",
+            2 to "影音",
+            3 to "播控",
+            4 to "电话",
+            5 to "直接车控",
+            6 to "车书",
+            7 to "闲聊"
         )
     }
 
