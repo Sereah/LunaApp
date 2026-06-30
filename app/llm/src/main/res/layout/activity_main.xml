@@ -13,92 +13,11 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- BERT 分类模型 -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="BERT 分类模型"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/bert_state"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Idle"
-                        android:textSize="13sp" />
-
-                </LinearLayout>
-
-                <EditText
-                    android:id="@+id/classic_prompt"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:autofillHints="classify input"
-                    android:hint="输入文本进行分类"
-                    android:inputType="text" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
-
-                    <Button
-                        android:id="@+id/send_classic"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="分类" />
-
-                    <TextView
-                        android:id="@+id/classification_time"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:textSize="13sp" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/classification_result"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:background="#1A000000"
-                    android:hint="分类结果将显示在这里"
-                    android:padding="10dp"
-                    android:textSize="15sp" />
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
         <!-- 生成模型 -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             app:cardCornerRadius="12dp"
             app:cardElevation="2dp">
 
@@ -127,10 +46,38 @@
                         android:id="@+id/generate_state"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Idle"
+                        android:text="未加载"
                         android:textSize="13sp" />
 
                 </LinearLayout>
+
+                <!-- 模型文件选择区域 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <Button
+                        android:id="@+id/select_generate_model"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="选择 GGUF 模型文件"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/generate_model_path"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:textSize="12sp"
+                    android:textColor="#666666"
+                    android:hint="未选择模型文件"
+                    android:maxLines="2"
+                    android:ellipsize="middle" />
 
                 <EditText
                     android:id="@+id/user_prompt"
@@ -174,6 +121,116 @@
                     android:padding="12dp"
                     android:textSize="15sp"
                     tools:text="空调已经为你打开啦，舒舒服服的～" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- BERT 分类模型 -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="BERT 分类模型"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/bert_state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="未加载"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <!-- 模型文件选择区域 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <Button
+                        android:id="@+id/select_bert_model"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="选择 GGUF 模型文件"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/bert_model_path"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:textSize="12sp"
+                    android:textColor="#666666"
+                    android:hint="未选择模型文件"
+                    android:maxLines="2"
+                    android:ellipsize="middle" />
+
+                <EditText
+                    android:id="@+id/classic_prompt"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:autofillHints="classify input"
+                    android:hint="输入文本进行分类"
+                    android:inputType="text" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <Button
+                        android:id="@+id/send_classic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="分类" />
+
+                    <TextView
+                        android:id="@+id/classification_time"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/classification_result"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="#1A000000"
+                    android:hint="分类结果将显示在这里"
+                    android:padding="10dp"
+                    android:textSize="15sp" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

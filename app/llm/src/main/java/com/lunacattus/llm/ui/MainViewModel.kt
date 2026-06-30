@@ -45,9 +45,7 @@ class MainViewModel @Inject constructor(
     }
 
     init {
-        Logger.d(TAG, "init")
-        initGenerateLlm()
-        initBertLLm()
+        Logger.d(TAG, "init — models must be manually initialized via initGenerateModel/initBertModel")
     }
 
     override fun onCleared() {
@@ -57,6 +55,18 @@ class MainViewModel @Inject constructor(
         bertLlm.unLoad()
         bertLlm.shutDown()
         super.onCleared()
+    }
+
+    fun initGenerateModel(modelPath: String) {
+        Logger.d(TAG, "initGenerateModel: $modelPath")
+        _state.update { it.copy(generateModelPath = modelPath) }
+        initGenerateLlm(modelPath)
+    }
+
+    fun initBertModel(modelPath: String) {
+        Logger.d(TAG, "initBertModel: $modelPath")
+        _state.update { it.copy(bertModelPath = modelPath) }
+        initBertLLm(modelPath)
     }
 
     fun sendSystemPrompt(prompt: String) {
@@ -109,9 +119,9 @@ class MainViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun initGenerateLlm() {
+    private fun initGenerateLlm(modelPath: String) {
         viewModelScope.launchSafe("initGenerateLlm") {
-            generateLlm.init().onStart {
+            generateLlm.init(modelPath).onStart {
                 _state.update { it.copy(generateState = ModelState.Loading) }
             }.collect { result ->
                 result.onSuccess { isSuccess ->
@@ -134,9 +144,9 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun initBertLLm() {
+    private fun initBertLLm(modelPath: String) {
         viewModelScope.launchSafe("initBertLLm") {
-            bertLlm.init().onStart {
+            bertLlm.init(modelPath).onStart {
                 _state.update { it.copy(bertState = ModelState.Loading) }
             }.collect { result ->
                 result.onSuccess { isSuccess ->

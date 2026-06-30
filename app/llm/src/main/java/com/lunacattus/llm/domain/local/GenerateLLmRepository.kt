@@ -19,18 +19,16 @@ class GenerateLLmRepository @Inject constructor(
     companion object {
         const val TAG = "GenerateLLmRepository"
         private val LlmSingleThreadDispatcher = Dispatchers.IO.limitedParallelism(1)
-        private const val MODEL_FILE_NAME = "Qwen3-0.6B-Q8_0.gguf"
     }
 
     override val tag = TAG
-    override val modelFileName = MODEL_FILE_NAME
 
-    override fun init(): Flow<Result<Boolean>> = flow {
-        Logger.d(TAG, "init")
+    override fun init(modelPath: String): Flow<Result<Boolean>> = flow {
+        Logger.d(TAG, "init: $modelPath")
         try {
             System.loadLibrary("luna_llm")
             nativeInit(context.applicationInfo.nativeLibraryDir)
-            emit(loadModel(context, ::nativeLoadModel, ::nativePrepare))
+            emit(loadModel(modelPath, ::nativeLoadModel, ::nativePrepare))
         } catch (e: Exception) {
             Logger.e(TAG, "init failed", e)
             emit(Result.failure(e))
