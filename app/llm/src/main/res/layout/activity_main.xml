@@ -65,7 +65,15 @@
                         android:id="@+id/select_bert_model"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="选择 GGUF 模型文件"
+                        android:text="选择模型文件"
+                        android:textSize="13sp" />
+
+                    <Switch
+                        android:id="@+id/npu_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="NPU"
                         android:textSize="13sp" />
 
                 </LinearLayout>

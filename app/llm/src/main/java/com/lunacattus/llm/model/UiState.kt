@@ -5,6 +5,7 @@ data class UiState(
     val bertState: ModelState = ModelState.Idle,
     val generateModelPath: String = "",
     val bertModelPath: String = "",
+    val useNpu: Boolean = false,
     val systemPromptReady: Boolean = false,
     val assistantResponse: String = "",
     val classificationResult: Int = -1,

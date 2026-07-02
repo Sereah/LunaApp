@@ -105,6 +105,33 @@ class MainActivity : AppCompatActivity() {
             openDocumentLauncher.launch(arrayOf("application/octet-stream", "*/*"))
         }
 
+        // 分类按钮 & 输入框：仅模型加载完成后可用
+        viewModel.state.map { it.bertState }.distinctUntilChanged().onEach { state ->
+            val loaded = state is com.lunacattus.llm.model.ModelState.Loaded
+            binding.sendClassic.isEnabled = loaded
+            binding.classicPrompt.isEnabled = loaded
+        }.launchIn(lifecycleScope)
+
+        // NPU 开关：加载中不可操作
+        viewModel.state.map { it.bertState }.distinctUntilChanged().onEach { state ->
+            val loading = state is com.lunacattus.llm.model.ModelState.Loading
+            binding.npuSwitch.isEnabled = !loading
+        }.launchIn(lifecycleScope)
+
+        // NPU 开关状态同步（UiState → Switch，避免切换时重复触发）
+        viewModel.state.map { it.useNpu }.distinctUntilChanged().onEach { useNpu ->
+            if (binding.npuSwitch.isChecked != useNpu) {
+                binding.npuSwitch.isChecked = useNpu
+            }
+        }.launchIn(lifecycleScope)
+
+        // NPU 开关用户操作
+        binding.npuSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked != viewModel.state.value.useNpu) {
+                viewModel.toggleNpu(isChecked)
+            }
+        }
+
         // 已有功能
         binding.sendClassic.setOnClickListener {
             viewModel.classify(binding.classicPrompt.text.toString())
@@ -188,7 +215,7 @@ class MainActivity : AppCompatActivity() {
                     val index = cursor.getColumnIndex(android.provider.MediaStore.MediaColumns.DATA)
                     if (index >= 0) {
                         val path = cursor.getString(index)
-                        if (path != null && File(path).exists()) return path
+                        if (path != null && File(path).exists() && File(path).canRead()) return path
                     }
                 }
             }

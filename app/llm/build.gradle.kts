@@ -70,4 +70,6 @@ android {
 dependencies {
     implementation(libs.common)
     implementation(libs.logger)
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:latest.release")
+    implementation("com.microsoft.onnxruntime:onnxruntime-extensions-android:latest.release")
 }

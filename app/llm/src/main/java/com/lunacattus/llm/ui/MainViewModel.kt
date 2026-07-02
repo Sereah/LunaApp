@@ -3,8 +3,10 @@ package com.lunacattus.llm.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.common.coroutine.SafeCoroutine.launchSafe
+import com.lunacattus.llm.di.ONNX
 import com.lunacattus.llm.domain.base.IBertLlm
 import com.lunacattus.llm.domain.base.IGenerateLlm
+import com.lunacattus.llm.domain.local.OnnxLlmRepository
 import com.lunacattus.llm.model.ModelState
 import com.lunacattus.llm.model.UiState
 import com.lunacattus.logger.Logger
@@ -21,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val generateLlm: IGenerateLlm,
-    private val bertLlm: IBertLlm
+    @param:ONNX private val bertLlm: IBertLlm
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -33,20 +35,32 @@ class MainViewModel @Inject constructor(
 
         private const val SYSTEM_PROMPT = "你扮演邻家大姐姐的角色，说话超级温柔，带上文字表情和语气词"
 
+//        private val LABELS = mapOf(
+//            0 to "出行",
+//            1 to "多意图",
+//            2 to "影音",
+//            3 to "播控",
+//            4 to "电话",
+//            5 to "直接车控",
+//            6 to "车书",
+//            7 to "闲聊"
+//        )
         private val LABELS = mapOf(
             0 to "出行",
-            1 to "多意图",
-            2 to "影音",
-            3 to "播控",
-            4 to "电话",
-            5 to "直接车控",
-            6 to "车书",
-            7 to "闲聊"
+            1 to "影音",
+            2 to "感知车控",
+            3 to "搜索",
+            4 to "直接车控",
+            5 to "车书",
+            6 to "闲聊"
         )
     }
 
     init {
-        Logger.d(TAG, "init — models must be manually initialized via initGenerateModel/initBertModel")
+        Logger.d(
+            TAG,
+            "init — models must be manually initialized via initGenerateModel/initBertModel"
+        )
     }
 
     override fun onCleared() {
@@ -68,6 +82,18 @@ class MainViewModel @Inject constructor(
         Logger.d(TAG, "initBertModel: $modelPath")
         _state.update { it.copy(bertModelPath = modelPath) }
         initBertLLm(modelPath)
+    }
+
+    /**
+     * 切换 NPU 模式。如果模型已加载，会使用新设置重新 init。
+     */
+    fun toggleNpu(enabled: Boolean) {
+        Logger.d(TAG, "toggleNpu: $enabled")
+        _state.update { it.copy(useNpu = enabled) }
+        val path = _state.value.bertModelPath
+        if (path.isNotEmpty()) {
+            initBertLLm(path)
+        }
     }
 
     fun sendSystemPrompt(prompt: String) {
@@ -147,6 +173,9 @@ class MainViewModel @Inject constructor(
 
     private fun initBertLLm(modelPath: String) {
         viewModelScope.launchSafe("initBertLLm") {
+            // 同步 NPU 开关到 repo（必须在 init 前设置）
+            (bertLlm as? OnnxLlmRepository)?.useNpu = _state.value.useNpu
+
             bertLlm.init(modelPath).onStart {
                 _state.update { it.copy(bertState = ModelState.Loading) }
             }.collect { result ->
