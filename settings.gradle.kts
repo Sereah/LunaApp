@@ -39,3 +39,8 @@ include(":app:gallery:data")
 include(":app:conflux")
 include(":statemachine")
 include(":app:llm")
+
+// 自动激活 pre-commit hook（防止大文件被提交）
+File(rootDir, ".githooks/pre-commit").takeIf { it.exists() }?.let {
+    Runtime.getRuntime().exec("git config core.hooksPath .githooks", null, rootDir)
+}
