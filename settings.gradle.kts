@@ -1,6 +1,5 @@
 pluginManagement {
     includeBuild("build-logic")
-    includeBuild("screen-adaptation-plugin")
     repositories {
         google {
             content {
@@ -38,6 +37,5 @@ include(":app:gallery:domain")
 include(":app:gallery:data")
 
 include(":app:conflux")
-include(":feature:voice")
 include(":statemachine")
 include(":app:llm")

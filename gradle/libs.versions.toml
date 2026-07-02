@@ -149,6 +149,8 @@ room = { id = "androidx.room", version.ref = "roomVersion" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-parcelize = { id = "kotlin-parcelize" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+framework-jar = { id = "com.lunacattus.android.framework.jar", version = "1.0.3" }
+screen-adaptation = { id = "com.lunacattus.android.screen-adaptation", version = "1.0.0" }
 
 # build-logic plugins
 app-android-application = { id = "app.android.application" }
@@ -161,4 +163,3 @@ app-android-application-jacoco = { id = "app.android.application.jacoco" }
 app-android-library-jacoco = { id = "app.android.library.jacoco" }
 app-hilt = { id = "app.hilt" }
 app-android-room = { id = "app.android.room" }
-framework-jar = { id = "framework.jar" }
