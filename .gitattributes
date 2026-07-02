@@ -1,4 +1,11 @@
-feature/speech/src/main/assets/duicore.zip filter=lfs diff=lfs merge=lfs -text
-app/voice/src/main/assets/duicore.zip filter=lfs diff=lfs merge=lfs -text
-app/voice/libs/lib-dds-2.19.0.1-release.aar filter=lfs diff=lfs merge=lfs -text
-*.gguf filter=lfs diff=lfs merge=lfs -text
+# 二进制文件标记（避免 git 尝试 diff 或自动合并）
+*.jar binary
+*.aar binary
+*.so binary
+*.bin binary
+*.onnx binary
+*.ort binary
+*.wav binary
+*.pcm binary
+*.db binary
+*.zip binary

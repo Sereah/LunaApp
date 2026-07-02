@@ -1,0 +1,35 @@
+#!/bin/sh
+# Pre-commit hook: 阻止提交大于 10MB 的文件
+#
+# 大文件应该通过以下方式处理：
+#   - JAR/AAR → 发布到 Maven Central（libs.versions.toml 引用）
+#   - 模型文件（.gguf, .bin, .ort 等）→ 启动时脚本下载或走 Maven
+#   - 第三方源码 → git submodule
+#
+# 安装：git config core.hooksPath .githooks
+
+echo "🔍 检查是否有大文件被提交..."
+
+THRESHOLD=$((10 * 1024 * 1024))  # 10MB
+HAS_LARGE=0
+
+# 检查 staged 中的所有文件
+git diff --cached --name-only --diff-filter=ACM | while read -r file; do
+    if [ -f "$file" ]; then
+        size=$(wc -c < "$file")
+        if [ "$size" -gt "$THRESHOLD" ]; then
+            size_mb=$(echo "scale=1; $size / 1048576" | bc)
+            echo "❌ 文件超过 ${THRESHOLD_MB}MB: $file (${size_mb}MB)"
+            echo "   请改用 Maven 依赖或下载脚本，不要直接提交大文件。"
+            HAS_LARGE=1
+        fi
+    fi
+done
+
+if [ "$HAS_LARGE" -eq 1 ]; then
+    echo "❌ 提交被阻止：存在大文件。请移除大文件后重试。"
+    exit 1
+fi
+
+echo "✅ 大文件检查通过"
+exit 0
