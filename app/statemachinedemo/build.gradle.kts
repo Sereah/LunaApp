@@ -14,5 +14,5 @@ android {
 
 dependencies {
     implementation(libs.logger)
-    implementation(files("libs/statemachine-1.0.0.aar"))
+    implementation("com.lunacattus.android:statemachine:1.0.0")
 }
