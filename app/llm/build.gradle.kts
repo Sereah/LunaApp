@@ -70,6 +70,8 @@ android {
 dependencies {
     implementation(libs.common)
     implementation(libs.logger)
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+    implementation("androidx.fragment:fragment-ktx:1.8.6")
     implementation("com.microsoft.onnxruntime:onnxruntime-android:latest.release")
     implementation("com.microsoft.onnxruntime:onnxruntime-extensions-android:latest.release")
 }
