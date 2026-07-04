@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.SpeakerNotes
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.RecordVoiceOver
@@ -152,7 +153,7 @@ private fun ComingSoonRow(modifier: Modifier = Modifier) {
             badgeText = stringResource(R.string.feature_coming_soon),
         ),
         CompactCardData(
-            icon = Icons.Rounded.SpeakerNotes,
+            icon = Icons.AutoMirrored.Default.SpeakerNotes,
             accentColor = MaterialTheme.colorScheme.error,
             title = stringResource(R.string.llm_asr_title),
             description = stringResource(R.string.llm_asr_desc),

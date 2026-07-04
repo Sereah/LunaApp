@@ -87,7 +87,7 @@ abstract class BaseDialogFragment<
         /** 如果你的布局有自己的形状（例如圆角），请设置为 true。 */
         val hasCustomBackground: Boolean = false,
         /** 用于窗口进入/退出动画的样式资源。 */
-        @StyleRes val windowAnimations: Int? = null
+        @param:StyleRes val windowAnimations: Int? = null
     )
 
     private fun applyWindowConfiguration() {

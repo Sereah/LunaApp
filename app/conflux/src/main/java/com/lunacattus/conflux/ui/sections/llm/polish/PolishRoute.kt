@@ -39,6 +39,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
@@ -462,7 +464,7 @@ private fun InputSection(
                     modifier = Modifier.size(32.dp),
                 ) {
                     Icon(
-                        Icons.Rounded.OpenInNew,
+                        Icons.AutoMirrored.Rounded.OpenInNew,
                         null,
                         Modifier.size(16.dp),
                         MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
@@ -524,7 +526,7 @@ private fun InputSection(
                     ),
             ) {
                 Icon(
-                    Icons.Rounded.Send,
+                    Icons.AutoMirrored.Rounded.Send,
                     null,
                     Modifier.size(22.dp),
                     if (state.inputText.isNotBlank() && !state.isRequesting)

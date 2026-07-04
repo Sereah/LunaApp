@@ -8,8 +8,8 @@ enum class RequestMode { HTTP, WebSocket }
 
 data class Speaker(
     val name: String,
-    @StringRes val descriptionRes: Int,
-    @StringRes val nativeLanguageRes: Int,
+    @param:StringRes val descriptionRes: Int,
+    @param:StringRes val nativeLanguageRes: Int,
 ) {
     companion object {
         val ALL = listOf(

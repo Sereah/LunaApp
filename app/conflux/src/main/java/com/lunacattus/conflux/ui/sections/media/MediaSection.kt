@@ -1,6 +1,6 @@
 package com.lunacattus.conflux.ui.sections.media
 
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.lunacattus.conflux.R

@@ -40,6 +40,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.automirrored.rounded.Send
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
@@ -612,7 +615,7 @@ private fun PlaybackControlsContent(state: TtsState, sendIntent: (TtsIntent) -> 
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                Icons.Rounded.VolumeUp,
+                Icons.AutoMirrored.Rounded.VolumeUp,
                 null,
                 Modifier.size(14.dp),
                 MaterialTheme.colorScheme.onSurfaceVariant
@@ -1178,7 +1181,7 @@ private fun InputSection(
             }
             if (inputMode) {
                 TextButton(onClick = onPickTextFile) {
-                    Icon(Icons.Rounded.OpenInNew, null, Modifier.size(14.dp))
+                    Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, Modifier.size(14.dp))
                     Spacer(Modifier.width(4.dp))
                     Text(stringResource(R.string.tts_pick_file), fontSize = 12.sp)
                 }
@@ -1238,7 +1241,7 @@ private fun InputSection(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        Icons.Rounded.Send,
+                        Icons.AutoMirrored.Rounded.Send,
                         stringResource(R.string.tts_send_cd),
                         Modifier.size(22.dp),
                         if (canSend) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(
@@ -1289,7 +1292,7 @@ private fun InputSection(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        Icons.Rounded.Send,
+                        Icons.AutoMirrored.Rounded.Send,
                         stringResource(R.string.tts_send_cd),
                         Modifier.size(22.dp),
                         if (canSend) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface.copy(

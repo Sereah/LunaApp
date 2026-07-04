@@ -18,7 +18,7 @@ import javax.inject.Singleton
 
 @Singleton
 class TtsAudioPlayer @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
     private var player: ExoPlayer? = null
     private var chunkFiles: MutableList<File> = mutableListOf()
