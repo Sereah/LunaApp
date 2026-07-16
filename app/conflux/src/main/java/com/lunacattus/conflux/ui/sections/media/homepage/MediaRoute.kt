@@ -1,10 +1,14 @@
 package com.lunacattus.conflux.ui.sections.media.homepage
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardVoice
+import androidx.compose.material.icons.rounded.LocalMovies
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -14,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.lunacattus.common.utils.toDuration
+import com.lunacattus.common.utils.toDurationStringShort
 import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.ActivityToastEvent
 import com.lunacattus.conflux.ui.LocalInnerPadding
@@ -24,6 +30,8 @@ import com.lunacattus.conflux.ui.base.NavigationItem
 import com.lunacattus.conflux.ui.base.SwitchItem
 import com.lunacattus.conflux.ui.sections.media.MediaSourceType
 import com.lunacattus.ui_design.compose.overScrollVertical
+import com.lunacattus.ui_design.compose.section.ClassifyHeader
+import com.lunacattus.ui_design.compose.section.SectionHeaderCard
 import kotlinx.coroutines.launch
 
 @Composable
@@ -41,18 +49,19 @@ fun MediaRoute(
 }
 
 @Composable
-fun MediaScreen(
+private fun MediaScreen(
     uiState: MediaHomeUiState,
     switchRecord: (isRecord: Boolean) -> Unit,
     navToMediaFilesScreen: (type: MediaSourceType) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
+    val toast = stringResource(R.string.media_stop_recording_first)
 
     val mediaUtilItems = listOf(
         SwitchItem(
             title = stringResource(R.string.record),
-            summary = if (uiState.isRecord) stringResource(R.string.recording) else null,
+            summary = if (uiState.isRecord) uiState.recordTimes.toDurationStringShort() else null,
             icon = IconSource.Vector(Icons.Rounded.KeyboardVoice),
             iconTint = MaterialTheme.colorScheme.tertiary,
             accentColor = MaterialTheme.colorScheme.primary,
@@ -65,7 +74,7 @@ fun MediaScreen(
             iconTint = MaterialTheme.colorScheme.primary,
             onClick = {
                 if (uiState.isRecord) {
-                    scope.launch { ActivityToastEvent.send(ToastEvent.ShowToast("请先停止录制")) }
+                    scope.launch { ActivityToastEvent.send(ToastEvent.ShowToast(toast)) }
                 } else {
                     navToMediaFilesScreen(MediaSourceType.AppRecording)
                 }
@@ -87,17 +96,45 @@ fun MediaScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
+            .padding(vertical = 12.dp, horizontal = 20.dp)
             .overScrollVertical(),
         contentPadding = LocalInnerPadding.current,
-        verticalArrangement = Arrangement.spacedBy(15.dp)
+        verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
 
         item {
-            ItemCard(mediaUtilItems, stringResource(R.string.record_skill))
+            SectionHeaderCard(
+                title = stringResource(R.string.media_title),
+                subtitle = stringResource(R.string.media_subtitle),
+                icon = Icons.Rounded.LocalMovies,
+                gradientColors = listOf(
+                    MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.9f),
+                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
+                    MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
+                ),
+                iconTint = MaterialTheme.colorScheme.tertiary,
+                glowTint = MaterialTheme.colorScheme.tertiary
+            )
+            Spacer(Modifier.height(20.dp))
         }
 
         item {
-            ItemCard(mediaFilesItems, stringResource(R.string.media_file))
+            ClassifyHeader(stringResource(R.string.record))
+            Spacer(Modifier.height(12.dp))
+        }
+
+        item {
+            ItemCard(mediaUtilItems)
+            Spacer(Modifier.height(20.dp))
+        }
+
+        item {
+            ClassifyHeader(stringResource(R.string.media_music))
+            Spacer(Modifier.height(12.dp))
+        }
+
+        item {
+            ItemCard(mediaFilesItems)
         }
     }
 }

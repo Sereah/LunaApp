@@ -45,6 +45,7 @@
   <string name="today">اليوم</string>
   <string name="tts">تحويل النص إلى كلام</string>
   <string name="tts_title">TTS</string>
+  <string name="polish_title">تحرير النص</string>
   <string name="unknow_error">تباً! خطأ غير معروف.</string>
   <string name="unlock">فتح</string>
   <string name="unlocking">فتح</string>
@@ -62,4 +63,18 @@
     <string name="tts_long_text_file">نص طويل / ملف</string>
     <string name="tts_pick_file">اختيار ملف</string>
     <string name="tts_send_cd">إرسال</string>
+
+    <!-- Connection -->
+    <string name="connection_open_fail">فشل في الفتح.</string>
+    <string name="connection_projection">الإسقاط</string>
+
+    <!-- Media -->
+    <string name="media_stop_recording_first">يرجى إيقاف التسجيل أولاً</string>
+    <string name="media_subtitle">قدرات الوسائط المتعددة: التسجيل والموسيقى والفيديو والمزيد.</string>
+    <string name="media_music">موسيقى</string>
+
+    <!-- Setting -->
+    <string name="setting_subtitle">إعدادات النظام: اللغة والسمات والوضع الليلي والمزيد.</string>
+    <string name="settings_appearance">المظهر</string>
+    <string name="settings_system">النظام</string>
 </resources>

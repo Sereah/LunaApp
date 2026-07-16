@@ -114,24 +114,27 @@ fun ItemRow(
             .padding(start = 0.dp, top = 14.dp, end = 16.dp, bottom = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier
-                .width(3.5.dp)
-                .height(36.dp)
-                .clip(RoundedCornerShape(2.dp))
-                .background(rowAccent.copy(alpha = 0.7f)),
-        )
-
-        Spacer(Modifier.width(14.dp))
-
         val iconBg = when (item) {
             is SwitchItem -> if (item.checked) rowAccent.copy(alpha = 0.16f) else MaterialTheme.colorScheme.surfaceContainerHighest
             else -> rowAccent.copy(alpha = 0.1f)
         }
         val resolvedTint = when (item) {
-            is SwitchItem -> if (item.checked) item.iconTint else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+            is SwitchItem -> if (item.checked) item.iconTint else MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                alpha = 0.5f
+            )
+
             else -> item.iconTint
         }
+
+        Box(
+            modifier = Modifier
+                .width(3.5.dp)
+                .height(36.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(rowAccent.copy(alpha = 0.4f)),
+        )
+
+        Spacer(Modifier.width(14.dp))
 
         Box(
             modifier = Modifier
@@ -246,16 +249,13 @@ fun ItemRow(
 @Composable
 fun ItemCard(
     items: List<Item>,
-    categoryText: String = "",
     lockState: CardLockState = CardLockState.UnLock,
     onLockButtonClick: (CardLockState) -> Unit = {}
 ) {
     val cardAccent = items.firstOrNull()?.accentColor ?: MaterialTheme.colorScheme.primary
 
     Box(
-        modifier = Modifier
-            .padding(horizontal = 20.dp)
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
@@ -267,32 +267,10 @@ fun ItemCard(
                     RoundedCornerShape(16.dp),
                 )
         ) {
-            if (categoryText.isNotEmpty()) {
-                Row(
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(cardAccent),
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = categoryText,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.5.sp,
-                        color = cardAccent,
-                    )
-                }
-            }
-
             items.forEachIndexed { index, item ->
                 ItemRow(
                     item = item,
-                    isFirst = index == 0 && categoryText.isEmpty(),
+                    isFirst = index == 0,
                     isLast = index == items.lastIndex,
                 )
             }

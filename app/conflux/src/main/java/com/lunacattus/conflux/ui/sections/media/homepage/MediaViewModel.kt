@@ -6,11 +6,14 @@ import com.lunacattus.logger.Logger
 import com.lunacattus.record.AudioRecordManager
 import com.lunacattus.record.RecordingFileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class MediaViewModel @Inject constructor(
@@ -20,15 +23,23 @@ class MediaViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(MediaHomeUiState())
     val uiState = _uiState.asStateFlow()
+    private var recordTimingJob: Job? = null
 
     init {
         Logger.d(TAG, "init.")
+        viewModelScope.launch {
+            audioRecordManager.isRecording.collect {
+                reduce { copy(isRecord = it) }
+            }
+        }
     }
 
     override fun onCleared() {
         super.onCleared()
         Logger.d(TAG, "onCleared.")
         audioRecordManager.stop()
+        recordTimingJob?.cancel()
+        recordTimingJob = null
     }
 
     fun handleUiIntent(intent: MediaHomeUiIntent) {
@@ -44,10 +55,21 @@ class MediaViewModel @Inject constructor(
         } else {
             audioRecordManager.stop()
         }
-        viewModelScope.launch {
-            audioRecordManager.isRecording.collect {
-                reduce { copy(isRecord = it) }
+        recordTiming(isRecord)
+    }
+
+    private fun recordTiming(isRecord: Boolean) {
+        recordTimingJob?.cancel()
+        if (isRecord) {
+            recordTimingJob = viewModelScope.launch {
+                while (true) {
+                    delay(1000.milliseconds)
+                    reduce { copy(recordTimes = recordTimes + 1000) }
+                }
             }
+        } else {
+            reduce { copy(recordTimes = 0L) }
+            recordTimingJob = null
         }
     }
 
@@ -61,7 +83,8 @@ class MediaViewModel @Inject constructor(
 }
 
 data class MediaHomeUiState(
-    val isRecord: Boolean = false
+    val isRecord: Boolean = false,
+    val recordTimes: Long = 0L,
 )
 
 sealed interface MediaHomeUiIntent {

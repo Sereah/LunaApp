@@ -12,6 +12,12 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 }
 
 dependencies {
@@ -28,7 +34,6 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.coil.compose)
     implementation(libs.gson)
-//    implementation("com.google.mediapipe:tasks-genai:0.10.27")
-//    implementation("com.google.ai.edge.litertlm:litertlm-android:latest.release")
     implementation("com.google.ai.edge.litertlm:litertlm-android:0.10.0")
+    implementation("com.lunacattus.android:llm:1.0.3")
 }

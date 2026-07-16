@@ -45,6 +45,7 @@
   <string name="today">Сегодня</string>
   <string name="tts">Текст в речь</string>
   <string name="tts_title">TTS</string>
+  <string name="polish_title">Обработка текста</string>
   <string name="unknow_error">Чёрт! Неизвестная ошибка.</string>
   <string name="unlock">Разблокировать</string>
   <string name="unlocking">Разблокировка</string>
@@ -62,4 +63,18 @@
     <string name="tts_long_text_file">Длинный / Файл</string>
     <string name="tts_pick_file">Выбрать файл</string>
     <string name="tts_send_cd">Отправить</string>
+
+    <!-- Connection -->
+    <string name="connection_open_fail">Ошибка открытия.</string>
+    <string name="connection_projection">Проекция</string>
+
+    <!-- Media -->
+    <string name="media_stop_recording_first">Сначала остановите запись</string>
+    <string name="media_subtitle">Мультимедийные возможности: запись, музыка, видео и другое.</string>
+    <string name="media_music">Музыка</string>
+
+    <!-- Setting -->
+    <string name="setting_subtitle">Системные настройки: язык, тема, ночной режим и другое.</string>
+    <string name="settings_appearance">Внешний вид</string>
+    <string name="settings_system">Система</string>
 </resources>

@@ -7,10 +7,6 @@ import android.content.Intent
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,12 +34,13 @@ import com.lunacattus.conflux.R
 import com.lunacattus.conflux.domain.settings.ConfluxAccessibilityService
 import com.lunacattus.conflux.ui.LocalActivityViewModel
 import com.lunacattus.conflux.ui.LocalInnerPadding
-import com.lunacattus.conflux.ui.base.GradientHeader
 import com.lunacattus.conflux.ui.base.IconSource
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.NavigationItem
 import com.lunacattus.conflux.ui.base.SwitchItem
 import com.lunacattus.ui_design.compose.overScrollVertical
+import com.lunacattus.ui_design.compose.section.ClassifyHeader
+import com.lunacattus.ui_design.compose.section.SectionHeaderCard
 
 @Composable
 fun SettingRoute(viewModel: SettingViewModel) {
@@ -52,7 +49,8 @@ fun SettingRoute(viewModel: SettingViewModel) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
     val checkAccessibility = {
-        val isEnable = isAccessibilityServiceEnabled(context, ConfluxAccessibilityService::class.java)
+        val isEnable =
+            isAccessibilityServiceEnabled(context, ConfluxAccessibilityService::class.java)
         viewModel.changeAccessibility(isEnable)
     }
 
@@ -74,15 +72,16 @@ fun SettingRoute(viewModel: SettingViewModel) {
 
     val toast = stringResource(R.string.toast_close_accessibility)
     SettingScreen(
-        enableDynamicColor = activityViewModel.dynamicColor,
+        dynamicColorEnabled = activityViewModel.dynamicColor,
         changeDynamicColor = { activityViewModel.changeDynamicColor(it) },
-        enableNightMode = activityViewModel.nightMode,
+        nightModeEnabled = activityViewModel.nightMode,
         changeNightMode = { activityViewModel.changeNightMode(it) },
-        enableAccessibility = viewModel.accessibilityEnable,
+        accessibilityEnabled = viewModel.accessibilityEnable,
         changeAccessibility = { isChecked ->
             if (isChecked) {
                 val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
-                    val serviceId = "${context.packageName}/${ConfluxAccessibilityService::class.java.canonicalName}"
+                    val serviceId =
+                        "${context.packageName}/${ConfluxAccessibilityService::class.java.canonicalName}"
                     putExtra(":settings:show_fragment_args", serviceId)
                     putExtra(":settings:fragment_args_key", serviceId)
                 }
@@ -101,11 +100,11 @@ fun SettingRoute(viewModel: SettingViewModel) {
 
 @Composable
 private fun SettingScreen(
-    enableDynamicColor: Boolean,
+    dynamicColorEnabled: Boolean,
     changeDynamicColor: (Boolean) -> Unit,
-    enableNightMode: Boolean,
+    nightModeEnabled: Boolean,
     changeNightMode: (Boolean) -> Unit,
-    enableAccessibility: Boolean,
+    accessibilityEnabled: Boolean,
     changeAccessibility: (Boolean) -> Unit,
     openLanguageSettings: () -> Unit,
 ) {
@@ -114,7 +113,7 @@ private fun SettingScreen(
             title = stringResource(R.string.dynamic_color),
             icon = IconSource.Vector(Icons.Rounded.ColorLens),
             iconTint = MaterialTheme.colorScheme.primary,
-            checked = enableDynamicColor,
+            checked = dynamicColorEnabled,
             onCheckedChange = changeDynamicColor,
         ),
         SwitchItem(
@@ -122,7 +121,7 @@ private fun SettingScreen(
             summary = stringResource(R.string.night_mode_summary),
             icon = IconSource.Vector(Icons.Rounded.Nightlight),
             iconTint = MaterialTheme.colorScheme.tertiary,
-            checked = enableNightMode,
+            checked = nightModeEnabled,
             onCheckedChange = changeNightMode,
         ),
     )
@@ -139,7 +138,7 @@ private fun SettingScreen(
             title = stringResource(R.string.accessibility_service),
             icon = IconSource.Vector(Icons.Rounded.Accessibility),
             iconTint = MaterialTheme.colorScheme.primary,
-            checked = enableAccessibility,
+            checked = accessibilityEnabled,
             onCheckedChange = changeAccessibility,
         ),
     )
@@ -147,68 +146,50 @@ private fun SettingScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
+            .padding(vertical = 12.dp, horizontal = 20.dp)
             .overScrollVertical(),
         contentPadding = LocalInnerPadding.current,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         item {
-            GradientHeader(
+            SectionHeaderCard(
                 title = stringResource(R.string.setting_title),
-                subtitle = stringResource(R.string.app_name),
+                subtitle = stringResource(R.string.setting_subtitle),
                 icon = Icons.Rounded.Settings,
-                modifier = Modifier.padding(horizontal = 20.dp),
             )
+            Spacer(Modifier.height(20.dp))
         }
 
         item {
-            AnimatedCard(
-                index = 0,
-                items = appearanceItems,
-                categoryText = stringResource(R.string.settings_appearance),
-            )
+            ClassifyHeader(stringResource(R.string.settings_appearance))
+            Spacer(Modifier.height(12.dp))
         }
 
         item {
-            AnimatedCard(
-                index = 1,
-                items = systemItems,
-                categoryText = stringResource(R.string.settings_system),
-            )
+            ItemCard(appearanceItems)
+            Spacer(Modifier.height(20.dp))
         }
 
-        item { Spacer(Modifier.height(12.dp)) }
+        item {
+            ClassifyHeader(stringResource(R.string.settings_system))
+            Spacer(Modifier.height(12.dp))
+        }
+
+        item {
+            ItemCard(systemItems)
+            Spacer(Modifier.height(20.dp))
+        }
     }
 }
 
-@Composable
-private fun AnimatedCard(
-    index: Int,
-    items: List<com.lunacattus.conflux.ui.base.Item>,
-    categoryText: String,
-) {
-    AnimatedVisibility(
-        visible = true,
-        enter = fadeIn(
-            animationSpec = tween(
-                durationMillis = 400,
-                delayMillis = 150 + index * 120,
-            )
-        ) + slideInVertically(
-            animationSpec = tween(
-                durationMillis = 400,
-                delayMillis = 150 + index * 120,
-            ),
-            initialOffsetY = { it / 4 },
-        ),
-    ) {
-        ItemCard(items = items, categoryText = categoryText)
-    }
-}
-
-fun isAccessibilityServiceEnabled(context: Context, serviceClass: Class<out AccessibilityService>): Boolean {
+private fun isAccessibilityServiceEnabled(
+    context: Context,
+    serviceClass: Class<out AccessibilityService>
+): Boolean {
     val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
     val expectedId = "${context.packageName}/${serviceClass.canonicalName}"
-    val enabledServices = am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
+    val enabledServices =
+        am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
 
     for (service in enabledServices) {
         if (service.id == expectedId) return true

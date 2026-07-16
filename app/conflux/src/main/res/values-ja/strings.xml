@@ -45,6 +45,7 @@
   <string name="today">今日</string>
   <string name="tts">テキスト読み上げ</string>
   <string name="tts_title">TTS</string>
+  <string name="polish_title">テキスト研磨</string>
   <string name="unknow_error">くそっ！不明なエラー。</string>
   <string name="unlock">ロック解除</string>
   <string name="unlocking">ロック解除</string>
@@ -132,4 +133,18 @@
     <string name="tts_speaker_sohee_desc">感情豊かで温かい韓国語の女性の声。</string>
     <string name="tts_speaker_sohee_lang">韓国語</string>
     <string name="tts_settings_title">設定を変更</string>
+
+    <!-- Connection -->
+    <string name="connection_open_fail">起動に失敗しました。</string>
+    <string name="connection_projection">プロジェクション</string>
+
+    <!-- Media -->
+    <string name="media_stop_recording_first">先に録音を停止してください</string>
+    <string name="media_subtitle">マルチメディア機能：録音、音楽、動画など。</string>
+    <string name="media_music">音楽</string>
+
+    <!-- Setting -->
+    <string name="setting_subtitle">システム設定：言語、テーマ、ナイトモードなど。</string>
+    <string name="settings_appearance">外観</string>
+    <string name="settings_system">システム</string>
 </resources>

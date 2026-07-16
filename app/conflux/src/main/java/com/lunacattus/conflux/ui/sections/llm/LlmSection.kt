@@ -32,9 +32,8 @@ data object PolishRoute : MainRoute {
 }
 
 fun EntryProviderScope<NavKey>.homeSection() {
-    entryWithNavAndVm<LlmRoute, LlmViewModel> { _, navigator, viewModel ->
+    entryWithNavAndVm<LlmRoute, LlmViewModel> { _, navigator, _ ->
         LlmRoute(
-            viewModel = viewModel,
             navToTts = { navigator.navigate(TtsRoute) },
             navToPolish = { navigator.navigate(PolishRoute) })
     }

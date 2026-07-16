@@ -22,6 +22,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @Singleton
@@ -155,7 +156,7 @@ class AudioRecordManager @Inject constructor(
         maxDurationJob?.cancel()
 
         maxDurationJob = scope.launch {
-            delay(maxRecordDurationMs)
+            delay(maxRecordDurationMs.milliseconds)
             Logger.i(TAG, "Max record duration reached, auto stop")
             stop()
         }

@@ -1,10 +1,6 @@
 package com.lunacattus.conflux.ui.sections.connection.homepage
 
 import android.content.Intent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,17 +21,19 @@ import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.ActivityToastEvent
 import com.lunacattus.conflux.ui.LocalInnerPadding
 import com.lunacattus.conflux.ui.ToastEvent
-import com.lunacattus.conflux.ui.base.GradientHeader
 import com.lunacattus.conflux.ui.base.IconSource
 import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.NavigationItem
 import com.lunacattus.ui_design.compose.overScrollVertical
+import com.lunacattus.ui_design.compose.section.ClassifyHeader
+import com.lunacattus.ui_design.compose.section.SectionHeaderCard
 import kotlinx.coroutines.launch
 
 @Composable
-fun ConnectionRoute(model: ConnectionViewModel) {
+fun ConnectionRoute() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val openFailText = stringResource(R.string.connection_open_fail)
     ConnectionScreen(
         navToAndroidAuto = {
             Intent().apply {
@@ -44,7 +42,7 @@ fun ConnectionRoute(model: ConnectionViewModel) {
                 runCatching {
                     context.startActivity(it)
                 }.onFailure {
-                    scope.launch { ActivityToastEvent.send(ToastEvent.ShowToast("打开失败")) }
+                    scope.launch { ActivityToastEvent.send(ToastEvent.ShowToast(openFailText)) }
                 }
             }
         }
@@ -52,7 +50,7 @@ fun ConnectionRoute(model: ConnectionViewModel) {
 }
 
 @Composable
-fun ConnectionScreen(
+private fun ConnectionScreen(
     navToAndroidAuto: () -> Unit
 ) {
     val connectionItems = listOf(
@@ -67,12 +65,13 @@ fun ConnectionScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
+            .padding(vertical = 12.dp, horizontal = 20.dp)
             .overScrollVertical(),
         contentPadding = LocalInnerPadding.current,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         item {
-            GradientHeader(
+            SectionHeaderCard(
                 title = stringResource(R.string.connection_title),
                 subtitle = stringResource(R.string.connection_subtitle),
                 icon = Icons.Rounded.Link,
@@ -83,41 +82,17 @@ fun ConnectionScreen(
                     MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
                 ),
                 glowTint = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.padding(horizontal = 20.dp),
             )
+            Spacer(Modifier.height(20.dp))
         }
 
         item {
-            AnimatedCard(
-                index = 0,
-                items = connectionItems,
-            )
+            ClassifyHeader(stringResource(R.string.connection_projection))
+            Spacer(Modifier.height(12.dp))
         }
 
-        item { Spacer(Modifier.height(12.dp)) }
-    }
-}
-
-@Composable
-private fun AnimatedCard(
-    index: Int,
-    items: List<com.lunacattus.conflux.ui.base.Item>,
-) {
-    AnimatedVisibility(
-        visible = true,
-        enter = fadeIn(
-            animationSpec = tween(
-                durationMillis = 400,
-                delayMillis = 150 + index * 120,
-            )
-        ) + slideInVertically(
-            animationSpec = tween(
-                durationMillis = 400,
-                delayMillis = 150 + index * 120,
-            ),
-            initialOffsetY = { it / 4 },
-        ),
-    ) {
-        ItemCard(items = items)
+        item {
+            ItemCard(items = connectionItems)
+        }
     }
 }

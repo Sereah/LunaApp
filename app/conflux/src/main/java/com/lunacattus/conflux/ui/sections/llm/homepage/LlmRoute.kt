@@ -17,7 +17,6 @@ import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.RecordVoiceOver
 import androidx.compose.material.icons.rounded.SmartToy
-import androidx.compose.material.icons.rounded.SpeakerNotes
 import androidx.compose.material.icons.rounded.Translate
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,17 +25,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.lunacattus.conflux.R
 import com.lunacattus.conflux.ui.LocalInnerPadding
-import com.lunacattus.conflux.ui.base.CompactCard
-import com.lunacattus.conflux.ui.base.CompactCardData
-import com.lunacattus.conflux.ui.base.FeatureCard
-import com.lunacattus.conflux.ui.base.FeatureCardData
-import com.lunacattus.conflux.ui.base.GradientHeader
-import com.lunacattus.conflux.ui.base.SectionHeader
 import com.lunacattus.ui_design.compose.overScrollVertical
+import com.lunacattus.ui_design.compose.section.ClassifyHeader
+import com.lunacattus.ui_design.compose.section.CompactCard
+import com.lunacattus.ui_design.compose.section.CompactCardData
+import com.lunacattus.ui_design.compose.section.FeatureCard
+import com.lunacattus.ui_design.compose.section.FeatureCardData
+import com.lunacattus.ui_design.compose.section.SectionHeaderCard
 
 @Composable
 fun LlmRoute(
-    viewModel: LlmViewModel,
     navToTts: () -> Unit,
     navToPolish: () -> Unit,
     modifier: Modifier = Modifier,
@@ -48,6 +46,7 @@ fun LlmRoute(
             title = stringResource(R.string.llm_tts_title),
             description = stringResource(R.string.llm_tts_desc),
             statusText = stringResource(R.string.llm_tts_available),
+            actionText = stringResource(R.string.feature_enter),
             onClick = navToTts,
         ),
         FeatureCardData(
@@ -56,6 +55,7 @@ fun LlmRoute(
             title = stringResource(R.string.llm_polish_title),
             description = stringResource(R.string.llm_polish_desc),
             statusText = stringResource(R.string.llm_tts_available),
+            actionText = stringResource(R.string.feature_enter),
             onClick = navToPolish,
         ),
     )
@@ -74,57 +74,48 @@ private fun LlmScreen(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
+            .padding(vertical = 12.dp, horizontal = 20.dp)
             .overScrollVertical(),
         contentPadding = LocalInnerPadding.current,
         verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
-        item { Spacer(Modifier.height(12.dp)) }
-
         item {
-            GradientHeader(
+            SectionHeaderCard(
                 title = stringResource(R.string.llm_ai_center),
                 subtitle = stringResource(R.string.llm_ai_subtitle),
                 icon = Icons.Rounded.Psychology,
-                modifier = Modifier.padding(horizontal = 20.dp),
             )
+            Spacer(Modifier.height(20.dp))
         }
 
-        item { Spacer(Modifier.height(20.dp)) }
-
         item {
-            SectionHeader(
+            ClassifyHeader(
                 title = stringResource(R.string.llm_available_caps),
-                modifier = Modifier.padding(horizontal = 20.dp),
             )
             Spacer(Modifier.height(12.dp))
         }
 
         items(capabilities, key = { it.title }) { capability ->
             FeatureCard(
-                data = capability,
-                modifier = Modifier.padding(horizontal = 20.dp),
+                data = capability
             )
             if (capability != capabilities.last()) {
                 Spacer(Modifier.height(12.dp))
+            } else {
+                Spacer(Modifier.height(20.dp))
             }
         }
 
         item {
-            Spacer(Modifier.height(28.dp))
-            SectionHeader(
+            ClassifyHeader(
                 title = stringResource(R.string.llm_coming_soon),
-                modifier = Modifier.padding(horizontal = 20.dp),
             )
             Spacer(Modifier.height(12.dp))
         }
 
         item {
-            ComingSoonRow(
-                modifier = Modifier.padding(horizontal = 20.dp),
-            )
+            ComingSoonRow()
         }
-
-        item { Spacer(Modifier.height(16.dp)) }
     }
 }
 

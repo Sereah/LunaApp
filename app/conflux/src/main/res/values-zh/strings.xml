@@ -51,6 +51,7 @@
   <string name="today">今天</string>
   <string name="tts">文本转语音</string>
   <string name="tts_title">文字转语音</string>
+  <string name="polish_title">文本润色</string>
   <string name="unknow_error">糟糕！未知错误。</string>
   <string name="unlock">解锁</string>
   <string name="unlocking">解锁中</string>
@@ -171,4 +172,16 @@
     <string name="polish_settings">设置</string>
     <string name="polish_close">关闭</string>
     <string name="polish_save">保存</string>
+
+    <!-- Connection -->
+    <string name="connection_open_fail">打开失败。</string>
+    <string name="connection_projection">投屏</string>
+
+    <!-- Media -->
+    <string name="media_stop_recording_first">请先停止录制</string>
+    <string name="media_subtitle">多媒体能力，包含录音，音乐，视频等。</string>
+    <string name="media_music">音乐</string>
+
+    <!-- Setting -->
+    <string name="setting_subtitle">系统设置能力，包含语言、主题、夜间模式等</string>
 </resources>

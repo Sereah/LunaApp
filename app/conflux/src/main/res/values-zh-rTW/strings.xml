@@ -45,6 +45,7 @@
   <string name="today">今天</string>
   <string name="tts">文字轉語音</string>
   <string name="tts_title">文字轉語音</string>
+  <string name="polish_title">文本潤色</string>
   <string name="unknow_error">糟糕！未知錯誤。</string>
   <string name="unlock">解鎖</string>
   <string name="unlocking">解鎖中</string>
@@ -132,4 +133,18 @@
     <string name="tts_speaker_sohee_desc">富含情感的溫暖韓語女聲</string>
     <string name="tts_speaker_sohee_lang">韓語</string>
     <string name="tts_settings_title">更改配置</string>
+
+    <!-- Connection -->
+    <string name="connection_open_fail">開啟失敗。</string>
+    <string name="connection_projection">投影</string>
+
+    <!-- Media -->
+    <string name="media_stop_recording_first">請先停止錄製</string>
+    <string name="media_subtitle">多媒體能力，包含錄音、音樂、影片等。</string>
+    <string name="media_music">音樂</string>
+
+    <!-- Setting -->
+    <string name="setting_subtitle">系統設定能力，包含語言、主題、夜間模式等</string>
+    <string name="settings_appearance">外觀</string>
+    <string name="settings_system">系統</string>
 </resources>

@@ -45,6 +45,7 @@
   <string name="today">Aujourd\'hui</string>
   <string name="tts">Synthèse vocale</string>
   <string name="tts_title">TTS</string>
+  <string name="polish_title">Polissage</string>
   <string name="unknow_error">Merde ! Erreur inconnue.</string>
   <string name="unlock">Débloquer</string>
   <string name="unlocking">Déverrouillage</string>
@@ -62,4 +63,18 @@
     <string name="tts_long_text_file">Texte long / Fichier</string>
     <string name="tts_pick_file">Choisir fichier</string>
     <string name="tts_send_cd">Envoyer</string>
+
+    <!-- Connection -->
+    <string name="connection_open_fail">Échec de l\'ouverture.</string>
+    <string name="connection_projection">Projection</string>
+
+    <!-- Media -->
+    <string name="media_stop_recording_first">Veuillez d\'abord arrêter l\'enregistrement</string>
+    <string name="media_subtitle">Fonctionnalités multimédia : enregistrement, musique, vidéo, etc.</string>
+    <string name="media_music">Musique</string>
+
+    <!-- Setting -->
+    <string name="setting_subtitle">Paramètres système : langue, thème, mode nuit, etc.</string>
+    <string name="settings_appearance">Apparence</string>
+    <string name="settings_system">Système</string>
 </resources>

@@ -45,6 +45,7 @@
   <string name="today">Heute</string>
   <string name="tts">Text-to-Speech</string>
   <string name="tts_title">TTS</string>
+  <string name="polish_title">Textverfeinerung</string>
   <string name="unknow_error">Mist! Unbekannter Fehler.</string>
   <string name="unlock">Freischalten</string>
   <string name="unlocking">Freischalten</string>
@@ -132,4 +133,18 @@
     <string name="tts_speaker_sohee_desc">Emotionale, warme koreanische Frauenstimme.</string>
     <string name="tts_speaker_sohee_lang">Koreanisch</string>
     <string name="tts_settings_title">Einstellungen ändern</string>
+
+    <!-- Connection -->
+    <string name="connection_open_fail">Öffnen fehlgeschlagen.</string>
+    <string name="connection_projection">Projektion</string>
+
+    <!-- Media -->
+    <string name="media_stop_recording_first">Bitte beenden Sie zuerst die Aufnahme</string>
+    <string name="media_subtitle">Multimedia-Funktionen: Aufnahme, Musik, Video und mehr.</string>
+    <string name="media_music">Musik</string>
+
+    <!-- Setting -->
+    <string name="setting_subtitle">Systemeinstellungen: Sprache, Theme, Nachtmodus und mehr.</string>
+    <string name="settings_appearance">Erscheinungsbild</string>
+    <string name="settings_system">System</string>
 </resources>

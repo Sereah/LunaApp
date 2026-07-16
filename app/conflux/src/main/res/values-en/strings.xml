@@ -45,6 +45,7 @@
   <string name="today">Today</string>
   <string name="tts">Text To Speech</string>
   <string name="tts_title">TTS</string>
+  <string name="polish_title">Polish</string>
   <string name="unknow_error">Shit! Unknown Error.</string>
   <string name="unlock">Unlock</string>
   <string name="unlocking">Unlocking</string>
@@ -155,4 +156,18 @@
     <string name="polish_settings">Settings</string>
     <string name="polish_close">Close</string>
     <string name="polish_save">Save</string>
+
+    <!-- Connection -->
+    <string name="connection_open_fail">Open failed.</string>
+    <string name="connection_projection">Projection</string>
+
+    <!-- Media -->
+    <string name="media_stop_recording_first">Please stop recording first</string>
+    <string name="media_subtitle">Multimedia capabilities: recording, music, video, and more.</string>
+    <string name="media_music">Music</string>
+
+    <!-- Setting -->
+    <string name="setting_subtitle">System settings: language, theme, night mode, and more.</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_system">System</string>
 </resources>

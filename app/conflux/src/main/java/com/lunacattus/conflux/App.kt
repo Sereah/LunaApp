@@ -2,6 +2,7 @@ package com.lunacattus.conflux
 
 import android.app.Application
 import com.lunacattus.common.CommonLog
+import com.lunacattus.llm.api.LlmSdk
 import com.lunacattus.logger.Logger
 import com.lunacattus.network.NetworkLog
 import dagger.hilt.android.HiltAndroidApp
@@ -27,5 +28,6 @@ class App : Application() {
                 Logger.e(tag, msg + tr)
             }
         )
+        LlmSdk.initialize(this)
     }
 }
