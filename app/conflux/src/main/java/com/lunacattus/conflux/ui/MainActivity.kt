@@ -64,7 +64,10 @@ class MainActivity : ComponentActivity() {
             )
         )
         setContent {
-            viewModel.changeNightMode(isSystemInDarkTheme())
+            val systemDarkTheme = isSystemInDarkTheme()
+            LaunchedEffect(Unit) {
+                viewModel.changeNightMode(systemDarkTheme)
+            }
             LunaAppTheme(
                 dynamicColor = viewModel.dynamicColor,
                 darkTheme = viewModel.nightMode
