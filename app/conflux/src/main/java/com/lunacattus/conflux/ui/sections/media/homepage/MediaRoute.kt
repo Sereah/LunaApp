@@ -18,9 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.lunacattus.common.utils.toDuration
 import com.lunacattus.common.utils.toDurationStringShort
 import com.lunacattus.conflux.R
+import com.lunacattus.conflux.permission.RationaleDialogConfig
+import com.lunacattus.conflux.permission.SettingsDialogConfig
+import com.lunacattus.conflux.permission.rememberPermissionState
 import com.lunacattus.conflux.ui.ActivityToastEvent
 import com.lunacattus.conflux.ui.LocalInnerPadding
 import com.lunacattus.conflux.ui.ToastEvent
@@ -41,9 +43,34 @@ fun MediaRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sendUiIntent = viewModel::handleUiIntent
+
+    val recordPermission = rememberPermissionState(
+        android.Manifest.permission.RECORD_AUDIO,
+        rationaleConfig = RationaleDialogConfig(
+            title = "需要录音权限",
+            message = "为了录制音频，我们需要使用你的麦克风功能。",
+            confirmText = "继续授权",
+            dismissText = "取消"
+        ),
+        settingsConfig = SettingsDialogConfig(
+            title = "需要权限",
+            message = "录音权限已被永久拒绝，请前往设置页面手动开启。",
+            confirmText = "前往设置",
+            dismissText = "取消"
+        )
+    )
+
     MediaScreen(
         uiState,
-        switchRecord = { sendUiIntent(MediaHomeUiIntent.SwitchRecord(it)) },
+        switchRecord = { isRecord ->
+            if (isRecord) {
+                recordPermission.request {
+                    sendUiIntent(MediaHomeUiIntent.SwitchRecord(true))
+                }
+            } else {
+                sendUiIntent(MediaHomeUiIntent.SwitchRecord(false))
+            }
+        },
         navToMediaFilesScreen = navToMediaFilesScreen
     )
 }

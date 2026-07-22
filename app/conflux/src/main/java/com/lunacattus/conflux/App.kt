@@ -11,7 +11,7 @@ import dagger.hilt.android.HiltAndroidApp
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        Logger.initBaseTag("Conflux")
+        Logger.initBaseTag("ConfluxApp")
         CommonLog.setLogger(
             debug = { tag, msg ->
                 Logger.d(tag, msg)
