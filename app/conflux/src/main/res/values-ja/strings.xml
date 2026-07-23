@@ -147,4 +147,16 @@
     <string name="setting_subtitle">システム設定：言語、テーマ、ナイトモードなど。</string>
     <string name="settings_appearance">外観</string>
     <string name="settings_system">システム</string>
+
+    <!-- Permission Names -->
+    <string name="perm_microphone">マイク</string>
+    <string name="perm_photos">写真</string>
+
+    <!-- Permission Dialogs -->
+    <string name="perm_continue">続行</string>
+    <string name="perm_cancel">キャンセル</string>
+    <string name="perm_go_settings">設定へ</string>
+    <string name="perm_record_rationale_title">録音権限</string>
+    <string name="perm_record_rationale_message">音声を録音するには、マイクへのアクセスが必要です。</string>
+    <string name="perm_record_settings_message">録音権限が完全に拒否されました。システム設定で有効にしてください。</string>
 </resources>

@@ -147,4 +147,16 @@
     <string name="setting_subtitle">系統設定能力，包含語言、主題、夜間模式等</string>
     <string name="settings_appearance">外觀</string>
     <string name="settings_system">系統</string>
+
+    <!-- Permission Names -->
+    <string name="perm_microphone">麥克風</string>
+    <string name="perm_photos">照片</string>
+
+    <!-- Permission Dialogs -->
+    <string name="perm_continue">繼續授權</string>
+    <string name="perm_cancel">取消</string>
+    <string name="perm_go_settings">前往設定</string>
+    <string name="perm_record_rationale_title">需要錄音權限</string>
+    <string name="perm_record_rationale_message">為了錄製音訊，我們需要使用你的麥克風功能。</string>
+    <string name="perm_record_settings_message">錄音權限已被永久拒絕，請前往設定頁面手動開啟。</string>
 </resources>

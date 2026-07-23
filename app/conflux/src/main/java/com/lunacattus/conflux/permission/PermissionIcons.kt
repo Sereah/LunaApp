@@ -15,9 +15,13 @@ import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.PermMedia
 import androidx.compose.material.icons.rounded.Phone
+import androidx.compose.material.icons.rounded.SdCard
 import androidx.compose.material.icons.rounded.Sensors
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Sms
 import androidx.compose.material.icons.rounded.VideoFile
+import androidx.compose.material.icons.rounded.Wifi
+import androidx.compose.material.icons.rounded.Widgets
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /** 所有需要用户同意的 Runtime 权限 → 图标映射 */
@@ -71,11 +75,12 @@ val PermissionIconMap: Map<String, ImageVector> = mapOf(
     // 运动数据
     android.Manifest.permission.ACTIVITY_RECOGNITION to Icons.AutoMirrored.Rounded.DirectionsRun,
 
-    // 附近设备 (Android 12+)
+    // 附近设备
     android.Manifest.permission.BLUETOOTH_SCAN to Icons.Rounded.Bluetooth,
     android.Manifest.permission.BLUETOOTH_CONNECT to Icons.Rounded.Bluetooth,
     android.Manifest.permission.BLUETOOTH_ADVERTISE to Icons.Rounded.Bluetooth,
     android.Manifest.permission.UWB_RANGING to Icons.Rounded.Bluetooth,
+    android.Manifest.permission.NEARBY_WIFI_DEVICES to Icons.Rounded.Wifi,
 
     // 通知 (Android 13+)
     android.Manifest.permission.POST_NOTIFICATIONS to Icons.Rounded.Notifications,
@@ -86,5 +91,10 @@ val PermissionIconMap: Map<String, ImageVector> = mapOf(
     android.Manifest.permission.READ_MEDIA_VIDEO to Icons.Rounded.VideoFile,
 
     // 媒体（通用/备用）
-    android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED to Icons.Rounded.PermMedia
+    android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED to Icons.Rounded.PermMedia,
+
+    // 特殊权限（需跳转系统设置手动开启）
+    android.Manifest.permission.SYSTEM_ALERT_WINDOW to Icons.Rounded.Widgets,
+    android.Manifest.permission.WRITE_SETTINGS to Icons.Rounded.Settings,
+    android.Manifest.permission.MANAGE_EXTERNAL_STORAGE to Icons.Rounded.SdCard
 )

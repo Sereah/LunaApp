@@ -147,4 +147,16 @@
     <string name="setting_subtitle">시스템 설정: 언어, 테마, 야간 모드 등.</string>
     <string name="settings_appearance">외관</string>
     <string name="settings_system">시스템</string>
+
+    <!-- Permission Names -->
+    <string name="perm_microphone">마이크</string>
+    <string name="perm_photos">사진</string>
+
+    <!-- Permission Dialogs -->
+    <string name="perm_continue">계속</string>
+    <string name="perm_cancel">취소</string>
+    <string name="perm_go_settings">설정으로</string>
+    <string name="perm_record_rationale_title">녹음 권한</string>
+    <string name="perm_record_rationale_message">오디오를 녹음하려면 마이크에 접근해야 합니다.</string>
+    <string name="perm_record_settings_message">녹음 권한이 영구적으로 거부되었습니다. 시스템 설정에서 활성화해 주세요.</string>
 </resources>

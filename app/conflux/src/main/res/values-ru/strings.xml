@@ -77,4 +77,16 @@
     <string name="setting_subtitle">Системные настройки: язык, тема, ночной режим и другое.</string>
     <string name="settings_appearance">Внешний вид</string>
     <string name="settings_system">Система</string>
+
+    <!-- Permission Names -->
+    <string name="perm_microphone">Микрофон</string>
+    <string name="perm_photos">Фото</string>
+
+    <!-- Permission Dialogs -->
+    <string name="perm_continue">Продолжить</string>
+    <string name="perm_cancel">Отмена</string>
+    <string name="perm_go_settings">Настройки</string>
+    <string name="perm_record_rationale_title">Разрешение записи</string>
+    <string name="perm_record_rationale_message">Для записи звука нам нужен доступ к вашему микрофону.</string>
+    <string name="perm_record_settings_message">Разрешение на запись было окончательно отклонено. Пожалуйста, включите его в настройках системы.</string>
 </resources>

@@ -147,4 +147,16 @@
     <string name="setting_subtitle">Systemeinstellungen: Sprache, Theme, Nachtmodus und mehr.</string>
     <string name="settings_appearance">Erscheinungsbild</string>
     <string name="settings_system">System</string>
+
+    <!-- Permission Names -->
+    <string name="perm_microphone">Mikrofon</string>
+    <string name="perm_photos">Fotos</string>
+
+    <!-- Permission Dialogs -->
+    <string name="perm_continue">Weiter</string>
+    <string name="perm_cancel">Abbrechen</string>
+    <string name="perm_go_settings">Zu den Einstellungen</string>
+    <string name="perm_record_rationale_title">Aufnahmeberechtigung</string>
+    <string name="perm_record_rationale_message">Zum Aufnehmen von Audio benötigen wir Zugriff auf Ihr Mikrofon.</string>
+    <string name="perm_record_settings_message">Die Aufnahmeberechtigung wurde dauerhaft abgelehnt. Bitte in den Systemeinstellungen aktivieren.</string>
 </resources>

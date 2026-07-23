@@ -77,4 +77,16 @@
     <string name="setting_subtitle">إعدادات النظام: اللغة والسمات والوضع الليلي والمزيد.</string>
     <string name="settings_appearance">المظهر</string>
     <string name="settings_system">النظام</string>
+
+    <!-- Permission Names -->
+    <string name="perm_microphone">الميكروفون</string>
+    <string name="perm_photos">الصور</string>
+
+    <!-- Permission Dialogs -->
+    <string name="perm_continue">متابعة</string>
+    <string name="perm_cancel">إلغاء</string>
+    <string name="perm_go_settings">للإعدادات</string>
+    <string name="perm_record_rationale_title">إذن التسجيل</string>
+    <string name="perm_record_rationale_message">لتسجيل الصوت، نحتاج إلى الوصول إلى الميكروفون الخاص بك.</string>
+    <string name="perm_record_settings_message">تم رفض إذن التسجيل بشكل دائم. يرجى تمكينه في إعدادات النظام.</string>
 </resources>

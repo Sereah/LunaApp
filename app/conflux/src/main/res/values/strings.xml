@@ -182,4 +182,16 @@
 
     <!-- Setting -->
     <string name="setting_subtitle">System settings: language, theme, night mode, and more.</string>
+
+    <!-- Permission Names -->
+    <string name="perm_microphone">Microphone</string>
+    <string name="perm_photos">Photos</string>
+
+    <!-- Permission Dialogs -->
+    <string name="perm_continue">Continue</string>
+    <string name="perm_cancel">Cancel</string>
+    <string name="perm_go_settings">Go to Settings</string>
+    <string name="perm_record_rationale_title">Recording Permission</string>
+    <string name="perm_record_rationale_message">To record audio, we need access to your microphone.</string>
+    <string name="perm_record_settings_message">Recording permission has been permanently denied. Please enable it in system settings.</string>
 </resources>

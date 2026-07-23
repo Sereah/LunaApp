@@ -1,14 +1,11 @@
 package com.lunacattus.conflux.permission
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -21,6 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lunacattus.logger.Logger
 
+/** 自定义权限弹窗签名：state 当前状态, dismiss 关闭回调, confirm 确认回调 */
+typealias CustomPermissionDialog = @Composable (PermissionState, () -> Unit, () -> Unit) -> Unit
+
 private const val TAG = "PermissionDialog"
 
 /**
@@ -31,23 +31,29 @@ fun PermissionRationaleDialog(
     show: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    title: String = "需要权限",
-    message: String = "为了提供完整的功能，我们需要获取此权限。",
-    confirmText: String = "继续授权",
-    dismissText: String = "取消",
+    title: String = "Permission Required",
+    message: String = "This permission is needed for full functionality.",
+    confirmText: String = "Continue",
+    dismissText: String = "Cancel",
+    cancelable: Boolean = false,
     permissions: List<String> = emptyList(),
-    permissionIcons: Map<String, ImageVector> = PermissionIconMap
+    permissionIcons: Map<String, ImageVector> = PermissionIconMap,
+    nameProvider: PermissionNameProvider = { permissionDisplayName(it) }
 ) {
     if (show) {
         Logger.d(TAG, "showRationaleDialog")
         AlertDialog(
             onDismissRequest = {
-                Logger.d(TAG, "rationaleDialog: dismiss")
-                onDismiss()
+                if (cancelable) {
+                    Logger.d(TAG, "rationaleDialog: dismiss")
+                    onDismiss()
+                } else {
+                    Logger.d(TAG, "rationaleDialog: dismiss blocked (not cancelable)")
+                }
             },
             title = { Text(title) },
             text = {
-                DialogText(permissions, permissionIcons, message)
+                DialogText(permissions, permissionIcons, message, nameProvider)
             },
             confirmButton = {
                 TextButton(onClick = {
@@ -58,11 +64,13 @@ fun PermissionRationaleDialog(
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    Logger.d(TAG, "rationaleDialog: cancel")
-                    onDismiss()
-                }) {
-                    Text(dismissText)
+                if (cancelable) {
+                    TextButton(onClick = {
+                        Logger.d(TAG, "rationaleDialog: cancel")
+                        onDismiss()
+                    }) {
+                        Text(dismissText)
+                    }
                 }
             }
         )
@@ -77,23 +85,29 @@ fun PermissionSettingsDialog(
     show: Boolean,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    title: String = "需要权限",
-    message: String = "该权限已被永久拒绝，请前往设置页面手动开启。",
-    confirmText: String = "前往设置",
-    dismissText: String = "取消",
+    title: String = "Permission Required",
+    message: String = "This permission has been permanently denied. Please enable it in system settings.",
+    confirmText: String = "Go to Settings",
+    dismissText: String = "Cancel",
+    cancelable: Boolean = true,
     permissions: List<String> = emptyList(),
-    permissionIcons: Map<String, ImageVector> = PermissionIconMap
+    permissionIcons: Map<String, ImageVector> = PermissionIconMap,
+    nameProvider: PermissionNameProvider = { permissionDisplayName(it) }
 ) {
     if (show) {
         Logger.d(TAG, "showSettingsDialog")
         AlertDialog(
             onDismissRequest = {
-                Logger.d(TAG, "settingsDialog: dismiss")
-                onDismiss()
+                if (cancelable) {
+                    Logger.d(TAG, "settingsDialog: dismiss")
+                    onDismiss()
+                } else {
+                    Logger.d(TAG, "settingsDialog: dismiss blocked (not cancelable)")
+                }
             },
             title = { Text(title) },
             text = {
-                DialogText(permissions, permissionIcons, message)
+                DialogText(permissions, permissionIcons, message, nameProvider)
             },
             confirmButton = {
                 TextButton(onClick = {
@@ -104,11 +118,13 @@ fun PermissionSettingsDialog(
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    Logger.d(TAG, "settingsDialog: cancel")
-                    onDismiss()
-                }) {
-                    Text(dismissText)
+                if (cancelable) {
+                    TextButton(onClick = {
+                        Logger.d(TAG, "settingsDialog: cancel")
+                        onDismiss()
+                    }) {
+                        Text(dismissText)
+                    }
                 }
             }
         )
@@ -122,16 +138,9 @@ fun PermissionSettingsDialog(
 @Composable
 fun PermissionDialogHost(
     state: PermissionState,
-    rationaleDialog: (@Composable (
-        PermissionState,
-        () -> Unit,
-        () -> Unit
-    ) -> Unit)? = null,
-    settingsDialog: (@Composable (
-        PermissionState,
-        () -> Unit,
-        () -> Unit
-    ) -> Unit)? = null
+    rationaleDialog: CustomPermissionDialog? = null,
+    settingsDialog: CustomPermissionDialog? = null,
+    nameProvider: PermissionNameProvider = { permissionDisplayName(it) }
 ) {
     if (state.showRationaleDialog) {
         if (rationaleDialog != null) {
@@ -145,7 +154,9 @@ fun PermissionDialogHost(
                 message = state.rationaleConfig.message,
                 confirmText = state.rationaleConfig.confirmText,
                 dismissText = state.rationaleConfig.dismissText,
-                permissions = state.deniedPermissions
+                cancelable = state.rationaleConfig.cancelable,
+                permissions = state.deniedPermissions,
+                nameProvider = nameProvider
             )
         }
     }
@@ -162,7 +173,9 @@ fun PermissionDialogHost(
                 message = state.settingsConfig.message,
                 confirmText = state.settingsConfig.confirmText,
                 dismissText = state.settingsConfig.dismissText,
-                permissions = state.deniedPermissions
+                cancelable = state.settingsConfig.cancelable,
+                permissions = state.deniedPermissions,
+                nameProvider = nameProvider
             )
         }
     }
@@ -172,24 +185,22 @@ fun PermissionDialogHost(
 private fun DialogText(
     permissions: List<String>,
     icons: Map<String, ImageVector>,
-    message: String
+    message: String,
+    nameProvider: PermissionNameProvider
 ) {
     Column {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(items = permissions, key = { it }) { perm ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    icons[perm]?.let {
-                        Icon(it, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(12.dp))
-                    }
-                    Text(permissionDisplayName(perm))
+        permissions.forEach { perm ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                icons[perm]?.let {
+                    Icon(it, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(12.dp))
                 }
+                Text(nameProvider(perm))
             }
+            Spacer(Modifier.height(12.dp))
         }
         if (permissions.isNotEmpty()) {
-            Spacer(Modifier.height(15.dp))
+            Spacer(Modifier.height(3.dp))
         }
         Text(message, fontSize = 15.sp)
     }

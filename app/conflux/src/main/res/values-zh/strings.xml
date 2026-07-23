@@ -184,4 +184,16 @@
 
     <!-- Setting -->
     <string name="setting_subtitle">系统设置能力，包含语言、主题、夜间模式等</string>
+
+    <!-- Permission Names -->
+    <string name="perm_microphone">麦克风</string>
+    <string name="perm_photos">照片</string>
+
+    <!-- Permission Dialogs -->
+    <string name="perm_continue">继续授权</string>
+    <string name="perm_cancel">取消</string>
+    <string name="perm_go_settings">前往设置</string>
+    <string name="perm_record_rationale_title">需要录音权限</string>
+    <string name="perm_record_rationale_message">为了录制音频，我们需要使用你的麦克风功能。</string>
+    <string name="perm_record_settings_message">录音权限已被永久拒绝，请前往设置页面手动开启。</string>
 </resources>

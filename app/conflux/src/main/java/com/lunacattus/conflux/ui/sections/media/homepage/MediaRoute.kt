@@ -22,6 +22,7 @@ import com.lunacattus.common.utils.toDurationStringShort
 import com.lunacattus.conflux.R
 import com.lunacattus.conflux.permission.RationaleDialogConfig
 import com.lunacattus.conflux.permission.SettingsDialogConfig
+import com.lunacattus.conflux.permission.permissionDisplayName
 import com.lunacattus.conflux.permission.rememberPermissionState
 import com.lunacattus.conflux.ui.ActivityToastEvent
 import com.lunacattus.conflux.ui.LocalInnerPadding
@@ -44,28 +45,40 @@ fun MediaRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sendUiIntent = viewModel::handleUiIntent
 
+    val micName = stringResource(R.string.perm_microphone)
+    val photosName = stringResource(R.string.perm_photos)
+
     val recordPermission = rememberPermissionState(
         android.Manifest.permission.RECORD_AUDIO,
         rationaleConfig = RationaleDialogConfig(
-            title = "需要录音权限",
-            message = "为了录制音频，我们需要使用你的麦克风功能。",
-            confirmText = "继续授权",
-            dismissText = "取消"
+            title = stringResource(R.string.perm_record_rationale_title),
+            message = stringResource(R.string.perm_record_rationale_message),
+            confirmText = stringResource(R.string.perm_continue),
+            dismissText = stringResource(R.string.perm_cancel)
         ),
         settingsConfig = SettingsDialogConfig(
-            title = "需要权限",
-            message = "录音权限已被永久拒绝，请前往设置页面手动开启。",
-            confirmText = "前往设置",
-            dismissText = "取消"
-        )
+            title = stringResource(R.string.perm_record_rationale_title),
+            message = stringResource(R.string.perm_record_settings_message),
+            confirmText = stringResource(R.string.perm_go_settings),
+            dismissText = stringResource(R.string.perm_cancel)
+        ),
+        nameProvider = { perm ->
+            when (perm) {
+                android.Manifest.permission.RECORD_AUDIO -> micName
+                android.Manifest.permission.READ_MEDIA_IMAGES -> photosName
+                else -> permissionDisplayName(perm)
+            }
+        }
     )
 
     MediaScreen(
         uiState,
         switchRecord = { isRecord ->
             if (isRecord) {
-                recordPermission.request {
-                    sendUiIntent(MediaHomeUiIntent.SwitchRecord(true))
+                recordPermission.request { allGranted, _ ->
+                    if (allGranted) {
+                        sendUiIntent(MediaHomeUiIntent.SwitchRecord(true))
+                    }
                 }
             } else {
                 sendUiIntent(MediaHomeUiIntent.SwitchRecord(false))

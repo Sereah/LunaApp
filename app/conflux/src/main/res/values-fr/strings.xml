@@ -77,4 +77,16 @@
     <string name="setting_subtitle">Paramètres système : langue, thème, mode nuit, etc.</string>
     <string name="settings_appearance">Apparence</string>
     <string name="settings_system">Système</string>
+
+    <!-- Permission Names -->
+    <string name="perm_microphone">Microphone</string>
+    <string name="perm_photos">Photos</string>
+
+    <!-- Permission Dialogs -->
+    <string name="perm_continue">Continuer</string>
+    <string name="perm_cancel">Annuler</string>
+    <string name="perm_go_settings">Paramètres</string>
+    <string name="perm_record_rationale_title">Autorisation d\'enregistrement</string>
+    <string name="perm_record_rationale_message">Pour enregistrer de l\'audio, nous avons besoin d\'accéder à votre microphone.</string>
+    <string name="perm_record_settings_message">L\'autorisation d\'enregistrement a été définitivement refusée. Veuillez l\'activer dans les paramètres système.</string>
 </resources>

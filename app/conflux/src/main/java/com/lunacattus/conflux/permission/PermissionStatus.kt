@@ -2,10 +2,7 @@ package com.lunacattus.conflux.permission
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
-import android.provider.Settings
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,52 +10,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.lunacattus.logger.Logger
 
 private const val TAG = "PermissionState"
-
-/** 权限 → 中文名映射 */
-fun permissionDisplayName(permission: String): String = when (permission) {
-    android.Manifest.permission.RECORD_AUDIO -> "麦克风"
-    android.Manifest.permission.CAMERA -> "相机"
-    android.Manifest.permission.ACCESS_FINE_LOCATION -> "精确位置"
-    android.Manifest.permission.ACCESS_COARSE_LOCATION -> "大致位置"
-    android.Manifest.permission.ACCESS_BACKGROUND_LOCATION -> "后台位置"
-    android.Manifest.permission.POST_NOTIFICATIONS -> "通知"
-    android.Manifest.permission.READ_MEDIA_AUDIO -> "音乐和音频"
-    android.Manifest.permission.READ_MEDIA_IMAGES -> "照片"
-    android.Manifest.permission.READ_MEDIA_VIDEO -> "视频"
-    android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED -> "照片和视频"
-    android.Manifest.permission.READ_EXTERNAL_STORAGE -> "存储空间"
-    android.Manifest.permission.WRITE_EXTERNAL_STORAGE -> "存储空间"
-    android.Manifest.permission.BLUETOOTH_CONNECT -> "蓝牙"
-    android.Manifest.permission.BLUETOOTH_SCAN -> "蓝牙扫描"
-    android.Manifest.permission.BLUETOOTH_ADVERTISE -> "蓝牙广播"
-    android.Manifest.permission.UWB_RANGING -> "超宽带"
-    android.Manifest.permission.READ_PHONE_STATE -> "电话状态"
-    android.Manifest.permission.READ_PHONE_NUMBERS -> "电话号码"
-    android.Manifest.permission.CALL_PHONE -> "拨打电话"
-    android.Manifest.permission.ANSWER_PHONE_CALLS -> "接听电话"
-    android.Manifest.permission.READ_CALL_LOG -> "通话记录"
-    android.Manifest.permission.WRITE_CALL_LOG -> "通话记录"
-    android.Manifest.permission.ADD_VOICEMAIL -> "语音信箱"
-    android.Manifest.permission.USE_SIP -> "网络电话"
-    android.Manifest.permission.ACCEPT_HANDOVER -> "通话转移"
-    android.Manifest.permission.READ_CONTACTS -> "通讯录"
-    android.Manifest.permission.WRITE_CONTACTS -> "通讯录"
-    android.Manifest.permission.GET_ACCOUNTS -> "账户"
-    android.Manifest.permission.READ_CALENDAR -> "日历"
-    android.Manifest.permission.WRITE_CALENDAR -> "日历"
-    android.Manifest.permission.BODY_SENSORS -> "身体传感器"
-    android.Manifest.permission.BODY_SENSORS_BACKGROUND -> "身体传感器"
-    android.Manifest.permission.ACTIVITY_RECOGNITION -> "运动数据"
-    android.Manifest.permission.READ_SMS -> "短信"
-    android.Manifest.permission.SEND_SMS -> "短信"
-    android.Manifest.permission.RECEIVE_SMS -> "短信"
-    android.Manifest.permission.RECEIVE_WAP_PUSH -> "WAP推送"
-    android.Manifest.permission.RECEIVE_MMS -> "彩信"
-    else -> permission.substringAfterLast(".")
-}
 
 class PermissionState(
     val permissions: List<String>,
@@ -76,35 +33,84 @@ class PermissionState(
     /** 最近一次请求中被拒绝的权限列表（用于弹窗展示） */
     internal var deniedPermissions by mutableStateOf(emptyList<String>())
 
-    private var onGrantedCallback: (() -> Unit)? = null
+    internal var waitingForSettingsResult by mutableStateOf(false)
+
+    private var onResultCallback: ((Boolean, List<String>) -> Unit)? = null
 
     init {
         Logger.d(TAG, "init: permissions=$permissions, allGranted=$allGranted")
     }
 
-    fun request(onGranted: () -> Unit) {
+    /**
+     * @param onResult 结果回调：allGranted 是否全部授权，deniedList 被拒绝的权限列表
+     */
+    fun request(onResult: (allGranted: Boolean, deniedList: List<String>) -> Unit) {
         if (allGranted) {
             Logger.d(TAG, "request: already all granted")
-            onGranted()
+            onResult(true, emptyList())
             return
         }
         Logger.d(TAG, "request: launching")
-        onGrantedCallback = onGranted
+        onResultCallback = onResult
         launchRequest()
     }
 
     fun launchRequest() {
-        Logger.d(TAG, "launchRequest: permissions=$permissions")
-        launcher.launch(permissions.toTypedArray())
+        val (standardPerms, specialPerms) = permissions.partition { !isSpecialPermission(it) }
+        val ungrantedSpecial = specialPerms.filter { !checkSpecialPermission(it, context) }
+
+        // 过滤当前设备不存在的权限
+        val definedStandard = standardPerms.filter { isPermissionDefined(it, context) }
+        val undefinedStandard = standardPerms.filter { !isPermissionDefined(it, context) }
+        if (undefinedStandard.isNotEmpty()) {
+            Logger.d(TAG, "launchRequest: skipping undefined permissions: $undefinedStandard")
+        }
+
+        // 过滤缺少同伴权限的孤儿权限
+        val orphanCompanions = definedStandard.filter { isOrphanCompanion(it, permissions) }
+        val validStandard = definedStandard - orphanCompanions.toSet()
+        if (orphanCompanions.isNotEmpty()) {
+            Logger.w(TAG, "launchRequest: skipping orphan companion permissions: $orphanCompanions")
+        }
+
+        if (ungrantedSpecial.isNotEmpty()) {
+            Logger.d(TAG, "launchRequest: special permissions need settings: $ungrantedSpecial")
+            deniedPermissions = ungrantedSpecial
+            showSettingsDialog = true
+            if (validStandard.isEmpty()) {
+                Logger.d(TAG, "launchRequest: no standard permissions to launch, showing settings dialog only")
+                return
+            }
+        }
+
+        if (validStandard.isNotEmpty()) {
+            Logger.d(TAG, "launchRequest: launching standard: $validStandard")
+            launcher.launch(validStandard.toTypedArray())
+        }
     }
 
     fun goToSettings() {
-        Logger.d(TAG, "goToSettings")
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", context.packageName, null)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+        val firstSpecial = deniedPermissions.firstOrNull { isSpecialPermission(it) }
+        val perm = firstSpecial ?: deniedPermissions.first()
+        val intent = getSettingsIntent(perm, context)
+        Logger.d(TAG, "goToSettings: perm=$perm, action=${intent.action}")
         context.startActivity(intent)
+    }
+
+    /** 从设置页返回后调用，检测权限是否已被手动开启 */
+    internal fun checkAfterSettingsReturn() {
+        if (!waitingForSettingsResult) return
+        waitingForSettingsResult = false
+        Logger.d(TAG, "checkAfterSettingsReturn: checking permissions")
+        if (checkAllGranted()) {
+            allGranted = true
+            Logger.d(TAG, "checkAfterSettingsReturn: permissions granted after settings, invoking callback")
+            onResultCallback?.invoke(true, emptyList())
+            onResultCallback = null
+        } else {
+            Logger.d(TAG, "checkAfterSettingsReturn: permissions still not granted, re-requesting")
+            launchRequest()
+        }
     }
 
     internal fun onRationaleConfirm() {
@@ -114,57 +120,119 @@ class PermissionState(
     }
 
     internal fun onRationaleDismiss() {
-        Logger.d(TAG, "rationaleDismiss")
+        Logger.d(TAG, "rationaleDismiss: invoking callback with denied=$deniedPermissions")
         showRationaleDialog = false
-        onGrantedCallback = null
+        onResultCallback?.invoke(false, deniedPermissions)
+        onResultCallback = null
     }
 
     internal fun onSettingsConfirm() {
         Logger.d(TAG, "settingsConfirm: go to settings")
         showSettingsDialog = false
+        waitingForSettingsResult = true
         goToSettings()
     }
 
     internal fun onSettingsDismiss() {
-        Logger.d(TAG, "settingsDismiss")
+        Logger.d(TAG, "settingsDismiss: invoking callback with denied=$deniedPermissions")
         showSettingsDialog = false
-        onGrantedCallback = null
+        onResultCallback?.invoke(false, deniedPermissions)
+        onResultCallback = null
     }
 
     internal fun handleResult(grantResults: Map<String, Boolean>) {
-        val granted = grantResults.values.all { it }
-        allGranted = granted
+        // 过滤被同伴组覆盖的拒绝项（如 VISUAL_USER_SELECTED 授权覆盖 IMAGES 拒绝）
+        val effectiveDenied = grantResults.filterValues { !it }.keys.filter { perm ->
+            val group = getCompanionGroup(perm, permissions)
+            if (group != null) {
+                val groupGranted = grantResults.any { (p, g) -> p in group && g } ||
+                    group.any { p -> checkRawPermission(p) }
+                if (groupGranted) {
+                    Logger.d(TAG, "handleResult: $perm denied but covered by companion group grant, ignoring")
+                }
+                !groupGranted
+            } else true
+        }
 
-        if (granted) {
-            Logger.d(TAG, "handleResult: all granted")
-            onGrantedCallback?.invoke()
-            onGrantedCallback = null
+        val specialPerms = permissions.filter { isSpecialPermission(it) }
+        val ungrantedSpecial = specialPerms.filter { !checkSpecialPermission(it, context) }
+
+        allGranted = effectiveDenied.isEmpty() && ungrantedSpecial.isEmpty()
+
+        if (allGranted) {
+            Logger.d(TAG, "handleResult: all effective permissions granted")
+            onResultCallback?.invoke(true, emptyList())
+            onResultCallback = null
             return
         }
 
-        val deniedList = grantResults.filterValues { !it }.keys.toList()
-        deniedPermissions = deniedList
+        // 展示列表不包含非孤儿同伴权限（主权限已代表相同的拒绝含义）
+        val displayDenied = effectiveDenied.filter { perm ->
+            !isCompanionPermission(perm) || isOrphanCompanion(perm, permissions)
+        }
+        val filteredCompanions = effectiveDenied - displayDenied.toSet()
+        if (filteredCompanions.isNotEmpty()) {
+            Logger.d(TAG, "handleResult: filtered companion permissions from display: $filteredCompanions")
+        }
+        deniedPermissions = displayDenied + ungrantedSpecial
 
-        val anyCanShowRationale = deniedList.any { perm ->
+        val anyCanShowRationale = effectiveDenied.any { perm ->
             (context as? Activity)?.let {
                 ActivityCompat.shouldShowRequestPermissionRationale(it, perm)
             } ?: false
         }
 
-        Logger.d(TAG, "handleResult: denied=$deniedList, anyRationale=$anyCanShowRationale")
+        Logger.d(TAG, "handleResult: effectiveDenied=$effectiveDenied, specialUngranted=$ungrantedSpecial, anyRationale=$anyCanShowRationale")
+
+        if (ungrantedSpecial.isNotEmpty()) {
+            deniedPermissions = ungrantedSpecial
+            showSettingsDialog = true
+            return
+        }
 
         if (anyCanShowRationale) {
             showRationaleDialog = true
         } else {
-            onGrantedCallback = null
             showSettingsDialog = true
         }
     }
 
+    // ═══════════════════════════════════════════════════════════
+    // 私有方法
+    // ═══════════════════════════════════════════════════════════
+
     private fun checkAllGranted(): Boolean {
-        return permissions.all {
-            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        return permissions.all { checkSinglePermission(it) }
+    }
+
+    private fun checkSinglePermission(permission: String): Boolean {
+        if (!isPermissionDefined(permission, context)) {
+            Logger.d(TAG, "checkSinglePermission: $permission not defined on this device, treating as granted")
+            return true
         }
+        if (isOrphanCompanion(permission, permissions)) {
+            Logger.w(TAG, "checkSinglePermission: $permission is orphan companion, treating as granted")
+            return true
+        }
+        if (isSpecialPermission(permission)) {
+            return checkSpecialPermission(permission, context)
+        }
+
+        // 同伴权限组：任一成员授权即视为本权限授权
+        val group = getCompanionGroup(permission, permissions)
+        if (group != null) {
+            val anyGroupGranted = group.any { checkRawPermission(it) }
+            if (anyGroupGranted) {
+                Logger.d(TAG, "checkSinglePermission: $permission covered by companion group grant")
+                return true
+            }
+        }
+
+        return checkRawPermission(permission)
+    }
+
+    private fun checkRawPermission(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
     }
 }
 
@@ -180,18 +248,12 @@ fun rememberPermissionState(
     vararg permissions: String,
     rationaleConfig: RationaleDialogConfig = RationaleDialogConfig(),
     settingsConfig: SettingsDialogConfig = SettingsDialogConfig(),
-    rationaleDialog: (@Composable (
-        PermissionState,
-        () -> Unit,  // dismiss
-        () -> Unit   // confirm
-    ) -> Unit)? = null,
-    settingsDialog: (@Composable (
-        PermissionState,
-        () -> Unit,  // dismiss
-        () -> Unit   // confirm
-    ) -> Unit)? = null
+    rationaleDialog: CustomPermissionDialog? = null,
+    settingsDialog: CustomPermissionDialog? = null,
+    nameProvider: PermissionNameProvider = { permissionDisplayName(it) }
 ): PermissionState {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     var permissionState: PermissionState? = null
     val permList = permissions.toList()
 
@@ -206,10 +268,24 @@ fun rememberPermissionState(
         PermissionState(permList, context, launcher, rationaleConfig, settingsConfig)
     }
 
+    // 从设置页返回后自动检测权限是否已开启
+    DisposableEffect(lifecycleOwner, permissionState) {
+        Logger.d(TAG, "rememberPermissionState: lifecycle observer registered")
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                Logger.d(TAG, "lifecycle: ON_RESUME, checking permissions")
+                permissionState.checkAfterSettingsReturn()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     PermissionDialogHost(
         state = permissionState,
         rationaleDialog = rationaleDialog,
-        settingsDialog = settingsDialog
+        settingsDialog = settingsDialog,
+        nameProvider = nameProvider
     )
     return permissionState
 }
