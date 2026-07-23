@@ -35,5 +35,6 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.gson)
     implementation("com.google.ai.edge.litertlm:litertlm-android:0.10.0")
-    implementation("com.lunacattus.android:llm:1.0.3")
+    implementation("com.lunacattus.android:llm:1.0.2")
+    implementation("com.lunacattus.android:permission-compose:1.0.0")
 }

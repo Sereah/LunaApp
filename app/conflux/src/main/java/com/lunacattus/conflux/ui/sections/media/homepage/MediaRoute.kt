@@ -20,10 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lunacattus.common.utils.toDurationStringShort
 import com.lunacattus.conflux.R
-import com.lunacattus.conflux.permission.RationaleDialogConfig
-import com.lunacattus.conflux.permission.SettingsDialogConfig
-import com.lunacattus.conflux.permission.permissionDisplayName
-import com.lunacattus.conflux.permission.rememberPermissionState
 import com.lunacattus.conflux.ui.ActivityToastEvent
 import com.lunacattus.conflux.ui.LocalInnerPadding
 import com.lunacattus.conflux.ui.ToastEvent
@@ -32,6 +28,10 @@ import com.lunacattus.conflux.ui.base.ItemCard
 import com.lunacattus.conflux.ui.base.NavigationItem
 import com.lunacattus.conflux.ui.base.SwitchItem
 import com.lunacattus.conflux.ui.sections.media.MediaSourceType
+import com.lunacattus.permission.compose.RationaleDialogConfig
+import com.lunacattus.permission.compose.SettingsDialogConfig
+import com.lunacattus.permission.compose.permissionDisplayName
+import com.lunacattus.permission.compose.rememberPermissionState
 import com.lunacattus.ui_design.compose.overScrollVertical
 import com.lunacattus.ui_design.compose.section.ClassifyHeader
 import com.lunacattus.ui_design.compose.section.SectionHeaderCard
