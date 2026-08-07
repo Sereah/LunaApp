@@ -1,0 +1,4 @@
+<resources>
+    <!-- Background service app: minimal theme, no Material Components needed. -->
+    <style name="Theme.LunaApp" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

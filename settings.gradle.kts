@@ -43,3 +43,4 @@ include(":app:conflux")
 File(rootDir, ".githooks/pre-commit").takeIf { it.exists() }?.let {
     Runtime.getRuntime().exec("git config core.hooksPath .githooks", null, rootDir)
 }
+include(":app:vehiclecontrol")

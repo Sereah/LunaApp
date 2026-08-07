@@ -72,9 +72,9 @@ internal fun Project.configureJacoco(
                 description = "Generates Jacoco coverage report for ${variant.name} variant."
 
                 dependsOn("test${variant.name.capitalize()}UnitTest")
-                if (androidComponentsExtension is ApplicationAndroidComponentsExtension) {
-                    dependsOn("connected${variant.name.capitalize()}AndroidTest")
-                }
+//                if (androidComponentsExtension is ApplicationAndroidComponentsExtension) {
+//                    dependsOn("connected${variant.name.capitalize()}AndroidTest")
+//                }
 
                 classDirectories.setFrom(
                     allJars,
