@@ -42,6 +42,10 @@
   <string name="start_recognition">Start Recognition</string>
   <string name="stop_recognition">Stop Recognition</string>
   <string name="toast_close_accessibility">Please manually disable the service in system settings.</string>
+  <string name="accessibility_notification_channel_name">Accessibility service</string>
+  <string name="accessibility_notification_channel_description">Keeps accessibility scanning available in the background.</string>
+  <string name="accessibility_notification_title">Accessibility service running</string>
+  <string name="accessibility_notification_content">Scanning visible page text in the background.</string>
   <string name="today">Today</string>
   <string name="tts">Text To Speech</string>
   <string name="tts_title">TTS</string>

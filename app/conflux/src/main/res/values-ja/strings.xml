@@ -42,6 +42,10 @@
   <string name="start_recognition">認識を開始</string>
   <string name="stop_recognition">認識を停止</string>
   <string name="toast_close_accessibility">システム設定でサービスを手動で無効にしてください。</string>
+  <string name="accessibility_notification_channel_name">ユーザー補助サービス</string>
+  <string name="accessibility_notification_channel_description">バックグラウンドでユーザー補助スキャンを利用できるようにします。</string>
+  <string name="accessibility_notification_title">ユーザー補助サービスが実行中</string>
+  <string name="accessibility_notification_content">バックグラウンドで表示中のページテキストをスキャンしています。</string>
   <string name="today">今日</string>
   <string name="tts">テキスト読み上げ</string>
   <string name="tts_title">TTS</string>

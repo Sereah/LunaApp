@@ -48,6 +48,10 @@
   <string name="start_recognition">开始识别</string>
   <string name="stop_recognition">停止识别</string>
   <string name="toast_close_accessibility">请在系统设置中手动禁用该服务。</string>
+  <string name="accessibility_notification_channel_name">无障碍服务</string>
+  <string name="accessibility_notification_channel_description">保持后台无障碍扫描可用。</string>
+  <string name="accessibility_notification_title">无障碍服务运行中</string>
+  <string name="accessibility_notification_content">正在后台扫描当前页面的可见文本。</string>
   <string name="today">今天</string>
   <string name="tts">文本转语音</string>
   <string name="tts_title">文字转语音</string>

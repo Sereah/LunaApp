@@ -42,6 +42,10 @@
   <string name="start_recognition">Начать распознавание</string>
   <string name="stop_recognition">Остановить распознавание</string>
   <string name="toast_close_accessibility">Пожалуйста, вручную отключите службу в системных настройках.</string>
+  <string name="accessibility_notification_channel_name">Служба специальных возможностей</string>
+  <string name="accessibility_notification_channel_description">Обеспечивает доступность сканирования специальных возможностей в фоновом режиме.</string>
+  <string name="accessibility_notification_title">Служба специальных возможностей работает</string>
+  <string name="accessibility_notification_content">Сканирование видимого текста страницы в фоновом режиме.</string>
   <string name="today">Сегодня</string>
   <string name="tts">Текст в речь</string>
   <string name="tts_title">TTS</string>

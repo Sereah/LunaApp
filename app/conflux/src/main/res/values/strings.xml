@@ -54,6 +54,10 @@
     <string name="settings_system">System</string>
     <string name="accessibility_service">Accessibility services</string>
     <string name="toast_close_accessibility">Please manually disable the service in system settings.</string>
+    <string name="accessibility_notification_channel_name">Accessibility service</string>
+    <string name="accessibility_notification_channel_description">Keeps accessibility scanning available in the background.</string>
+    <string name="accessibility_notification_title">Accessibility service running</string>
+    <string name="accessibility_notification_content">Scanning visible page text in the background.</string>
 
     <!-- LLM -->
     <string name="llm_ai_center">AI Center</string>

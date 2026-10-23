@@ -42,6 +42,10 @@
   <string name="start_recognition">Démarrer la reconnaissance</string>
   <string name="stop_recognition">Arrêter la reconnaissance</string>
   <string name="toast_close_accessibility">Veuillez désactiver manuellement le service dans les paramètres système.</string>
+  <string name="accessibility_notification_channel_name">Service d’accessibilité</string>
+  <string name="accessibility_notification_channel_description">Maintient l’analyse d’accessibilité disponible en arrière-plan.</string>
+  <string name="accessibility_notification_title">Service d’accessibilité actif</string>
+  <string name="accessibility_notification_content">Analyse du texte visible de la page en arrière-plan.</string>
   <string name="today">Aujourd\'hui</string>
   <string name="tts">Synthèse vocale</string>
   <string name="tts_title">TTS</string>

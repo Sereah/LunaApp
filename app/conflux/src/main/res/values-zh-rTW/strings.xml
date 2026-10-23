@@ -42,6 +42,10 @@
   <string name="start_recognition">開始辨識</string>
   <string name="stop_recognition">停止辨識</string>
   <string name="toast_close_accessibility">請手動在系統設定中停用此服務。</string>
+  <string name="accessibility_notification_channel_name">無障礙服務</string>
+  <string name="accessibility_notification_channel_description">保持背景無障礙掃描可用。</string>
+  <string name="accessibility_notification_title">無障礙服務執行中</string>
+  <string name="accessibility_notification_content">正在背景掃描目前頁面的可見文字。</string>
   <string name="today">今天</string>
   <string name="tts">文字轉語音</string>
   <string name="tts_title">文字轉語音</string>

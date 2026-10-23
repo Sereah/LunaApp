@@ -42,6 +42,10 @@
   <string name="start_recognition">بدء التعرف</string>
   <string name="stop_recognition">إيقاف التعرف</string>
   <string name="toast_close_accessibility">يرجى تعطيل الخدمة يدويًا في إعدادات النظام.</string>
+  <string name="accessibility_notification_channel_name">خدمة إمكانية الوصول</string>
+  <string name="accessibility_notification_channel_description">تحافظ على توفر فحص إمكانية الوصول في الخلفية.</string>
+  <string name="accessibility_notification_title">خدمة إمكانية الوصول قيد التشغيل</string>
+  <string name="accessibility_notification_content">جارٍ فحص نص الصفحة الظاهر في الخلفية.</string>
   <string name="today">اليوم</string>
   <string name="tts">تحويل النص إلى كلام</string>
   <string name="tts_title">TTS</string>

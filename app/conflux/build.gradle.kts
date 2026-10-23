@@ -2,6 +2,13 @@ plugins {
     alias(libs.plugins.app.android.application)
     alias(libs.plugins.app.android.application.compose)
     alias(libs.plugins.app.hilt)
+    alias(libs.plugins.app.version)
+}
+
+appVersion {
+    major = 1
+    minor = 0
+    patch = 1
 }
 
 android {
@@ -9,8 +16,6 @@ android {
 
     defaultConfig {
         applicationId = "com.lunacattus.app.conflux"
-        versionCode = 1
-        versionName = "1.0"
     }
 
     packaging {

@@ -42,6 +42,10 @@
   <string name="start_recognition">Erkennung starten</string>
   <string name="stop_recognition">Erkennung stoppen</string>
   <string name="toast_close_accessibility">Bitte deaktivieren Sie den Dienst manuell in den Systemeinstellungen.</string>
+  <string name="accessibility_notification_channel_name">Barrierefreiheitsdienst</string>
+  <string name="accessibility_notification_channel_description">Hält die Barrierefreiheitsprüfung im Hintergrund verfügbar.</string>
+  <string name="accessibility_notification_title">Barrierefreiheitsdienst aktiv</string>
+  <string name="accessibility_notification_content">Sichtbarer Seitentext wird im Hintergrund geprüft.</string>
   <string name="today">Heute</string>
   <string name="tts">Text-to-Speech</string>
   <string name="tts_title">TTS</string>
