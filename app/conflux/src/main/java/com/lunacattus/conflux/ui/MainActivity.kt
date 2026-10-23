@@ -7,14 +7,6 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -29,7 +21,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
@@ -54,7 +45,6 @@ import com.lunacattus.conflux.ui.sections.llm.LlmRoute
 import com.lunacattus.conflux.ui.sections.media.MediaRoute
 import com.lunacattus.conflux.ui.sections.root.rootSection
 import com.lunacattus.conflux.ui.sections.setting.SettingRoute
-import com.lunacattus.conflux.ui.splash.SplashScreen
 import com.lunacattus.conflux.ui.theme.LunaAppTheme
 import com.lunacattus.conflux.ui.theme.enterAndExit
 import com.lunacattus.conflux.ui.theme.popEnterAndExit
@@ -77,7 +67,6 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             val systemDarkTheme = isSystemInDarkTheme()
-            var showSplash by rememberSaveable { mutableStateOf(true) }
 
             LaunchedEffect(Unit) {
                 viewModel.changeNightMode(systemDarkTheme)
@@ -88,74 +77,48 @@ class MainActivity : ComponentActivity() {
             ) {
                 SystemBarAppearance(viewModel.nightMode)
 
-                AnimatedContent(
-                    targetState = showSplash,
-                    transitionSpec = {
-                        if (targetState) {
-                            EnterTransition.None togetherWith ExitTransition.None
-                        } else {
-                            fadeIn(
-                                animationSpec = tween(
-                                    durationMillis = 600,
-                                    easing = CubicBezierEasing(0.42f, 0.00f, 0.58f, 1.00f)
-                                )
-                            ) togetherWith fadeOut(
-                                animationSpec = tween(
-                                    durationMillis = 400,
-                                    easing = CubicBezierEasing(0.42f, 0.00f, 0.58f, 1.00f)
-                                )
-                            )
-                        }
-                    },
-                    label = "splash-transition"
-                ) { isSplash ->
-                    if (isSplash) {
-                        SplashScreen(onSplashFinished = { showSplash = false })
-                    } else {
-                        val rootBackStack = rememberNavBackStack(Main)
-                        val mainNavigationState = rememberNavigationState(
-                            startRoute = LlmRoute,
-                            topLevelRoutesKey = topLevelRoutes().keys
-                        )
-                        val navigator = remember(rootBackStack, mainNavigationState) {
-                            Navigator(
-                                mainNavState = mainNavigationState,
-                                rootBackStack = rootBackStack
-                            )
-                        }
-                        CompositionLocalProvider(
-                            LocalNavigator provides navigator,
-                            LocalActivityViewModel provides viewModel
-                        ) {
-                            NavDisplay(
-                                entries = rememberDecoratedNavEntries(
-                                    backStack = rootBackStack,
-                                    entryDecorators = listOf(
-                                        rememberSaveableStateHolderNavEntryDecorator(),
-                                        rememberViewModelStoreNavEntryDecorator()
-                                    ),
-                                    entryProvider = entryProvider {
-                                        entry<Main> {
-                                            Main(mainNavigationState, navigator)
-                                        }
-                                        rootSection()
-                                    }
-                                ),
-                                onBack = { navigator.goBack() },
-                                transitionSpec = {
-                                    enterAndExit
-                                },
-                                popTransitionSpec = {
-                                    popEnterAndExit
-                                },
-                                predictivePopTransitionSpec = {
-                                    popEnterAndExit
-                                }
-                            )
-                        }
-                        ToastView()
-                    }
+                val rootBackStack = rememberNavBackStack(Main)
+                val mainNavigationState = rememberNavigationState(
+                    startRoute = LlmRoute,
+                    topLevelRoutesKey = topLevelRoutes().keys
+                )
+                val navigator = remember(rootBackStack, mainNavigationState) {
+                    Navigator(
+                        mainNavState = mainNavigationState,
+                        rootBackStack = rootBackStack
+                    )
                 }
+                CompositionLocalProvider(
+                    LocalNavigator provides navigator,
+                    LocalActivityViewModel provides viewModel
+                ) {
+                    NavDisplay(
+                        entries = rememberDecoratedNavEntries(
+                            backStack = rootBackStack,
+                            entryDecorators = listOf(
+                                rememberSaveableStateHolderNavEntryDecorator(),
+                                rememberViewModelStoreNavEntryDecorator()
+                            ),
+                            entryProvider = entryProvider {
+                                entry<Main> {
+                                    Main(mainNavigationState, navigator)
+                                }
+                                rootSection()
+                            }
+                        ),
+                        onBack = { navigator.goBack() },
+                        transitionSpec = {
+                            enterAndExit
+                        },
+                        popTransitionSpec = {
+                            popEnterAndExit
+                        },
+                        predictivePopTransitionSpec = {
+                            popEnterAndExit
+                        }
+                    )
+                }
+                ToastView()
             }
         }
     }
